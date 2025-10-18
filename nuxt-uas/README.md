@@ -1,1 +1,0 @@
-# nuxt-uas - placeholder README
