@@ -1,1 +1,2 @@
-<!-- placeholder -->
+<template>
+</template>

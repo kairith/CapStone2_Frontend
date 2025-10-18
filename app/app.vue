@@ -1,7 +1,15 @@
 <template>
   <v-app>
-    <v-main>
-      <NuxtPage />
-    </v-main>
+    <NuxtPage />
   </v-app>
 </template>
+
+<script setup>
+// Initialize authentication check on app start
+const { checkAuth } = useAuth()
+
+onMounted(async () => {
+  // Check authentication status when app loads
+  await checkAuth()
+})
+</script>
