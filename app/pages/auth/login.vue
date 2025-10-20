@@ -4,19 +4,8 @@
       <v-row no-gutters class="fill-height">
         <!-- Left side - Branding/Image -->
         <v-col cols="12" md="6" class="login-brand-section">
-          <div class="brand-content d-flex flex-column justify-center align-center pa-8">
-            <div class="brand-logo mb-6">
-              <v-icon size="80" color="white">mdi-school</v-icon>
-            </div>
-            <h1 class="brand-title text-h3 font-weight-bold text-white text-center mb-4">
-              UAS System
-            </h1>
-            <p class="brand-subtitle text-h6 text-white text-center opacity-90">
-              University Attendance System
-            </p>
-            <p class="brand-description text-body-1 text-white text-center mt-4 opacity-75 max-width-400">
-              Streamline attendance management for students, lecturers, and administrators with our comprehensive digital solution.
-            </p>
+          <div class="brand-content">
+            <img src="../../assets/images/login/graduation-logo.jpg" alt="University Logo" class="full-screen-image">
           </div>
         </v-col>
 
@@ -25,7 +14,7 @@
           <div class="form-container d-flex flex-column justify-center align-center pa-8">
             <v-card class="login-card pa-8" elevation="0" width="100%" max-width="400">
               <div class="text-center mb-8">
-                <h2 class="text-h4 font-weight-bold mb-2">Welcome Back</h2>
+                <h2 class="text-h4 font-weight-bold mb-2">University Attendance System</h2>
                 <p class="text-body-1 text-medium-emphasis">
                   Sign in to access your account
                 </p>
@@ -33,69 +22,33 @@
 
               <v-form ref="loginForm" @submit.prevent="handleLogin">
                 <!-- Email Field -->
-                <v-text-field
-                  v-model="loginData.email"
-                  label="Email Address"
-                  type="email"
-                  prepend-inner-icon="mdi-email"
-                  variant="outlined"
-                  density="comfortable"
-                  class="mb-4"
-                  :rules="emailRules"
-                  :error-messages="errors.email"
-                  required
-                />
+                <v-text-field v-model="loginData.email" label="Email Address" type="email"
+                  prepend-inner-icon="mdi-email" variant="outlined" density="comfortable" class="mb-4"
+                  :rules="emailRules" :error-messages="errors.email" required />
 
                 <!-- Password Field -->
-                <v-text-field
-                  v-model="loginData.password"
-                  :label="'Password'"
-                  :type="showPassword ? 'text' : 'password'"
-                  prepend-inner-icon="mdi-lock"
-                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  variant="outlined"
-                  density="comfortable"
-                  class="mb-4"
-                  :rules="passwordRules"
-                  :error-messages="errors.password"
-                  @click:append-inner="showPassword = !showPassword"
-                  required
-                />
+                <v-text-field v-model="loginData.password" :label="'Password'"
+                  :type="showPassword ? 'text' : 'password'" prepend-inner-icon="mdi-lock"
+                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" variant="outlined" density="comfortable"
+                  class="mb-4" :rules="passwordRules" :error-messages="errors.password"
+                  @click:append-inner="showPassword = !showPassword" required />
 
                 <!-- Remember Me & Forgot Password -->
                 <div class="d-flex justify-space-between align-center mb-6">
-                  <v-checkbox
-                    v-model="loginData.rememberMe"
-                    label="Remember me"
-                    density="compact"
-                    hide-details
-                  />
+                  <v-checkbox v-model="loginData.rememberMe" label="Remember me" density="compact" hide-details />
                   <NuxtLink to="/auth/forgot" class="text-primary text-decoration-none">
                     Forgot password?
                   </NuxtLink>
                 </div>
 
                 <!-- Login Button -->
-                <v-btn
-                  type="submit"
-                  color="primary"
-                  size="large"
-                  block
-                  class="mb-6"
-                  :loading="isLoading"
-                  :disabled="!isFormValid"
-                >
+                <v-btn type="submit" color="primary" size="large" block class="mb-6" :loading="isLoading"
+                  :disabled="!isFormValid">
                   Sign In
                 </v-btn>
 
                 <!-- Error Alert -->
-                <v-alert
-                  v-if="loginError"
-                  type="error"
-                  variant="tonal"
-                  class="mb-4"
-                  :text="loginError"
-                />
+                <v-alert v-if="loginError" type="error" variant="tonal" class="mb-4" :text="loginError" />
 
                 <!-- Register Link -->
                 <div class="text-center">
@@ -159,10 +112,10 @@ const loginForm = ref(null)
 const currentYear = computed(() => new Date().getFullYear())
 
 const isFormValid = computed(() => {
-  return loginData.email && 
-         loginData.password && 
-         emailRules.every(rule => rule(loginData.email) === true) &&
-         passwordRules.every(rule => rule(loginData.password) === true)
+  return loginData.email &&
+    loginData.password &&
+    emailRules.every(rule => rule(loginData.email) === true) &&
+    passwordRules.every(rule => rule(loginData.password) === true)
 })
 
 // Validation rules
@@ -180,26 +133,26 @@ const passwordRules = [
 const handleLogin = async () => {
   // Validate form
   const { valid } = await loginForm.value.validate()
-  
+
   if (!valid) {
     return
   }
 
   isLoading.value = true
   loginError.value = ''
-  
+
   try {
     // TODO: Replace with your actual authentication logic
     // const authStore = useAuthStore()
     // await authStore.login(loginData)
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500))
-    
+
     // Redirect based on user role
     // For now, redirect to dashboard
     await navigateTo('/admin/dashboard')
-    
+
   } catch (error) {
     console.error('Login error:', error)
     loginError.value = error.message || 'Login failed. Please try again.'
@@ -223,13 +176,14 @@ watch(() => loginData.password, () => {
 <style scoped>
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
 }
 
 .login-brand-section {
-  background: linear-gradient(135deg, rgba(24, 103, 192, 0.9) 0%, rgba(92, 187, 246, 0.9) 100%),
-              url('/images/university-bg.jpg') center/cover;
-  background-blend-mode: overlay;
+  background: #ffffff;
+  padding: 0 !important;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .login-form-section {
@@ -237,8 +191,19 @@ watch(() => loginData.password, () => {
 }
 
 .brand-content {
-  max-width: 500px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.full-screen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .brand-title {
@@ -271,15 +236,21 @@ watch(() => loginData.password, () => {
 /* Responsive adjustments */
 @media (max-width: 960px) {
   .login-brand-section {
+    height: 40vh;
     min-height: 300px;
   }
-  
+
   .form-container {
-    min-height: auto;
+    min-height: 60vh;
   }
-  
+
   .brand-content {
-    padding: 2rem !important;
+    padding: 0 !important;
+  }
+
+  .full-screen-image {
+    height: 100%;
+    width: 100%;
   }
 }
 

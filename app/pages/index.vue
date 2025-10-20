@@ -31,6 +31,9 @@
                 prepend-icon="mdi-account-plus">
                 Register
               </v-btn>
+              <v-btn to="/admin/dashboard" variant="outlined" color="primary" size="large" class="mb-4">
+                Dashboard
+              </v-btn>
             </div>
 
             <div class="features-grid mt-12">
@@ -75,35 +78,35 @@
 
 <script setup>
 // Meta tags for SEO
-useHead({
-  title: 'Welcome - UAS System',
-  meta: [
-    { name: 'description', content: 'University Attendance System - Streamline attendance management for educational institutions' }
-  ]
-})
+// useHead({
+//   title: 'Welcome - UAS System',
+//   meta: [
+//     { name: 'description', content: 'University Attendance System - Streamline attendance management for educational institutions' }
+//   ]
+// })
 
 // Check if user is already authenticated and redirect
-const { checkAuth, isAuthenticated, userRole } = useAuth()
+// const { checkAuth, isAuthenticated, userRole } = useAuth()
 
-onMounted(async () => {
-  const isAuth = await checkAuth()
-  if (isAuth && isAuthenticated.value) {
-    // Redirect based on user role
-    switch (userRole.value) {
-      case 'admin':
-        await navigateTo('/admin/dashboard')
-        break
-      case 'lecturer':
-        await navigateTo('/lecturer/dashboard')
-        break
-      case 'student':
-        await navigateTo('/student/dashboard')
-        break
-      default:
-        await navigateTo('/auth/login')
-    }
-  }
-})
+// onMounted(async () => {
+//   const isAuth = await checkAuth()
+//   if (isAuth && isAuthenticated.value) {
+//     // Redirect based on user role
+//     switch (userRole.value) {
+//       case 'admin':
+//         await navigateTo('/admin/dashboard')
+//         break
+//       case 'lecturer':
+//         await navigateTo('/lecturer/dashboard')
+//         break
+//       case 'student':
+//         await navigateTo('/student/dashboard')
+//         break
+//       default:
+//         await navigateTo('/auth/login')
+//     }
+//   }
+// })
 </script>
 
 <style scoped>

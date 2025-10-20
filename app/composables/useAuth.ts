@@ -1,11 +1,13 @@
+import type { LoginCredentials, RegisterData, User, UserRole, Permission } from '~/types/auth'
+
 export const useAuth = () => {
   const authStore = useAuthStore()
 
   // Login function
-  const login = async (credentials) => {
+  const login = async (credentials: LoginCredentials) => {
     try {
       await authStore.login(credentials)
-      
+
       // Redirect based on user role
       const redirectPath = getRedirectPath(authStore.getUserRole)
       await navigateTo(redirectPath)
@@ -61,12 +63,12 @@ export const useAuth = () => {
   // Require authentication (for middleware)
   const requireAuth = async () => {
     const isAuthenticated = await checkAuth()
-    
+
     if (!isAuthenticated) {
       await navigateTo('/auth/login')
       return false
     }
-    
+
     return true
   }
 
@@ -115,7 +117,7 @@ export const useAuth = () => {
     isAuthenticated: computed(() => authStore.isAuthenticated),
     loading: computed(() => authStore.loading),
     error: computed(() => authStore.error),
-    
+
     // Getters
     userRole: computed(() => authStore.getUserRole),
     userName: computed(() => authStore.getUserName),
@@ -123,7 +125,7 @@ export const useAuth = () => {
     isAdmin: computed(() => authStore.isAdmin),
     isLecturer: computed(() => authStore.isLecturer),
     isStudent: computed(() => authStore.isStudent),
-    
+
     // Actions
     login,
     logout,
