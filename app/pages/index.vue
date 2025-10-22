@@ -85,6 +85,11 @@
 //   ]
 // })
 
+// Auto-redirect to dashboard for testing
+onMounted(async () => {
+  await navigateTo('/admin/dashboard')
+})
+
 // Check if user is already authenticated and redirect
 // const { checkAuth, isAuthenticated, userRole } = useAuth()
 
