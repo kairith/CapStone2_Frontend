@@ -27,11 +27,12 @@
                 Sign In
               </v-btn>
 
-              <v-btn to="/auth/register" variant="outlined" color="primary" size="large" class="mb-4"
+              <v-btn to="/auth/register" variant="outlined" color="primary" size="large" class="mr-4 mb-4"
                 prepend-icon="mdi-account-plus">
                 Register
               </v-btn>
-              <v-btn to="/admin/dashboard" variant="outlined" color="primary" size="large" class="mb-4">
+
+              <v-btn to="/admin/dashboard" variant="outlined" color="primary" size="large" class="mr-4 mb-4">
                 Dashboard
               </v-btn>
             </div>
