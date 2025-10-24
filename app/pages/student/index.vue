@@ -1,27 +1,24 @@
 <template>
   <v-app>
-    <Navbar />
+    
+    <Navbar v-model:drawer="drawer" />
     <v-main>
       <v-container>
+        <!-- page content -->
        
-        <!-- Add your student page content here -->
       </v-container>
     </v-main>
   </v-app>
 </template>
 
-<script>
-import Navbar from '~/components/ui/Navbar.vue';
+<script setup lang="ts">
+import { ref } from 'vue'
+import Navbar from '~/components/ui/Navbar.vue'
 
-export default {
-  components: {
-    Navbar,
-  },
-};
+
+const drawer = ref(true)
 </script>
 
 <style scoped>
-.v-main {
-  padding: 20px;
-}
+.v-main { padding: 20px; }
 </style>
