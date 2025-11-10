@@ -4,28 +4,30 @@
       <v-row no-gutters class="fill-height">
         <!-- Left side - Branding/Image -->
         <v-col cols="12" md="6" class="login-brand-section">
-          <div class="brand-content d-flex flex-column justify-center align-center pa-8">
-            <div class="brand-logo mb-6">
-              <v-icon size="80" color="white">mdi-school</v-icon>
-            </div>
-            <h1 class="brand-title text-h3 font-weight-bold text-white text-center mb-4">
-              UAS System
-            </h1>
-            <p class="brand-subtitle text-h6 text-white text-center opacity-90">
-              University Attendance System
-            </p>
-            <p class="brand-description text-body-1 text-white text-center mt-4 opacity-75 max-width-400">
-              Streamline attendance management for students, lecturers, and administrators with our comprehensive digital solution.
-            </p>
+          <div class="brand-content">
+            <img
+              src="../../assets/images/login/graduation-logo.jpg"
+              alt="University Logo"
+              class="full-screen-image"
+            />
           </div>
         </v-col>
 
         <!-- Right side - Login Form -->
         <v-col cols="12" md="6" class="login-form-section">
-          <div class="form-container d-flex flex-column justify-center align-center pa-8">
-            <v-card class="login-card pa-8" elevation="0" width="100%" max-width="400">
+          <div
+            class="form-container d-flex flex-column justify-center align-center pa-8"
+          >
+            <v-card
+              class="login-card pa-8"
+              elevation="0"
+              width="100%"
+              max-width="400"
+            >
               <div class="text-center mb-8">
-                <h2 class="text-h4 font-weight-bold mb-2">Welcome Back</h2>
+                <h2 class="text-h4 font-weight-bold mb-2">
+                  University Attendance System
+                </h2>
                 <p class="text-body-1 text-medium-emphasis">
                   Sign in to access your account
                 </p>
@@ -70,7 +72,10 @@
                     density="compact"
                     hide-details
                   />
-                  <NuxtLink to="/auth/forgot" class="text-primary text-decoration-none">
+                  <NuxtLink
+                    to="/auth/forgot"
+                    class="text-primary text-decoration-none"
+                  >
                     Forgot password?
                   </NuxtLink>
                 </div>
@@ -99,8 +104,13 @@
 
                 <!-- Register Link -->
                 <div class="text-center">
-                  <span class="text-medium-emphasis">Don't have an account?</span>
-                  <NuxtLink to="/auth/register" class="text-primary text-decoration-none ml-1">
+                  <span class="text-medium-emphasis"
+                    >Don't have an account?</span
+                  >
+                  <NuxtLink
+                    to="/auth/register"
+                    class="text-primary text-decoration-none ml-1"
+                  >
                     Sign up here
                   </NuxtLink>
                 </div>
@@ -121,115 +131,123 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive } from "vue";
 
 // Meta tags for SEO
 useHead({
-  title: 'Login - UAS System',
+  title: "Login - UAS System",
   meta: [
-    { name: 'description', content: 'Login to access your UAS System account' }
-  ]
-})
+    { name: "description", content: "Login to access your UAS System account" },
+  ],
+});
 
 // Define layout
 definePageMeta({
   layout: false, // No layout for auth pages
-  middleware: ['auth'] // Add auth middleware if needed
-})
+  middleware: ["auth"], // Add auth middleware if needed
+});
 
 // Reactive data
 const loginData = reactive({
-  email: '',
-  password: '',
-  rememberMe: false
-})
+  email: "",
+  password: "",
+  rememberMe: false,
+});
 
-const showPassword = ref(false)
-const isLoading = ref(false)
-const loginError = ref('')
+const showPassword = ref(false);
+const isLoading = ref(false);
+const loginError = ref("");
 const errors = reactive({
   email: [],
-  password: []
-})
+  password: [],
+});
 
 // Refs
-const loginForm = ref(null)
+const loginForm = ref(null);
 
 // Computed
-const currentYear = computed(() => new Date().getFullYear())
+const currentYear = computed(() => new Date().getFullYear());
 
 const isFormValid = computed(() => {
-  return loginData.email && 
-         loginData.password && 
-         emailRules.every(rule => rule(loginData.email) === true) &&
-         passwordRules.every(rule => rule(loginData.password) === true)
-})
+  return (
+    loginData.email &&
+    loginData.password &&
+    emailRules.every((rule) => rule(loginData.email) === true) &&
+    passwordRules.every((rule) => rule(loginData.password) === true)
+  );
+});
 
 // Validation rules
 const emailRules = [
-  (v) => !!v || 'Email is required',
-  (v) => /.+@.+\..+/.test(v) || 'Email must be valid'
-]
+  (v) => !!v || "Email is required",
+  (v) => /.+@.+\..+/.test(v) || "Email must be valid",
+];
 
 const passwordRules = [
-  (v) => !!v || 'Password is required',
-  (v) => (v && v.length >= 6) || 'Password must be at least 6 characters'
-]
+  (v) => !!v || "Password is required",
+  (v) => (v && v.length >= 6) || "Password must be at least 6 characters",
+];
 
 // Methods
 const handleLogin = async () => {
   // Validate form
-  const { valid } = await loginForm.value.validate()
-  
+  const { valid } = await loginForm.value.validate();
+
   if (!valid) {
-    return
+    return;
   }
 
-  isLoading.value = true
-  loginError.value = ''
-  
+  isLoading.value = true;
+  loginError.value = "";
+
   try {
     // TODO: Replace with your actual authentication logic
     // const authStore = useAuthStore()
     // await authStore.login(loginData)
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
     // Redirect based on user role
     // For now, redirect to dashboard
-    await navigateTo('/admin/dashboard')
-    
+    await navigateTo("/admin/dashboard");
   } catch (error) {
-    console.error('Login error:', error)
-    loginError.value = error.message || 'Login failed. Please try again.'
+    console.error("Login error:", error);
+    loginError.value = error.message || "Login failed. Please try again.";
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 // Clear errors when user types
-watch(() => loginData.email, () => {
-  errors.email = []
-  loginError.value = ''
-})
+watch(
+  () => loginData.email,
+  () => {
+    errors.email = [];
+    loginError.value = "";
+  }
+);
 
-watch(() => loginData.password, () => {
-  errors.password = []
-  loginError.value = ''
-})
+watch(
+  () => loginData.password,
+  () => {
+    errors.password = [];
+    loginError.value = "";
+  }
+);
 </script>
 
 <style scoped>
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
 }
 
 .login-brand-section {
-  background: linear-gradient(135deg, rgba(24, 103, 192, 0.9) 0%, rgba(92, 187, 246, 0.9) 100%),
-              url('/images/university-bg.jpg') center/cover;
-  background-blend-mode: overlay;
+  background: #ffffff;
+  padding: 0 !important;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .login-form-section {
@@ -237,8 +255,19 @@ watch(() => loginData.password, () => {
 }
 
 .brand-content {
-  max-width: 500px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.full-screen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .brand-title {
@@ -271,15 +300,21 @@ watch(() => loginData.password, () => {
 /* Responsive adjustments */
 @media (max-width: 960px) {
   .login-brand-section {
+    height: 40vh;
     min-height: 300px;
   }
-  
+
   .form-container {
-    min-height: auto;
+    min-height: 60vh;
   }
-  
+
   .brand-content {
-    padding: 2rem !important;
+    padding: 0 !important;
+  }
+
+  .full-screen-image {
+    height: 100%;
+    width: 100%;
   }
 }
 

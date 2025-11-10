@@ -171,7 +171,7 @@ watch(() => email.value, () => {
 <style scoped>
 .forgot-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
   padding: 2rem 0;
 }
 
