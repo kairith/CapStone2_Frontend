@@ -1,69 +1,41 @@
 <template>
   <!-- Floating toggle on mobile (like ChatGPT hamburger) -->
-   
-  <VBtn
-    v-if="isMobile && !drawer"
-    class="uas-fab"
-    :style="fabStyle"
-    icon
-    size="large"
-    :aria-label="'Open navigation'"
-    @click="openDrawer()"
-  >
+
+  <VBtn v-if="isMobile && !drawer" class="uas-fab" :style="fabStyle" icon size="large" :aria-label="'Open navigation'"
+    @click="openDrawer()">
     <VIcon icon="mdi-menu" />
   </VBtn>
-  <VNavigationDrawer
-    v-model="drawer"
-    app
-    :permanent="!isMobile"
-    :temporary="isMobile"
-    :width="300"
-    :rail="isRail"
-    :rail-width="72"
-    :location="side"
-    class="uas-drawer"
-    :class="side === 'right' ? 'uas-drawer--right' : 'uas-drawer--left'"
-  >
+  <VNavigationDrawer v-model="drawer" app :permanent="!isMobile" :temporary="isMobile" :width="300" :rail="isRail"
+    :rail-width="72" :location="side" class="uas-drawer"
+    :class="side === 'right' ? 'uas-drawer--right' : 'uas-drawer--left'">
     <!-- Brand -->
-     <div class="flex">
-    <div
-      class="uas-brand"
-      role="button"
-      tabindex="0"
-      :aria-pressed="(!isMobile && collapsed) ? 'true' : 'false'"
-      :aria-label="(!isMobile && collapsed) ? 'Expand sidebar' : 'Collapse sidebar'"
-      @click="toggleDrawer"
-      @keydown.enter="toggleDrawer"
-      @keydown.space.prevent="toggleDrawer"
-    >
-      <VAvatar size="36" class="uas-logo">
-        <VIcon icon="mdi-hexagon-outline" />
-      </VAvatar>
+    <div class="flex">
+      <div class="uas-brand" role="button" tabindex="0" :aria-pressed="(!isMobile && collapsed) ? 'true' : 'false'"
+        :aria-label="(!isMobile && collapsed) ? 'Expand sidebar' : 'Collapse sidebar'" @click="toggleDrawer"
+        @keydown.enter="toggleDrawer" @keydown.space.prevent="toggleDrawer">
+        <VAvatar size="36" class="uas-logo">
+          <VIcon icon="mdi-hexagon-outline" />
+        </VAvatar>
 
-      <!-- Brand title only when expanded -->
-      <div class="uas-brand-text" v-if="!isRail">
-        <span class="uas-title">UAMS</span>
-        <span class="uas-version">v.1</span>
+        <!-- Brand title only when expanded -->
+        <div class="uas-brand-text" v-if="!isRail">
+          <span class="uas-title">UAMS</span>
+          <span class="uas-version">v.1</span>
+        </div>
       </div>
-    </div>
-    
+
     </div>
 
-    
 
-    
+
+
 
     <!-- Main menu -->
     <VList nav density="comfortable" class="pt-0" v-model:opened="opened">
 
       <!-- Dashboard -->
-      <VListItem
-        :to="'/dashboard'"
-        nav
-        :active="isActivePath('/dashboard')"
-        :class="['uas-item', isActivePath('/dashboard') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/dashboard'" nav :active="isActivePath('/dashboard')"
+        :class="['uas-item', isActivePath('/dashboard') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Dashboard" location="right">
             <template #activator="{ props }">
@@ -76,13 +48,8 @@
       </VListItem>
 
       <!-- Roles -->
-      <VListItem
-        :to="'/role'"
-        nav
-        :active="isActivePath('/role')"
-        :class="['uas-item', isActivePath('/role') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/role'" nav :active="isActivePath('/role')"
+        :class="['uas-item', isActivePath('/role') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Roles" location="right">
             <template #activator="{ props }">
@@ -95,71 +62,52 @@
       </VListItem>
 
       <!-- Users (collapsible group) -->
-     <!-- Users (collapsible group) -->
-<VListGroup value="users">
-  <template #activator="{ props }">
-    <VListItem
-      v-bind="props"
-      :active="isSectionActive('/user')"
-      :class="['uas-item', isSectionActive('/user') && 'uas-item--active']"
-    >
-      <template #prepend>
-        <VTooltip v-if="isRail" text="Users" location="right">
-          <template #activator="{ props: tip }">
-            <VIcon v-bind="tip" icon="mdi-account-outline" class="uas-item-icon" />
-          </template>
-        </VTooltip>
-        <VIcon v-else icon="mdi-account-outline" class="uas-item-icon" />
-      </template>
+      <!-- Users (collapsible group) -->
+      <VListGroup value="users">
+        <template #activator="{ props }">
+          <VListItem v-bind="props" :active="isSectionActive('/user')"
+            :class="['uas-item', isSectionActive('/user') && 'uas-item--active']">
+            <template #prepend>
+              <VTooltip v-if="isRail" text="Users" location="right">
+                <template #activator="{ props: tip }">
+                  <VIcon v-bind="tip" icon="mdi-account-outline" class="uas-item-icon" />
+                </template>
+              </VTooltip>
+              <VIcon v-else icon="mdi-account-outline" class="uas-item-icon" />
+            </template>
 
-      <VListItemTitle v-if="!isRail" class="uas-item-title">Users</VListItemTitle>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Users</VListItemTitle>
 
-      <!-- Chevron that rotates based on "opened" -->
-      <template #append>
-        <VIcon
-          v-if="!isRail"
-          icon="mdi-chevron-right"
-          :class="isUsersOpen ? 'uas-chevron--open' : 'uas-chevron'"
-          aria-hidden="true"
-        />
-      </template>
-    </VListItem>
-  </template>
-
-  <!-- Sub items -->
-  <VListItem
-    v-for="r in userRoles"
-    :key="r.to"
-    :to="r.to"
-    nav
-    :active="isActivePath(r.to)"
-    :class="['uas-item', isActivePath(r.to) && 'uas-item--active']"
-    @click="onClickItem"
-  >
-    <template #prepend>
-      <VTooltip v-if="isRail" :text="r.title" location="right">
-        <template #activator="{ props: tip }">
-          <VIcon v-bind="tip" :icon="r.icon" class="uas-item-icon" />
+            <!-- Chevron that rotates based on "opened" -->
+            <template #append>
+              <VIcon v-if="!isRail" icon="mdi-chevron-right" :class="isUsersOpen ? 'uas-chevron--open' : 'uas-chevron'"
+                aria-hidden="true" />
+            </template>
+          </VListItem>
         </template>
-      </VTooltip>
-      <VIcon v-else :icon="r.icon" class="uas-item-icon" />
-    </template>
 
-    <VListItemTitle v-if="!isRail" class="uas-item-title">
-      {{ r.title }}
-    </VListItemTitle>
-  </VListItem>
-</VListGroup>
+        <!-- Sub items -->
+        <VListItem v-for="r in userRoles" :key="r.to" :to="r.to" nav :active="isActivePath(r.to)"
+          :class="['uas-item', isActivePath(r.to) && 'uas-item--active']" @click="onClickItem">
+          <template #prepend>
+            <VTooltip v-if="isRail" :text="r.title" location="right">
+              <template #activator="{ props: tip }">
+                <VIcon v-bind="tip" :icon="r.icon" class="uas-item-icon" />
+              </template>
+            </VTooltip>
+            <VIcon v-else :icon="r.icon" class="uas-item-icon" />
+          </template>
+
+          <VListItemTitle v-if="!isRail" class="uas-item-title">
+            {{ r.title }}
+          </VListItemTitle>
+        </VListItem>
+      </VListGroup>
 
 
       <!-- Schedules -->
-      <VListItem
-        :to="'/schedule'"
-        nav
-        :active="isActivePath('/schedule')"
-        :class="['uas-item', isActivePath('/schedule') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/schedule'" nav :active="isActivePath('/schedule')"
+        :class="['uas-item', isActivePath('/schedule') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Schedules" location="right">
             <template #activator="{ props }">
@@ -172,13 +120,8 @@
       </VListItem>
 
       <!-- Professors -->
-      <VListItem
-        :to="'/professor'"
-        nav
-        :active="isActivePath('/professor')"
-        :class="['uas-item', isActivePath('/professor') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/professor'" nav :active="isActivePath('/professor')"
+        :class="['uas-item', isActivePath('/professor') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Professors" location="right">
             <template #activator="{ props }">
@@ -191,13 +134,8 @@
       </VListItem>
 
       <!-- Subjects -->
-      <VListItem
-        :to="'/subject'"
-        nav
-        :active="isActivePath('/subject')"
-        :class="['uas-item', isActivePath('/subject') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/subject'" nav :active="isActivePath('/subject')"
+        :class="['uas-item', isActivePath('/subject') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Subjects" location="right">
             <template #activator="{ props }">
@@ -210,13 +148,8 @@
       </VListItem>
 
       <!-- Classrooms -->
-      <VListItem
-        :to="'/classroom'"
-        nav
-        :active="isActivePath('/classroom')"
-        :class="['uas-item', isActivePath('/classroom') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/classroom'" nav :active="isActivePath('/classroom')"
+        :class="['uas-item', isActivePath('/classroom') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Classrooms" location="right">
             <template #activator="{ props }">
@@ -228,14 +161,23 @@
         <VListItemTitle v-if="!isRail" class="uas-item-title">Classrooms</VListItemTitle>
       </VListItem>
 
+      <!-- Groups -->
+      <VListItem :to="'/admin/groups'" nav :active="isActivePath('/admin/groups')"
+        :class="['uas-item', isActivePath('/admin/groups') && 'uas-item--active']" @click="onClickItem">
+        <template #prepend>
+          <VTooltip v-if="isRail" text="Groups" location="right">
+            <template #activator="{ props }">
+              <VIcon v-bind="props" icon="mdi-account-group" class="uas-item-icon" />
+            </template>
+          </VTooltip>
+          <VIcon v-else icon="mdi-account-group" class="uas-item-icon" />
+        </template>
+        <VListItemTitle v-if="!isRail" class="uas-item-title">Groups</VListItemTitle>
+      </VListItem>
+
       <!-- Request leave -->
-      <VListItem
-        :to="'/leave'"
-        nav
-        :active="isActivePath('/leave')"
-        :class="['uas-item', isActivePath('/leave') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/leave'" nav :active="isActivePath('/leave')"
+        :class="['uas-item', isActivePath('/leave') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Request leave" location="right">
             <template #activator="{ props }">
@@ -248,13 +190,8 @@
       </VListItem>
 
       <!-- Report -->
-      <VListItem
-        :to="'/report'"
-        nav
-        :active="isActivePath('/report')"
-        :class="['uas-item', isActivePath('/report') && 'uas-item--active']"
-        @click="onClickItem"
-      >
+      <VListItem :to="'/report'" nav :active="isActivePath('/report')"
+        :class="['uas-item', isActivePath('/report') && 'uas-item--active']" @click="onClickItem">
         <template #prepend>
           <VTooltip v-if="isRail" text="Report" location="right">
             <template #activator="{ props }">
@@ -278,41 +215,21 @@
             </VBtn>
           </template>
         </VTooltip>
-        <VBtn
-          v-else
-          icon
-          variant="text"
-          class="uas-footer-btn"
-          :title="'Settings'"
-          :aria-label="'Open settings'"
-        >
+        <VBtn v-else icon variant="text" class="uas-footer-btn" :title="'Settings'" :aria-label="'Open settings'">
           <VIcon icon="mdi-cog-outline" />
         </VBtn>
 
         <!-- Collapse / Expand control (like ChatGPT chevron) -->
         <VTooltip v-if="isRail" :text="'Expand'" location="right">
           <template #activator="{ props }">
-            <VBtn
-              v-bind="props"
-              icon
-              variant="text"
-              class="uas-footer-btn"
-              :aria-label="'Expand sidebar'"
-              @click="expandDrawer()"
-            >
+            <VBtn v-bind="props" icon variant="text" class="uas-footer-btn" :aria-label="'Expand sidebar'"
+              @click="expandDrawer()">
               <VIcon :icon="side === 'left' ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'" />
             </VBtn>
           </template>
         </VTooltip>
-        <VBtn
-          v-else
-          icon
-          variant="text"
-          class="uas-footer-btn"
-          :title="'Collapse'"
-          :aria-label="'Collapse sidebar'"
-          @click="collapseDrawer()"
-        >
+        <VBtn v-else icon variant="text" class="uas-footer-btn" :title="'Collapse'" :aria-label="'Collapse sidebar'"
+          @click="collapseDrawer()">
           <VIcon :icon="side === 'left' ? 'mdi-chevron-double-left' : 'mdi-chevron-double-right'" />
         </VBtn>
       </div>
@@ -376,11 +293,11 @@ onMounted(() => {
         if (typeof c === 'boolean') collapsed.value = c
         if (s === 'left' || s === 'right') side.value = s
         if (og && typeof og.users === 'boolean') openGroups.value.users = og.users
-      } catch {}
+      } catch { }
     }
   }
   // Auto-open Users when already under /user/*
-   if (route.path.startsWith('/user') && !opened.value.includes('users')) {
+  if (route.path.startsWith('/user') && !opened.value.includes('users')) {
     opened.value.push('users')
   }
 })
@@ -403,10 +320,10 @@ watch([drawer, collapsed, side, openGroups], () => {
 }, { deep: true })
 
 /* ---------- Actions ---------- */
-const openDrawer   = () => { drawer.value = true; if (!isMobile.value) collapsed.value = false }
+const openDrawer = () => { drawer.value = true; if (!isMobile.value) collapsed.value = false }
 const collapseDrawer = () => { if (!isMobile.value) collapsed.value = true }
-const expandDrawer   = () => { if (!isMobile.value) collapsed.value = false; drawer.value = true }
-const toggleDrawer   = () => {
+const expandDrawer = () => { if (!isMobile.value) collapsed.value = false; drawer.value = true }
+const toggleDrawer = () => {
   if (isMobile.value) {
     drawer.value = !drawer.value
   } else {
@@ -427,22 +344,50 @@ const isSectionActive = (base: string) =>
   route.path === base || route.path.startsWith(base + '/')
 /* ---------- Menu: Users sub-roles ---------- */
 const userRoles = [
-  { title: 'Super Admin', icon: 'mdi-shield-crown-outline',    to: '/admin/superadmin' },
-  { title: 'Admin',       icon: 'mdi-shield-account-outline',  to: '/admin/admin' },
-  { title: 'Student',     icon: 'mdi-school-outline',          to: '/admin/student' },
-  { title: 'Lecturer',    icon: 'mdi-account-tie-outline',     to: '/admin/lecturer' },
+  { title: 'Super Admin', icon: 'mdi-shield-crown-outline', to: '/admin/superadmin' },
+  { title: 'Admin', icon: 'mdi-shield-account-outline', to: '/admin/admin' },
+  { title: 'Student', icon: 'mdi-school-outline', to: '/admin/student' },
+  { title: 'Lecturer', icon: 'mdi-account-tie-outline', to: '/admin/lecturer' },
 ]
 </script>
 
 <style scoped>
 /* Drawer baseline (theme-aware) */
-.uas-drawer { background: rgb(var(--v-theme-surface)); }
+.uas-drawer {
+  background: rgb(var(--v-theme-surface));
+}
+
 /* Brand */
-.uas-brand { display: flex; align-items: center; gap: 12px; padding: 20px; cursor: pointer; }
-.uas-logo { border-radius: 12px; background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent); color: rgb(var(--v-theme-primary)); }
-.uas-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-.uas-title { font-size: 20px; font-weight: 700; }
-.uas-version { font-size: 12px; color: rgb(var(--v-theme-on-surface-variant, 130,130,130)); }
+.uas-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.uas-logo {
+  border-radius: 12px;
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+  color: rgb(var(--v-theme-primary));
+}
+
+.uas-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.uas-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.uas-version {
+  font-size: 12px;
+  color: rgb(var(--v-theme-on-surface-variant, 130, 130, 130));
+}
+
 /* Items */
 .uas-item {
   margin: 10px 6px;
@@ -452,26 +397,48 @@ const userRoles = [
   transition: background .2s, color .2s;
   color: rgb(var(--v-theme-on-surface));
 }
-.uas-item :deep(.v-icon) { color: currentColor; }
-.uas-item-title { font-size: 16px; font-weight: 500; }
+
+.uas-item :deep(.v-icon) {
+  color: currentColor;
+}
+
+.uas-item-title {
+  font-size: 16px;
+  font-weight: 500;
+}
 
 .uas-item--active {
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
 }
+
 .uas-item:hover {
   background: color-mix(in srgb, rgb(var(--v-theme-on-surface)) 12%, transparent);
   color: rgb(var(--v-theme-on-surface));
 }
 
 /* Footer strip like ChatGPT */
-.uas-footer { display: flex; align-items: center; justify-content: space-between; padding: 8px; }
-.uas-footer-btn { margin: 4px; }
+.uas-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+}
+
+.uas-footer-btn {
+  margin: 4px;
+}
 
 /* Chevron rotation for groups */
 .uas-chevron,
-.uas-chevron, .uas-chevron--open { transition: transform .2s ease; }
-.uas-chevron--open { transform: rotate(90deg); }
+.uas-chevron,
+.uas-chevron--open {
+  transition: transform .2s ease;
+}
+
+.uas-chevron--open {
+  transform: rotate(90deg);
+}
 
 
 
@@ -480,27 +447,34 @@ const userRoles = [
   position: fixed;
   z-index: 9999;
   bottom: 16px;
-  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
 }
+
 /* Right-side tweaks */
-.uas-drawer--right .uas-item { padding-left: 16px; padding-right: 10px; }
+.uas-drawer--right .uas-item {
+  padding-left: 16px;
+  padding-right: 10px;
+}
 
 /* Hide scrollbar inside the navigation drawer */
 /* Hide the drawer's scrollbar but keep scrolling */
 :deep(.v-navigation-drawer__content) {
   overflow-y: auto;
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
+
 :deep(.v-navigation-drawer__content::-webkit-scrollbar) {
   width: 0;
-  height: 0;                    /* Chrome/Safari */
+  height: 0;
+  /* Chrome/Safari */
 }
 
 /* Prevent inner list from creating its own scrollbar during group expand */
 :deep(.v-navigation-drawer__content .v-list) {
-  overflow: visible;            /* let the group expand without a nested scroller */
+  overflow: visible;
+  /* let the group expand without a nested scroller */
 }
-
-
 </style>

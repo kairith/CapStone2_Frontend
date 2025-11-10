@@ -23,11 +23,11 @@
                             <div class="stat-label">Total Groups</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ groups.filter(g => g.active).length }}</div>
+                            <div class="stat-number">{{groups.filter(g => g.active).length}}</div>
                             <div class="stat-label">Active</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ groups.filter(g => !g.active).length }}</div>
+                            <div class="stat-number">{{groups.filter(g => !g.active).length}}</div>
                             <div class="stat-label">Inactive</div>
                         </div>
                     </div>
@@ -36,12 +36,8 @@
                 <div class="action-section">
                     <v-menu offset-y>
                         <template v-slot:activator="{ props }">
-                            <v-btn 
-                                class="modern-btn import-btn" 
-                                prepend-icon="mdi-download" 
-                                variant="outlined" 
-                                v-bind="props"
-                            >
+                            <v-btn class="modern-btn import-btn" prepend-icon="mdi-download" variant="outlined"
+                                v-bind="props">
                                 Import
                                 <v-icon icon="mdi-chevron-down" size="16" class="ml-1" />
                             </v-btn>
@@ -58,12 +54,8 @@
 
                     <v-menu offset-y>
                         <template v-slot:activator="{ props }">
-                            <v-btn 
-                                class="modern-btn export-btn" 
-                                prepend-icon="mdi-upload" 
-                                variant="outlined"
-                                v-bind="props"
-                            >
+                            <v-btn class="modern-btn export-btn" prepend-icon="mdi-upload" variant="outlined"
+                                v-bind="props">
                                 Export
                                 <v-icon icon="mdi-chevron-down" size="16" class="ml-1" />
                             </v-btn>
@@ -84,14 +76,8 @@
                         </v-list>
                     </v-menu>
 
-                    <v-btn 
-                        class="modern-btn add-btn" 
-                        prepend-icon="mdi-plus" 
-                        variant="flat" 
-                        color="primary"
-                        @click="openCreateDialog"
-                        elevation="2"
-                    >
+                    <v-btn class="modern-btn add-btn" prepend-icon="mdi-plus" variant="flat" color="primary"
+                        @click="openCreateDialog" elevation="2">
                         Add Group
                     </v-btn>
                 </div>
@@ -111,37 +97,19 @@
                         </h2>
                         <div class="table-subtitle">Manage and organize your groups</div>
                     </div>
-                    
+
                     <div class="toolbar-right">
                         <div class="search-container">
-                            <v-text-field 
-                                v-model="searchQuery" 
-                                placeholder="Search groups..." 
-                                prepend-inner-icon="mdi-magnify"
-                                variant="outlined" 
-                                density="compact" 
-                                hide-details
-                                class="search-input"
-                                clearable
-                            />
+                            <v-text-field v-model="searchQuery" placeholder="Search groups..."
+                                prepend-inner-icon="mdi-magnify" variant="outlined" density="compact" hide-details
+                                class="search-input" clearable />
                         </div>
-                        
-                        <v-select 
-                            v-model="tableSortOrder" 
-                            :items="tableSortOptions" 
-                            label="Sort by" 
-                            variant="outlined"
-                            density="compact" 
-                            hide-details
-                            class="sort-select"
-                        />
-                        
-                        <v-btn 
-                            icon="mdi-filter-variant" 
-                            variant="outlined" 
-                            class="filter-btn"
-                            @click="showFilters = !showFilters"
-                        />
+
+                        <v-select v-model="tableSortOrder" :items="tableSortOptions" label="Sort by" variant="outlined"
+                            density="compact" hide-details class="sort-select" />
+
+                        <v-btn icon="mdi-filter-variant" variant="outlined" class="filter-btn"
+                            @click="showFilters = !showFilters" />
                     </div>
                 </div>
 
@@ -227,17 +195,10 @@
                                     </div>
                                 </td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip 
-                                        :color="group.active ? 'success' : 'error'" 
-                                        size="small" 
-                                        variant="flat"
-                                        class="status-chip"
-                                    >
-                                        <v-icon 
-                                            :icon="group.active ? 'mdi-check-circle' : 'mdi-close-circle'" 
-                                            size="12" 
-                                            class="mr-1"
-                                        />
+                                    <v-chip :color="group.active ? 'success' : 'error'" size="small" variant="flat"
+                                        class="status-chip">
+                                        <v-icon :icon="group.active ? 'mdi-check-circle' : 'mdi-close-circle'" size="12"
+                                            class="mr-1" />
                                         {{ group.active ? 'Active' : 'Inactive' }}
                                     </v-chip>
                                 </td>
@@ -249,28 +210,16 @@
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <div class="action-group">
-                                        <v-btn 
-                                            icon="mdi-pencil" 
-                                            size="small" 
-                                            variant="text" 
-                                            color="primary"
-                                            class="action-btn"
-                                            @click="openEditDialog(group)"
-                                        />
-                                        <v-btn 
-                                            icon="mdi-delete" 
-                                            size="small" 
-                                            variant="text" 
-                                            color="error"
-                                            class="action-btn"
-                                            @click="confirmDelete(group)"
-                                        />
+                                        <v-btn icon="mdi-pencil" size="small" variant="text" color="primary"
+                                            class="action-btn" @click="openEditDialog(group)" />
+                                        <v-btn icon="mdi-delete" size="small" variant="text" color="error"
+                                            class="action-btn" @click="confirmDelete(group)" />
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </v-table>
-                    
+
                     <!-- Empty State -->
                     <div v-if="filteredGroups.length === 0" class="empty-state">
                         <v-icon icon="mdi-account-group-outline" size="64" color="grey-lighten-1" />
@@ -278,13 +227,8 @@
                         <p class="empty-subtitle">
                             {{ searchQuery ? 'Try adjusting your search terms' : 'Create your first group to get started' }}
                         </p>
-                        <v-btn 
-                            v-if="!searchQuery"
-                            color="primary" 
-                            variant="flat" 
-                            @click="openCreateDialog"
-                            class="mt-4"
-                        >
+                        <v-btn v-if="!searchQuery" color="primary" variant="flat" @click="openCreateDialog"
+                            class="mt-4">
                             <v-icon icon="mdi-plus" class="mr-1" />
                             Add First Group
                         </v-btn>
@@ -300,11 +244,8 @@
                 <div class="dialog-header">
                     <div class="header-content">
                         <div class="header-icon">
-                            <v-icon 
-                                :icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'" 
-                                :color="isEdit ? 'warning' : 'primary'"
-                                size="28"
-                            />
+                            <v-icon :icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
+                                :color="isEdit ? 'warning' : 'primary'" size="28" />
                         </div>
                         <div class="header-text">
                             <h2 class="dialog-title">{{ isEdit ? 'Edit Group' : 'Create New Group' }}</h2>
@@ -313,48 +254,28 @@
                             </p>
                         </div>
                     </div>
-                    <v-btn 
-                        icon="mdi-close" 
-                        variant="text" 
-                        size="small"
-                        @click="closeDialog"
-                        class="close-btn"
-                    />
+                    <v-btn icon="mdi-close" variant="text" size="small" @click="closeDialog" class="close-btn" />
                 </div>
 
                 <v-divider />
-                
+
                 <!-- Dialog Content -->
                 <v-card-text class="dialog-content">
                     <v-form ref="formRef" v-model="formValid" @submit.prevent="submitForm">
                         <div class="form-group">
                             <label class="form-label">Global ID</label>
-                            <v-text-field
-                                v-model="formData.global_id"
-                                placeholder="Enter global ID (e.g., G001)"
-                                variant="outlined"
-                                density="comfortable"
-                                prepend-inner-icon="mdi-identifier"
-                                hide-details="auto"
-                                :rules="globalIdRules"
-                                class="form-field"
-                            />
+                            <v-text-field v-model="formData.global_id" placeholder="Enter global ID (e.g., G001)"
+                                variant="outlined" density="comfortable" prepend-inner-icon="mdi-identifier"
+                                hide-details="auto" :rules="globalIdRules" class="form-field" />
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Group Name</label>
-                            <v-text-field
-                                v-model="formData.group_name"
-                                placeholder="Enter group name"
-                                variant="outlined"
-                                density="comfortable"
-                                prepend-inner-icon="mdi-account-group"
-                                hide-details="auto"
-                                :rules="groupNameRules"
-                                class="form-field"
-                            />
+                            <v-text-field v-model="formData.group_name" placeholder="Enter group name"
+                                variant="outlined" density="comfortable" prepend-inner-icon="mdi-account-group"
+                                hide-details="auto" :rules="groupNameRules" class="form-field" />
                         </div>
-                        
+
                         <div class="form-group">
                             <div class="switch-container">
                                 <div class="switch-info">
@@ -363,39 +284,23 @@
                                         {{ formData.active ? 'Group is active and available' : 'Group is inactive and hidden' }}
                                     </p>
                                 </div>
-                                <v-switch
-                                    v-model="formData.active"
-                                    color="success"
-                                    inset
-                                    hide-details
-                                />
+                                <v-switch v-model="formData.active" color="success" inset hide-details />
                             </div>
                         </div>
                     </v-form>
                 </v-card-text>
 
                 <v-divider />
-                
+
                 <!-- Dialog Actions -->
                 <v-card-actions class="dialog-actions">
-                    <v-btn
-                        variant="outlined"
-                        color="grey-darken-1"
-                        @click="closeDialog"
-                        class="action-btn cancel-btn"
-                    >
+                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
-                    
-                    <v-btn
-                        :color="isEdit ? 'warning' : 'primary'"
-                        variant="flat"
-                        @click="submitForm"
-                        :disabled="!formValid"
-                        :loading="formLoading"
-                        class="action-btn submit-btn"
-                    >
+
+                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm"
+                        :disabled="!formValid" :loading="formLoading" class="action-btn submit-btn">
                         <v-icon start>{{ isEdit ? 'mdi-content-save' : 'mdi-plus' }}</v-icon>
                         {{ isEdit ? 'Update Group' : 'Create Group' }}
                     </v-btn>
@@ -416,14 +321,14 @@
                 </div>
 
                 <v-divider />
-                
+
                 <!-- Delete Content -->
                 <v-card-text class="delete-content">
                     <div class="warning-box">
                         <v-icon icon="mdi-alert-circle" color="warning" class="warning-icon" />
                         <div class="warning-text">
                             <p class="warning-message">
-                                You are about to permanently delete 
+                                You are about to permanently delete
                                 <strong class="group-name">{{ selectedGroup?.group_name }}</strong>
                             </p>
                             <p class="warning-details">
@@ -434,26 +339,17 @@
                 </v-card-text>
 
                 <v-divider />
-                
+
                 <!-- Delete Actions -->
                 <v-card-actions class="delete-actions">
-                    <v-btn
-                        variant="outlined"
-                        color="grey-darken-1"
-                        @click="deleteDialog = false"
-                        class="action-btn cancel-btn"
-                    >
+                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false"
+                        class="action-btn cancel-btn">
                         <v-icon start>mdi-cancel</v-icon>
                         Cancel
                     </v-btn>
-                    
-                    <v-btn
-                        color="error"
-                        variant="flat"
-                        @click="handleDelete"
-                        :loading="deleteLoading"
-                        class="action-btn delete-btn"
-                    >
+
+                    <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading"
+                        class="action-btn delete-btn">
                         <v-icon start>mdi-delete</v-icon>
                         Delete Group
                     </v-btn>
@@ -464,6 +360,12 @@
 </template>
 
 <script setup>
+definePageMeta({
+    layout: 'admin',
+    // middleware: ['auth', 'role-admin'] // Commented out for testing
+})
+
+import Navbar from '@/components/ui/Navbar.vue'
 // Import mock data for testing
 import mockGroups from '@/mock/groups.json'
 
@@ -632,19 +534,19 @@ const closeDialog = () => {
 // Form submission
 const submitForm = async () => {
     if (!formValid.value) return
-    
+
     formLoading.value = true
-    
+
     try {
         const groupData = {
             global_id: formData.global_id,
             group_name: formData.group_name,
             active: formData.active ? 1 : 0
         }
-        
+
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         if (isEdit.value && selectedGroup.value) {
             // Update existing group
             const index = groups.value.findIndex(g => g.id === selectedGroup.value.id)
@@ -665,7 +567,7 @@ const submitForm = async () => {
             }
             groups.value.push(newGroup)
         }
-        
+
         closeDialog()
     } catch (error) {
         console.error('Error submitting form:', error)
@@ -687,18 +589,18 @@ const confirmDelete = (group) => {
 
 const handleDelete = async () => {
     if (!selectedGroup.value) return
-    
+
     deleteLoading.value = true
-    
+
     try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         const index = groups.value.findIndex(g => g.id === selectedGroup.value.id)
         if (index !== -1) {
             groups.value.splice(index, 1)
         }
-        
+
         deleteDialog.value = false
         selectedGroup.value = null
     } catch (error) {
@@ -1554,6 +1456,7 @@ const handleExportPDF = () => {
         opacity: 0;
         transform: scale(0.9) translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
