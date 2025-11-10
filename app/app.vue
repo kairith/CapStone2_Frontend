@@ -12,4 +12,5 @@ onMounted(async () => {
   // Check authentication status when app loads
   await checkAuth()
 })
+
 </script>
