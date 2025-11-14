@@ -1,1 +1,304 @@
-[]
+[
+  {
+    "id": 1,
+    "group_id": "G001",
+    "group_name": "Computer Science 2024",
+    "generation": 9,
+    "year": 2025,
+    "specialize": "CS",
+    "semester": 1,
+    "academic_year": "2024-2025",
+    "start_date": "2024-09-02",
+    "end_date": "2024-12-20",
+    "schedule_data": {
+      "Monday": [
+        {
+          "time": "08:00-09:30",
+          "subject": "Natural Language Processing",
+          "lecturer": "Ms. Hem Sokeng",
+          "room": "A001",
+          "type": "Theory"
+        },
+        {
+          "time": "09:30-09:50",
+          "subject": "Break (20min)",
+          "type": "Break"
+        },
+        {
+          "time": "09:50-11:20",
+          "subject": "Natural Language Processing",
+          "lecturer": "Ms. Hem Sokeng",
+          "room": "A001",
+          "type": "Theory"
+        },
+        {
+          "time": "11:20-12:10",
+          "subject": "Lunch Break (50min)",
+          "type": "Break"
+        },
+        {
+          "time": "12:10-13:40",
+          "subject": "Natural Language Processing",
+          "lecturer": "Ms. Hem Sokeng",
+          "room": "A001",
+          "type": "Theory"
+        },
+        {
+          "time": "13:40-13:50",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "13:50-15:20",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "15:20-15:30",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "15:30-17:00",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        }
+      ],
+      "Tuesday": [
+        {
+          "time": "08:00-09:30",
+          "subject": "Fundamentals of Machine Learning",
+          "lecturer": "Dr. Dach Dyna",
+          "room": "A001",
+          "type": "Theory"
+        },
+        {
+          "time": "09:30-09:50",
+          "subject": "Break (20min)",
+          "type": "Break"
+        },
+        {
+          "time": "09:50-11:20",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "11:20-12:10",
+          "subject": "Lunch Break (50min)",
+          "type": "Break"
+        },
+        {
+          "time": "12:10-13:40",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "13:40-13:50",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "13:50-15:20",
+          "subject": "Fundamentals of Machine Learning",
+          "lecturer": "Ms. Meavanh Sak-tony",
+          "room": "A002",
+          "type": "Lab"
+        },
+        {
+          "time": "15:20-15:30",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "15:30-17:00",
+          "subject": "Fundamentals of Machine Learning",
+          "lecturer": "Ms. Meavanh Sak-tony",
+          "room": "A002",
+          "type": "Lab"
+        }
+      ],
+      "Wednesday": [
+        {
+          "time": "08:00-09:30",
+          "subject": "SEMINAR",
+          "lecturer": "",
+          "room": "",
+          "type": "Seminar"
+        },
+        {
+          "time": "09:30-09:50",
+          "subject": "Break (20min)",
+          "type": "Break"
+        },
+        {
+          "time": "09:50-11:20",
+          "subject": "SEMINAR",
+          "lecturer": "",
+          "room": "",
+          "type": "Seminar"
+        },
+        {
+          "time": "11:20-12:10",
+          "subject": "Lunch Break (50min)",
+          "type": "Break"
+        },
+        {
+          "time": "12:10-13:40",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "13:40-13:50",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "13:50-15:20",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "15:20-15:30",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "15:30-17:00",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        }
+      ],
+      "Thursday": [
+        {
+          "time": "08:00-09:30",
+          "subject": "Computer Vision",
+          "lecturer": "Dr. Map Makara",
+          "room": "A003",
+          "type": "Theory"
+        },
+        {
+          "time": "09:30-09:50",
+          "subject": "Break (20min)",
+          "type": "Break"
+        },
+        {
+          "time": "09:50-11:20",
+          "subject": "Computer Vision",
+          "lecturer": "Dr. Map Makara",
+          "room": "A003",
+          "type": "Theory"
+        },
+        {
+          "time": "11:20-12:10",
+          "subject": "Lunch Break (50min)",
+          "type": "Break"
+        },
+        {
+          "time": "12:10-13:40",
+          "subject": "Computer Vision",
+          "lecturer": "Dr. Map Makara",
+          "room": "A003",
+          "type": "Theory"
+        },
+        {
+          "time": "13:40-13:50",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "13:50-15:20",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "15:20-15:30",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "15:30-17:00",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        }
+      ],
+      "Friday": [
+        {
+          "time": "08:00-09:30",
+          "subject": "Soft Skill (Leadership)",
+          "lecturer": "Ms. Chou Bora",
+          "room": "A004",
+          "type": "Theory"
+        },
+        {
+          "time": "09:30-09:50",
+          "subject": "Break (20min)",
+          "type": "Break"
+        },
+        {
+          "time": "09:50-11:20",
+          "subject": "Soft Skill (Leadership)",
+          "lecturer": "Ms. Chou Bora",
+          "room": "A004",
+          "type": "Theory"
+        },
+        {
+          "time": "11:20-12:10",
+          "subject": "Lunch Break (50min)",
+          "type": "Break"
+        },
+        {
+          "time": "12:10-13:40",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "13:40-13:50",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "13:50-15:20",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        },
+        {
+          "time": "15:20-15:30",
+          "subject": "Break (10min)",
+          "type": "Break"
+        },
+        {
+          "time": "15:30-17:00",
+          "subject": "Capstone Project 3",
+          "lecturer": "",
+          "room": "",
+          "type": "Project"
+        }
+      ]
+    },
+    "status": "active",
+    "created_at": "2024-09-01",
+    "updated_at": "2024-09-01"
+  }
+]
