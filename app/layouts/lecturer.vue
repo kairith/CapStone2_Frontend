@@ -27,10 +27,6 @@
                 <v-list-item to="/lecturer/leave" prepend-icon="mdi-calendar-remove">
                     <v-list-item-title>Leave Requests</v-list-item-title>
                 </v-list-item>
-
-                <v-list-item to="/request_leave" prepend-icon="mdi-account-plus">
-                    <v-list-item-title>Request Leave</v-list-item-title>
-                </v-list-item>
             </v-list>
         </v-navigation-drawer>
 

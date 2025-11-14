@@ -80,11 +80,11 @@ const menuItems = ref([
     icon: 'mdi-account-multiple',
     to: '/admin/groups'
   },
-  {
-    title: 'Request Leaves', 
-    icon: 'mdi-calendar-remove',
-    to: '/lecturer/leave'
-  },
+  // {
+  //   title: 'Request Leaves', 
+  //   icon: 'mdi-calendar-remove',
+  //   to: '/lecturer/leave'
+  // },
   {
     title: 'Report',
     icon: 'mdi-chart-bar',
