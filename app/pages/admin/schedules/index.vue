@@ -166,59 +166,96 @@
 
     <!-- Create/Edit Schedule Dialog -->
     <v-dialog v-model="scheduleDialog" max-width="800" persistent>
-      <v-card class="modern-dialog">
+      <v-card class="modern-dialog" elevation="24">
+        <!-- Dialog Header -->
         <div class="dialog-header">
-          <h2 class="dialog-title">
-            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" class="mr-2" />
-            {{ isEdit ? 'Edit Schedule' : 'Create New Schedule' }}
-          </h2>
-          <v-btn icon="mdi-close" variant="text" @click="closeDialog" />
+          <div class="header-content">
+            <div class="header-icon">
+              <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" color="primary" size="24" />
+            </div>
+            <div class="header-text">
+              <h2 class="dialog-title">{{ isEdit ? 'Edit Schedule' : 'Create New Schedule' }}</h2>
+              <p class="dialog-subtitle">{{ isEdit ? 'Update schedule information and settings' : 'Set up a new schedule for the group' }}</p>
+            </div>
+          </div>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="closeDialog" class="close-btn" />
         </div>
 
         <v-divider />
 
+        <!-- Dialog Content -->
         <v-card-text class="dialog-content">
-          <v-form ref="formRef" v-model="formValid">
+          <v-form ref="formRef" v-model="formValid" @submit.prevent="submitForm">
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field v-model="formData.group_id" :rules="groupIdRules" label="Group ID" variant="outlined"
-                  density="compact" />
+                <div class="form-group">
+                  <label class="form-label">Group ID</label>
+                  <v-text-field v-model="formData.group_id" :rules="groupIdRules" variant="outlined"
+                    density="comfortable" hide-details="auto" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="formData.group_name" :rules="groupNameRules" label="Group Name"
-                  variant="outlined" density="compact" />
+                <div class="form-group">
+                  <label class="form-label">Group Name</label>
+                  <v-text-field v-model="formData.group_name" :rules="groupNameRules"
+                    variant="outlined" density="comfortable" hide-details="auto" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="4">
-                <v-select v-model="formData.generation" :items="generationItems" label="Generation" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Generation</label>
+                  <v-select v-model="formData.generation" :items="generationItems" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="4">
-                <v-select v-model="formData.year" :items="yearItems" label="Year" variant="outlined" density="compact"
-                  :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Year</label>
+                  <v-select v-model="formData.year" :items="yearItems" variant="outlined" density="comfortable"
+                    hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="4">
-                <v-select v-model="formData.specialize" :items="specializeItems" label="Specialization"
-                  variant="outlined" density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Specialization</label>
+                  <v-select v-model="formData.specialize" :items="specializeItems"
+                    variant="outlined" density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-select v-model="formData.semester" :items="semesterItems" label="Semester" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Semester</label>
+                  <v-select v-model="formData.semester" :items="semesterItems" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="formData.academic_year" label="Academic Year" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Academic Year</label>
+                  <v-text-field v-model="formData.academic_year" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="formData.start_date" type="date" label="Start Date" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Start Date</label>
+                  <v-text-field v-model="formData.start_date" type="date" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="formData.end_date" type="date" label="End Date" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">End Date</label>
+                  <v-text-field v-model="formData.end_date" type="date" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
               <v-col cols="12">
-                <v-select v-model="formData.status" :items="statusItems" label="Status" variant="outlined"
-                  density="compact" :rules="requiredRules" />
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <v-select v-model="formData.status" :items="statusItems" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
               </v-col>
             </v-row>
           </v-form>
@@ -226,9 +263,10 @@
 
         <v-divider />
 
+        <!-- Dialog Actions -->
         <v-card-actions class="dialog-actions">
-          <v-btn variant="outlined" @click="closeDialog" class="action-btn cancel-btn">
-            <v-icon start>mdi-cancel</v-icon>
+          <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn">
+            <v-icon start>mdi-close</v-icon>
             Cancel
           </v-btn>
 
@@ -274,15 +312,19 @@
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="deleteDialog" max-width="420" persistent>
-      <v-card class="delete-dialog">
+      <v-card class="delete-dialog" elevation="24">
+        <!-- Delete Header -->
         <div class="delete-header">
-          <v-icon icon="mdi-delete-alert" color="error" size="48" />
+          <div class="delete-icon-container">
+            <v-icon icon="mdi-delete-alert" color="error" size="48" />
+          </div>
           <h2 class="delete-title">Delete Schedule</h2>
           <p class="delete-subtitle">This action cannot be undone</p>
         </div>
 
         <v-divider />
 
+        <!-- Delete Content -->
         <v-card-text class="delete-content">
           <div class="warning-box">
             <v-icon icon="mdi-alert-circle" color="warning" class="warning-icon" />
@@ -300,6 +342,7 @@
 
         <v-divider />
 
+        <!-- Delete Actions -->
         <v-card-actions class="delete-actions">
           <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false" class="action-btn cancel-btn">
             <v-icon start>mdi-cancel</v-icon>
@@ -829,53 +872,243 @@ onMounted(() => {
   color: #94a3b8;
 }
 
-/* Dialog Styles */
+/* Modern Dialog Styles */
 .modern-dialog {
-  border-radius: 16px;
+  border-radius: 16px !important;
   overflow: hidden;
 }
 
 .dialog-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 24px 24px 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  justify-content: space-between;
+  padding: 24px 24px 20px;
+  background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-text {
+  flex: 1;
 }
 
 .dialog-title {
   font-size: 20px;
   font-weight: 600;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.dialog-subtitle {
+  font-size: 14px;
+  color: #6b7280;
   margin: 0;
+  line-height: 1.3;
+}
+
+.close-btn {
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .dialog-content {
   padding: 24px !important;
 }
 
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.form-field {
+  margin-bottom: 0 !important;
+}
+
+.form-field :deep(.v-field) {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.form-field :deep(.v-field:hover) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.form-field :deep(.v-field--focused) {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .dialog-actions {
-  padding: 16px 24px 24px !important;
+  padding: 20px 24px 24px !important;
   gap: 12px;
 }
 
 .action-btn {
-  height: 42px;
-  min-width: 120px;
+  height: 44px;
+  border-radius: 12px;
   text-transform: none;
-  border-radius: 8px;
   font-weight: 500;
+  font-size: 14px;
+  padding: 0 24px;
+  transition: all 0.2s ease;
 }
 
 .cancel-btn {
-  color: #64748b;
-  border-color: #e2e8f0;
+  min-width: 100px;
 }
 
 .submit-btn {
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+  min-width: 140px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.submit-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Delete Dialog Styles */
+.delete-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.delete-header {
+  text-align: center;
+  padding: 32px 24px 24px;
+  background: linear-gradient(135deg, #fef7f7 0%, #fdf2f2 100%);
+}
+
+.delete-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+}
+
+.delete-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0 0 4px 0;
+}
+
+.delete-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.delete-content {
+  padding: 24px !important;
+}
+
+.warning-box {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #fef3cd;
+  border: 1px solid #fde047;
+  border-radius: 12px;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warning-text {
+  flex: 1;
+}
+
+.warning-message {
+  font-size: 14px;
+  color: #92400e;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.group-name {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.warning-details {
+  font-size: 13px;
+  color: #a16207;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.delete-actions {
+  padding: 20px 24px 24px !important;
+  gap: 12px;
+}
+
+.delete-btn {
+  min-width: 130px;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.delete-btn:hover {
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Animation for dialogs */
+.modern-dialog,
+.delete-dialog {
+  animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes dialogSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* Schedule Detail Dialog */

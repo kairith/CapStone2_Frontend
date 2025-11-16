@@ -134,55 +134,36 @@
                     <v-table class="modern-table" fixed-header height="500">
                         <thead>
                             <tr class="modern-header-row">
-                                <th class="modern-header-cell id-column">
-                                    <div class="header-content">
-                                        <span>ID</span>
-                                    </div>
+                                <th class="modern-header-cell id-column center-align">
+                                    <div class="header-content">ID</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        <v-icon icon="mdi-account-group" size="16" class="mr-1" />
-                                        <span>Group Name</span>
-                                    </div>
+                                    <div class="header-content">Name</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        <v-icon icon="mdi-identifier" size="16" class="mr-1" />
-                                        <span>Global ID</span>
-                                    </div>
+                                    <div class="header-content">Global ID</div>
                                 </th>
                                 <th class="modern-header-cell center-align">
-                                    <div class="header-content">
-                                        <v-icon icon="mdi-circle-outline" size="16" class="mr-1" />
-                                        <span>Status</span>
-                                    </div>
+                                    <div class="header-content">Status</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        <v-icon icon="mdi-calendar" size="16" class="mr-1" />
-                                        <span>Created</span>
-                                    </div>
+                                    <div class="header-content">Created</div>
                                 </th>
                                 <th class="modern-header-cell center-align">
-                                    <div class="header-content">
-                                        <v-icon icon="mdi-dots-horizontal" size="16" class="mr-1" />
-                                        <span>Actions</span>
-                                    </div>
+                                    <div class="header-content">Actions</div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(group, index) in filteredGroups" :key="group.id" class="modern-table-row">
-                                <td class="modern-table-cell id-column">
-                                    <div class="id-badge">
-                                        {{ String(index + 1).padStart(2, '0') }}
-                                    </div>
+                            <tr v-for="(group, idx) in filteredGroups" :key="group.id" class="modern-table-row">
+                                <td class="modern-table-cell id-column center-align">
+                                    <span class="id-badge">{{ group.id }}</span>
                                 </td>
                                 <td class="modern-table-cell">
                                     <div class="group-info">
-                                        <div class="group-avatar">
-                                            <v-icon icon="mdi-account-group" size="16" />
-                                        </div>
+                                        <span class="group-avatar">
+                                            <v-icon size="22" color="#1d4ed8">mdi-account-group</v-icon>
+                                        </span>
                                         <div class="group-details">
                                             <div class="group-name">{{ group.group_name }}</div>
                                             <div class="group-meta">{{ group.global_id }}</div>
@@ -190,15 +171,10 @@
                                     </div>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <div class="global-id-badge">
-                                        {{ group.global_id }}
-                                    </div>
+                                    <span class="global-id-badge">{{ group.global_id }}</span>
                                 </td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip :color="group.active ? 'success' : 'error'" size="small" variant="flat"
-                                        class="status-chip">
-                                        <v-icon :icon="group.active ? 'mdi-check-circle' : 'mdi-close-circle'" size="12"
-                                            class="mr-1" />
+                                    <v-chip :color="group.active ? 'success' : 'error'" class="status-chip" size="small">
                                         {{ group.active ? 'Active' : 'Inactive' }}
                                     </v-chip>
                                 </td>
@@ -210,10 +186,12 @@
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <div class="action-group">
-                                        <v-btn icon="mdi-pencil" size="small" variant="text" color="primary"
-                                            class="action-btn" @click="openEditDialog(group)" />
-                                        <v-btn icon="mdi-delete" size="small" variant="text" color="error"
-                                            class="action-btn" @click="confirmDelete(group)" />
+                                        <v-btn icon class="action-btn" @click="openEditDialog(group)">
+                                            <v-icon color="#fde047">mdi-pencil</v-icon>
+                                        </v-btn>
+                                        <v-btn icon class="action-btn" @click="confirmDelete(group)">
+                                            <v-icon color="#dc2626">mdi-delete</v-icon>
+                                        </v-btn>
                                     </div>
                                 </td>
                             </tr>
@@ -245,7 +223,7 @@
                     <div class="header-content">
                         <div class="header-icon">
                             <v-icon :icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-                                :color="isEdit ? 'warning' : 'primary'" size="28" />
+                                :color="isEdit ? '#fde047' : 'primary'" size="28" />
                         </div>
                         <div class="header-text">
                             <h2 class="dialog-title">{{ isEdit ? 'Edit Group' : 'Create New Group' }}</h2>
@@ -949,24 +927,27 @@ const handleExportPDF = () => {
     padding: 20px 16px;
     border: none;
     position: relative;
+    text-align: left !important;
 }
 
 .modern-header-cell.center-align {
-    text-align: center;
+    text-align: left !important;
 }
 
 .modern-header-cell.id-column {
     width: 80px;
+    text-align: left !important;
 }
 
 .header-content {
     display: flex;
     align-items: center;
-    color: white !important;
+    color: #45474b !important;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-left: 4px;
 }
 
 .modern-table-row {
@@ -983,14 +964,16 @@ const handleExportPDF = () => {
     padding: 16px;
     border: none;
     vertical-align: middle;
+    text-align: left !important;
 }
 
 .modern-table-cell.center-align {
-    text-align: center;
+    text-align: left !important;
 }
 
 .modern-table-cell.id-column {
     width: 80px;
+    text-align: left !important;
 }
 
 .id-badge {
@@ -1047,13 +1030,13 @@ const handleExportPDF = () => {
     background: #f1f5f9;
     color: #475569;
     font-weight: 500;
-    font-size: 13px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.status-chip {
-    font-weight: 500;
+                                display: block;
+                                color: #1e293b !important;
+                                font-weight: 600;
+                                font-size: 15px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                                padding: 0;
     border-radius: 8px !important;
 }
 
@@ -1077,7 +1060,7 @@ const handleExportPDF = () => {
 .action-group {
     display: flex;
     gap: 4px;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .action-btn {

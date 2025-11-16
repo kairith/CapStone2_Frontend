@@ -33,6 +33,8 @@
       </template>
     </v-navigation-drawer>
 
+    <!-- Modern AppHeader -->
+    <AppHeader @toggle-drawer="drawer = !drawer" />
     <!-- Main Content Area -->
     <v-main class="main-content">
       <slot />
@@ -40,7 +42,9 @@
   </v-app>
 </template>
 
+
 <script setup>
+import AppHeader from '~/components/ui/AppHeader.vue'
 const drawer = ref(true)
 const route = useRoute()
 
@@ -79,6 +83,11 @@ const menuItems = ref([
     title: 'Groups',
     icon: 'mdi-account-multiple',
     to: '/admin/groups'
+  },
+  {
+    title: 'Request Leave',
+    icon: 'mdi-calendar-remove',
+    to: '/admin/request_leave'
   },
   {
     title: 'Report',

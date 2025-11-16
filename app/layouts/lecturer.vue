@@ -25,21 +25,17 @@
         </v-list-item>
       </v-list>
       <!-- Bottom Section -->
-      <template v-slot:append>
+      <!-- <template v-slot:append>
         <div class="pa-4">
           <v-divider class="mb-3 border-opacity-25"></v-divider>
           <v-list-item @click="logout" prepend-icon="mdi-logout" class="menu-item" rounded="lg">
             <v-list-item-title class="text-body-2">Logout</v-list-item-title>
           </v-list-item>
         </div>
-      </template>
+      </template> -->
     </v-navigation-drawer>
-    <!-- App Bar -->
-    <v-app-bar>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>UAS Lecturer</v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-app-bar>
+    <!-- Modern AppHeader -->
+    <AppHeader @toggle-drawer="drawer = !drawer" />
     <!-- Main Content Area -->
     <v-main class="main-content">
       <v-container fluid>
@@ -49,7 +45,9 @@
   </v-app>
 </template>
 
+
 <script setup>
+import AppHeader from '~/components/ui/AppHeader.vue'
 const drawer = ref(true)
 const logout = async () => {
   try {
