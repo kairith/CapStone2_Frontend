@@ -1,239 +1,387 @@
 <template>
-  <!-- Floating toggle on mobile (like ChatGPT hamburger) -->
-
-  <VBtn v-if="isMobile && !drawer" class="uas-fab" :style="fabStyle" icon size="large" :aria-label="'Open navigation'"
-    @click="openDrawer()">
-    <VIcon icon="mdi-menu" />
+  <!-- Floating toggle on mobile -->
+  <VBtn 
+    v-if="isMobile && !drawer" 
+    class="uas-fab" 
+    :style="fabStyle" 
+    icon 
+    size="large" 
+    :aria-label="'Open navigation'"
+    @click="openDrawer()"
+  >
+    <VIcon icon="mdi-menu" size="24" />
   </VBtn>
-  <VNavigationDrawer v-model="drawer" app :permanent="!isMobile" :temporary="isMobile" :width="300" :rail="isRail"
-    :rail-width="72" :location="side" class="uas-drawer"
-    :class="side === 'right' ? 'uas-drawer--right' : 'uas-drawer--left'">
-    <!-- Brand -->
-    <div class="flex">
-      <div class="uas-brand" role="button" tabindex="0" :aria-pressed="(!isMobile && collapsed) ? 'true' : 'false'"
-        :aria-label="(!isMobile && collapsed) ? 'Expand sidebar' : 'Collapse sidebar'" @click="toggleDrawer"
-        @keydown.enter="toggleDrawer" @keydown.space.prevent="toggleDrawer">
-        <VAvatar size="36" class="uas-logo">
-          <VIcon icon="mdi-hexagon-outline" />
-        </VAvatar>
+
+  <VNavigationDrawer 
+    v-model="drawer" 
+    app 
+    :permanent="!isMobile" 
+    :temporary="isMobile" 
+    :width="280" 
+    :rail="isRail"
+    :rail-width="80" 
+    :location="side" 
+    class="uas-drawer"
+    :class="side === 'right' ? 'uas-drawer--right' : 'uas-drawer--left'"
+    elevation="3"
+  >
+    <!-- Brand Section -->
+    <div class="uas-brand-container" :class="{ 'uas-brand-container--rail': isRail }">
+      <div class="uas-brand" @click="!isRail && $router.push('/')">
+        <div class="uas-logo-wrapper">
+          <VAvatar size="40" class="uas-logo">
+            <VIcon icon="mdi-school" size="24" />
+          </VAvatar>
+        </div>
 
         <!-- Brand title only when expanded -->
-        <div class="uas-brand-text" v-if="!isRail">
-          <span class="uas-title">UAMS</span>
-          <span class="uas-version">v.1</span>
-        </div>
+        <Transition name="brand-text">
+          <div class="uas-brand-text" v-if="!isRail">
+            <span class="uas-title">UAMS</span>
+          </div>
+        </Transition>
       </div>
-
     </div>
 
-
-
-
-
-    <!-- Main menu -->
-    <VList nav density="comfortable" class="pt-0" v-model:opened="opened">
-
-      <!-- Dashboard -->
-      <VListItem :to="'/dashboard'" nav :active="isActivePath('/dashboard')"
-        :class="['uas-item', isActivePath('/dashboard') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Dashboard" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-view-dashboard-outline" class="uas-item-icon" />
-            </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-view-dashboard-outline" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Dashboard</VListItemTitle>
-      </VListItem>
-
-      <!-- Roles -->
-      <VListItem :to="'/role'" nav :active="isActivePath('/role')"
-        :class="['uas-item', isActivePath('/role') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Roles" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-account-badge-outline" class="uas-item-icon" />
-            </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-account-badge-outline" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Roles</VListItemTitle>
-      </VListItem>
-
-      <!-- Users (collapsible group) -->
-      <!-- Users (collapsible group) -->
-      <VListGroup value="users">
-        <template #activator="{ props }">
-          <VListItem v-bind="props" :active="isSectionActive('/user')"
-            :class="['uas-item', isSectionActive('/user') && 'uas-item--active']">
+    <!-- Navigation Menu -->
+    <div class="uas-menu-wrapper">
+      <VList nav density="comfortable" class="uas-navigation-list" v-model:opened="opened">
+        <!-- Admin Navigation -->
+        <template v-if="props.role === 'admin'">
+          <!-- Dashboard -->
+          <VListItem 
+            :to="'/admin/dashboard'" 
+            nav 
+            :active="isActivePath('/admin/dashboard')"
+            :class="['uas-item', isActivePath('/admin/dashboard') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
             <template #prepend>
-              <VTooltip v-if="isRail" text="Users" location="right">
-                <template #activator="{ props: tip }">
-                  <VIcon v-bind="tip" icon="mdi-account-outline" class="uas-item-icon" />
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Dashboard" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-view-dashboard" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-view-dashboard" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Dashboard</VListItemTitle>
+          </VListItem>
+
+          <!-- Users Section -->
+          <div v-if="!isRail" class="uas-section-divider">
+            <span class="uas-section-title">User Management</span>
+          </div>
+
+          <!-- Roles -->
+          <VListItem 
+            :to="'/admin/roles'" 
+            nav 
+            :active="isActivePath('/admin/roles')"
+            :class="['uas-item', isActivePath('/admin/roles') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Roles" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-shield-account" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-shield-account" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Roles</VListItemTitle>
+          </VListItem>
+
+          <!-- Users Group -->
+          <VListGroup value="users" class="uas-group">
+            <template #activator="{ props }">
+              <VListItem 
+                v-bind="props" 
+                :active="isSectionActive('/admin/users')"
+                :class="['uas-item', 'uas-group-item', isSectionActive('/admin/users') && 'uas-item--active']"
+              >
+                <template #prepend>
+                  <div class="uas-item-icon-wrapper">
+                    <VTooltip v-if="isRail" text="Users" location="right" offset="8">
+                      <template #activator="{ props: tip }">
+                        <VIcon v-bind="tip" icon="mdi-account-group" class="uas-item-icon" />
+                      </template>
+                    </VTooltip>
+                    <VIcon v-else icon="mdi-account-group" class="uas-item-icon" />
+                  </div>
                 </template>
-              </VTooltip>
-              <VIcon v-else icon="mdi-account-outline" class="uas-item-icon" />
+
+                <VListItemTitle v-if="!isRail" class="uas-item-title">Users</VListItemTitle>
+
+                <template #append>
+                  <VIcon 
+                    v-if="!isRail" 
+                    icon="mdi-chevron-down" 
+                    :class="['uas-chevron', isUsersOpen && 'uas-chevron--open']"
+                    size="18" 
+                  />
+                </template>
+              </VListItem>
             </template>
 
-            <VListItemTitle v-if="!isRail" class="uas-item-title">Users</VListItemTitle>
+            <!-- User Sub-items -->
+            <div class="uas-sub-items">
+              <VListItem 
+                v-for="r in userRoles" 
+                :key="r.to" 
+                :to="r.to" 
+                nav 
+                :active="isActivePath(r.to)"
+                :class="['uas-item', 'uas-sub-item', isActivePath(r.to) && 'uas-item--active']" 
+                @click="onClickItem"
+              >
+                <template #prepend>
+                  <div class="uas-item-icon-wrapper uas-sub-icon-wrapper">
+                    <VTooltip v-if="isRail" :text="r.title" location="right" offset="8">
+                      <template #activator="{ props: tip }">
+                        <VIcon v-bind="tip" :icon="r.icon" class="uas-item-icon" size="18" />
+                      </template>
+                    </VTooltip>
+                    <VIcon v-else :icon="r.icon" class="uas-item-icon" size="18" />
+                  </div>
+                </template>
 
-            <!-- Chevron that rotates based on "opened" -->
-            <template #append>
-              <VIcon v-if="!isRail" icon="mdi-chevron-right" :class="isUsersOpen ? 'uas-chevron--open' : 'uas-chevron'"
-                aria-hidden="true" />
+                <VListItemTitle v-if="!isRail" class="uas-item-title uas-sub-title">
+                  {{ r.title }}
+                </VListItemTitle>
+              </VListItem>
+            </div>
+          </VListGroup>
+
+          <!-- Academic Section -->
+          <div v-if="!isRail" class="uas-section-divider">
+            <span class="uas-section-title">Academic</span>
+          </div>
+          <!-- Schedules -->
+          <VListItem 
+            :to="'/admin/schedules'" 
+            nav 
+            :active="isActivePath('/admin/schedules')"
+            :class="['uas-item', isActivePath('/admin/schedules') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Schedules" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-calendar-clock" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-calendar-clock" class="uas-item-icon" />
+              </div>
             </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Schedules</VListItemTitle>
+          </VListItem>
+
+          <!-- Professors -->
+          <VListItem 
+            :to="'/admin/profs'" 
+            nav 
+            :active="isActivePath('/admin/profs')"
+            :class="['uas-item', isActivePath('/admin/profs') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Professors" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-account-tie" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-account-tie" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Professors</VListItemTitle>
+          </VListItem>
+
+          <!-- Classes -->
+          <VListItem 
+            :to="'/admin/classes'" 
+            nav 
+            :active="isActivePath('/admin/classes')"
+            :class="['uas-item', isActivePath('/admin/classes') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Classes" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-google-classroom" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-google-classroom" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Classes</VListItemTitle>
+          </VListItem>
+
+          <!-- Groups -->
+          <VListItem 
+            :to="'/admin/groups'" 
+            nav 
+            :active="isActivePath('/admin/groups')"
+            :class="['uas-item', isActivePath('/admin/groups') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Groups" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-account-group-outline" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-account-group-outline" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Groups</VListItemTitle>
+          </VListItem>
+
+          <!-- Operations Section -->
+          <div v-if="!isRail" class="uas-section-divider">
+            <span class="uas-section-title">Operations</span>
+          </div>
+
+          <!-- Leave Requests -->
+          <VListItem 
+            :to="'/admin/request_leave'" 
+            nav 
+            :active="isActivePath('/admin/request_leave')"
+            :class="['uas-item', isActivePath('/admin/request_leave') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Leave Requests" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-calendar-remove" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-calendar-remove" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Leave Requests</VListItemTitle>
+          </VListItem>
+
+          <!-- Reports -->
+          <VListItem 
+            :to="'/admin/reports'" 
+            nav 
+            :active="isActivePath('/admin/reports')"
+            :class="['uas-item', isActivePath('/admin/reports') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Reports" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-chart-box" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-chart-box" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Reports</VListItemTitle>
           </VListItem>
         </template>
 
-        <!-- Sub items -->
-        <VListItem v-for="r in userRoles" :key="r.to" :to="r.to" nav :active="isActivePath(r.to)"
-          :class="['uas-item', isActivePath(r.to) && 'uas-item--active']" @click="onClickItem">
-          <template #prepend>
-            <VTooltip v-if="isRail" :text="r.title" location="right">
-              <template #activator="{ props: tip }">
-                <VIcon v-bind="tip" :icon="r.icon" class="uas-item-icon" />
-              </template>
-            </VTooltip>
-            <VIcon v-else :icon="r.icon" class="uas-item-icon" />
-          </template>
-
-          <VListItemTitle v-if="!isRail" class="uas-item-title">
-            {{ r.title }}
-          </VListItemTitle>
-        </VListItem>
-      </VListGroup>
-
-
-      <!-- Schedules -->
-      <VListItem :to="'/schedule'" nav :active="isActivePath('/schedule')"
-        :class="['uas-item', isActivePath('/schedule') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Schedules" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-calendar-outline" class="uas-item-icon" />
+        <!-- Lecturer Navigation -->
+        <template v-else-if="props.role === 'lecturer'">
+          <!-- Dashboard -->
+          <VListItem 
+            :to="'/lecturer/dashboard'" 
+            nav 
+            :active="isActivePath('/lecturer/dashboard')"
+            :class="['uas-item', isActivePath('/lecturer/dashboard') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Dashboard" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-view-dashboard" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-view-dashboard" class="uas-item-icon" />
+              </div>
             </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-calendar-outline" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Schedules</VListItemTitle>
-      </VListItem>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Dashboard</VListItemTitle>
+          </VListItem>
 
-      <!-- Professors -->
-      <VListItem :to="'/professor'" nav :active="isActivePath('/professor')"
-        :class="['uas-item', isActivePath('/professor') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Professors" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-account-tie-outline" class="uas-item-icon" />
+          <!-- Classes -->
+          <VListItem 
+            :to="'/lecturer/classes'" 
+            nav 
+            :active="isActivePath('/lecturer/classes')"
+            :class="['uas-item', isActivePath('/lecturer/classes') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Classes" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-google-classroom" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-google-classroom" class="uas-item-icon" />
+              </div>
             </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-account-tie-outline" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Professors</VListItemTitle>
-      </VListItem>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Classes</VListItemTitle>
+          </VListItem>
 
-      <!-- Subjects -->
-      <VListItem :to="'/subject'" nav :active="isActivePath('/subject')"
-        :class="['uas-item', isActivePath('/subject') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Subjects" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-book-open-variant" class="uas-item-icon" />
+          <!-- Insights -->
+          <VListItem 
+            :to="'/lecturer/insights'" 
+            nav 
+            :active="isActivePath('/lecturer/insights')"
+            :class="['uas-item', isActivePath('/lecturer/insights') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Insights" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-chart-line" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-chart-line" class="uas-item-icon" />
+              </div>
             </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-book-open-variant" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Subjects</VListItemTitle>
-      </VListItem>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Insights</VListItemTitle>
+          </VListItem>
 
-      <!-- Classrooms -->
-      <VListItem :to="'/classroom'" nav :active="isActivePath('/classroom')"
-        :class="['uas-item', isActivePath('/classroom') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Classrooms" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-grid" class="uas-item-icon" />
+          <!-- Leave Request -->
+          <VListItem 
+            :to="'/lecturer/leave'" 
+            nav 
+            :active="isActivePath('/lecturer/leave')"
+            :class="['uas-item', isActivePath('/lecturer/leave') && 'uas-item--active']" 
+            @click="onClickItem"
+          >
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Leave Request" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-calendar-clock" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-calendar-clock" class="uas-item-icon" />
+              </div>
             </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-grid" class="uas-item-icon" />
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Leave Request</VListItemTitle>
+          </VListItem>
         </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Classrooms</VListItemTitle>
-      </VListItem>
+      </VList>
+    </div>
 
-      <!-- Groups -->
-      <VListItem :to="'/admin/groups'" nav :active="isActivePath('/admin/groups')"
-        :class="['uas-item', isActivePath('/admin/groups') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Groups" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-account-group" class="uas-item-icon" />
-            </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-account-group" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Groups</VListItemTitle>
-      </VListItem>
-
-      <!-- Request leave -->
-      <VListItem :to="'/leave'" nav :active="isActivePath('/leave')"
-        :class="['uas-item', isActivePath('/leave') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Request leave" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-account-arrow-left" class="uas-item-icon" />
-            </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-account-arrow-left" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Request leave</VListItemTitle>
-      </VListItem>
-
-      <!-- Report -->
-      <VListItem :to="'/report'" nav :active="isActivePath('/report')"
-        :class="['uas-item', isActivePath('/report') && 'uas-item--active']" @click="onClickItem">
-        <template #prepend>
-          <VTooltip v-if="isRail" text="Report" location="right">
-            <template #activator="{ props }">
-              <VIcon v-bind="props" icon="mdi-chart-donut" class="uas-item-icon" />
-            </template>
-          </VTooltip>
-          <VIcon v-else icon="mdi-chart-donut" class="uas-item-icon" />
-        </template>
-        <VListItemTitle v-if="!isRail" class="uas-item-title">Report</VListItemTitle>
-      </VListItem>
-    </VList>
-
-    <template #append>
-      <VDivider />
-      <div class="uas-footer">
-        <!-- Settings -->
-        <VTooltip v-if="isRail" text="Settings" location="right">
-          <template #activator="{ props }">
-            <VBtn v-bind="props" icon variant="text" class="uas-footer-btn" :aria-label="'Open settings'">
-              <VIcon icon="mdi-cog-outline" />
-            </VBtn>
-          </template>
-        </VTooltip>
-        <VBtn v-else icon variant="text" class="uas-footer-btn" :title="'Settings'" :aria-label="'Open settings'">
-          <VIcon icon="mdi-cog-outline" />
-        </VBtn>
-
-        <!-- Collapse / Expand control (like ChatGPT chevron) -->
-        <VTooltip v-if="isRail" :text="'Expand'" location="right">
-          <template #activator="{ props }">
-            <VBtn v-bind="props" icon variant="text" class="uas-footer-btn" :aria-label="'Expand sidebar'"
-              @click="expandDrawer()">
-              <VIcon :icon="side === 'left' ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left'" />
-            </VBtn>
-          </template>
-        </VTooltip>
-        <VBtn v-else icon variant="text" class="uas-footer-btn" :title="'Collapse'" :aria-label="'Collapse sidebar'"
-          @click="collapseDrawer()">
-          <VIcon :icon="side === 'left' ? 'mdi-chevron-double-left' : 'mdi-chevron-double-right'" />
-        </VBtn>
-      </div>
-    </template>
+    <!-- Rail Expand Button (removed - using hamburger in brand) -->
   </VNavigationDrawer>
 </template>
 
@@ -241,7 +389,29 @@
 import { ref, computed, watch, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDisplay } from 'vuetify'
-import AppHeaderMini from '~/components/ui/AppHeader.vue'
+
+// Props
+interface Props {
+  modelValue?: boolean
+  role?: 'admin' | 'lecturer' | 'student'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: true,
+  role: 'admin'
+})
+
+// Emits
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+}>()
+
+// Expose methods for parent components
+defineExpose({
+  toggleDrawer: () => toggleDrawer(),
+  openDrawer: () => openDrawer(),
+  collapseDrawer: () => collapseDrawer()
+})
 
 const route = useRoute()
 const { mdAndDown } = useDisplay()
@@ -254,7 +424,14 @@ const onClickItem = () => {
 
 
 /* ---------- State ---------- */
-const drawer = ref(true)                 // open/close
+const internalDrawer = ref(true)
+const drawer = computed({
+  get: () => props.modelValue && internalDrawer.value,
+  set: (value) => {
+    internalDrawer.value = value
+    emit('update:modelValue', value)
+  }
+})
 const collapsed = ref(false)             // desktop collapsed -> rail
 const side = ref<'left' | 'right'>('left')
 const openGroups = ref<{ users: boolean }>({ users: false })
@@ -266,10 +443,10 @@ const isRail = computed(() => !isMobile.value && collapsed.value)
 /* Normalize state when breakpoint changes */
 watch(isMobile, (m) => {
   if (m) {
-    drawer.value = false        // start closed on mobile
+    internalDrawer.value = false        // start closed on mobile
     collapsed.value = false     // no rail on mobile
   } else {
-    drawer.value = true         // visible on desktop
+    internalDrawer.value = true         // visible on desktop
   }
 }, { immediate: true })
 
@@ -289,7 +466,7 @@ onMounted(() => {
     if (saved) {
       try {
         const { drawer: d, collapsed: c, side: s, openGroups: og } = JSON.parse(saved)
-        if (typeof d === 'boolean') drawer.value = d
+        if (typeof d === 'boolean') internalDrawer.value = d
         if (typeof c === 'boolean') collapsed.value = c
         if (s === 'left' || s === 'right') side.value = s
         if (og && typeof og.users === 'boolean') openGroups.value.users = og.users
@@ -303,14 +480,14 @@ onMounted(() => {
 })
 
 let persistTimer: number | undefined
-watch([drawer, collapsed, side, openGroups], () => {
+watch([internalDrawer, collapsed, side, openGroups], () => {
   if (typeof window === 'undefined') return
   clearTimeout(persistTimer)
   persistTimer = window.setTimeout(() => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
-        drawer: drawer.value,
+        drawer: internalDrawer.value,
         collapsed: collapsed.value,
         side: side.value,
         openGroups: openGroups.value,
@@ -320,15 +497,23 @@ watch([drawer, collapsed, side, openGroups], () => {
 }, { deep: true })
 
 /* ---------- Actions ---------- */
-const openDrawer = () => { drawer.value = true; if (!isMobile.value) collapsed.value = false }
-const collapseDrawer = () => { if (!isMobile.value) collapsed.value = true }
-const expandDrawer = () => { if (!isMobile.value) collapsed.value = false; drawer.value = true }
+const openDrawer = () => { 
+  internalDrawer.value = true; 
+  if (!isMobile.value) collapsed.value = false 
+}
+const collapseDrawer = () => { 
+  if (!isMobile.value) collapsed.value = true 
+}
+const expandDrawer = () => { 
+  if (!isMobile.value) collapsed.value = false; 
+  internalDrawer.value = true 
+}
 const toggleDrawer = () => {
   if (isMobile.value) {
-    drawer.value = !drawer.value
+    internalDrawer.value = !internalDrawer.value
   } else {
     collapsed.value = !collapsed.value
-    drawer.value = true
+    internalDrawer.value = true
   }
 }
 
@@ -336,7 +521,7 @@ const opened = ref<(string | number)[]>([])
 // convenience for the chevron
 const isUsersOpen = computed(() => opened.value.includes('users'))
 /* Close drawer on route change (mobile) */
-watch(() => route.fullPath, () => { if (isMobile.value) drawer.value = false })
+watch(() => route.fullPath, () => { if (isMobile.value) internalDrawer.value = false })
 /* Active helpers */
 const isActivePath = (base: string) =>
   route.path === base || route.path.startsWith(base + '/')
@@ -350,13 +535,11 @@ const userRoles = [
   { title: 'Lecturer', icon: 'mdi-account-tie-outline', to: '/admin/lecturer' },
 ]
 </script>
-
 <style scoped>
 /* Drawer baseline (theme-aware) */
 .uas-drawer {
   background: rgb(var(--v-theme-surface));
 }
-
 /* Brand */
 .uas-brand {
   display: flex;
@@ -365,43 +548,36 @@ const userRoles = [
   padding: 20px;
   cursor: pointer;
 }
-
 .uas-logo {
   border-radius: 12px;
   background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
   color: rgb(var(--v-theme-primary));
 }
-
 .uas-brand-text {
   display: flex;
   flex-direction: column;
   line-height: 1.1;
 }
-
 .uas-title {
   font-size: 20px;
   font-weight: 700;
 }
-
 .uas-version {
   font-size: 12px;
   color: rgb(var(--v-theme-on-surface-variant, 130, 130, 130));
 }
-
 /* Items */
 .uas-item {
   margin: 10px 6px;
   border-radius: 5px;
   padding-left: 10px;
   min-height: 52px;
-  transition: background .2s, color .2s;
+  transition: background 0.2s, color 0.2s;
   color: rgb(var(--v-theme-on-surface));
 }
-
 .uas-item :deep(.v-icon) {
   color: currentColor;
 }
-
 .uas-item-title {
   font-size: 16px;
   font-weight: 500;
@@ -411,9 +587,12 @@ const userRoles = [
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
 }
-
 .uas-item:hover {
-  background: color-mix(in srgb, rgb(var(--v-theme-on-surface)) 12%, transparent);
+  background: color-mix(
+    in srgb,
+    rgb(var(--v-theme-on-surface)) 12%,
+    transparent
+  );
   color: rgb(var(--v-theme-on-surface));
 }
 
@@ -424,7 +603,6 @@ const userRoles = [
   justify-content: space-between;
   padding: 8px;
 }
-
 .uas-footer-btn {
   margin: 4px;
 }
@@ -433,23 +611,19 @@ const userRoles = [
 .uas-chevron,
 .uas-chevron,
 .uas-chevron--open {
-  transition: transform .2s ease;
+  transition: transform 0.2s ease;
 }
-
 .uas-chevron--open {
   transform: rotate(90deg);
 }
-
-
 
 /* Floating action button on mobile */
 .uas-fab {
   position: fixed;
   z-index: 9999;
   bottom: 16px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
-
 /* Right-side tweaks */
 .uas-drawer--right .uas-item {
   padding-left: 16px;
@@ -460,21 +634,16 @@ const userRoles = [
 /* Hide the drawer's scrollbar but keep scrolling */
 :deep(.v-navigation-drawer__content) {
   overflow-y: auto;
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
-
 :deep(.v-navigation-drawer__content::-webkit-scrollbar) {
   width: 0;
-  height: 0;
-  /* Chrome/Safari */
+  height: 0; /* Chrome/Safari */
 }
 
 /* Prevent inner list from creating its own scrollbar during group expand */
 :deep(.v-navigation-drawer__content .v-list) {
-  overflow: visible;
-  /* let the group expand without a nested scroller */
+  overflow: visible; /* let the group expand without a nested scroller */
 }
 </style>
