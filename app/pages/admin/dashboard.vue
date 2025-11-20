@@ -4,7 +4,7 @@
         <v-row class="mb-6">
             <v-col cols="12" class="d-flex justify-space-between align-center">
                 <div>
-                    <h1 class="text-h4 font-weight-bold">Hello, Admin 👋</h1>
+                    <h1 class="text-h4 font-semibold">Hello, Admin 👋</h1>
                 </div>
                 <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search ..."
                     variant="outlined" density="compact" hide-details style="max-width: 300px" rounded />
@@ -43,7 +43,7 @@
                 <v-card class="stat-card blue-border" elevation="2">
                     <v-card-text class="d-flex align-center justify-space-between">
                         <div>
-                            <div class="text-h6 font-weight-bold">Count of student</div>
+                            <div class="text-h6 font-semibold">Count of student</div>
                             <div class="text-h4 font-weight-bold mt-2">45 students</div>
                             <div class="text-caption text-grey">Female 23 Male 22</div>
                         </div>
@@ -191,10 +191,9 @@
         </v-row>
     </div>
 </template>
-
 <script setup>
 definePageMeta({
-    layout: 'admin',
+    layout: 'admin', // ✅ Use admin layout to show Navbar
     // middleware: ['auth', 'role-admin'] // Commented out for testing
 })
 
@@ -383,6 +382,7 @@ const initDoughnutChart = () => {
 .stat-card {
     border-left: 4px solid;
     height: 100%;
+    border-radius: 12px;
 }
 
 .stat-card.blue-border {
