@@ -1,10 +1,5 @@
 <template>
-  <VNavigationDrawer
-    v-model="drawer"
-    app
-    width="300"
-    class="uas-drawer"
-  >
+  <VNavigationDrawer v-model="drawer" app width="300" class="uas-drawer">
     <!-- Brand -->
     <div class="uas-brand">
       <VAvatar size="36" class="uas-logo">
@@ -20,20 +15,11 @@
 
     <!-- Menu -->
     <VList nav density="comfortable" class="pt-0">
-      <VListItem
-        v-for="item in items"
-        :key="item.to"
-        :to="item.to"
-        link
-        nav
-        :active="isActive(item)"
-        :class="[
-          'uas-item',
-          item.variant === 'muted' && 'uas-item--muted',
-          isActive(item) && 'uas-item--active'
-        ]"
-        @click="onClickItem"
-      >
+      <VListItem v-for="item in items" :key="item.to" :to="item.to" link nav :active="isActive(item)" :class="[
+        'uas-item',
+        item.variant === 'muted' && 'uas-item--muted',
+        isActive(item) && 'uas-item--active'
+      ]" @click="onClickItem">
         <template #prepend>
           <VIcon :icon="item.icon" class="uas-item-icon" />
         </template>
@@ -57,21 +43,21 @@ const route = useRoute()
 
 // match your screenshot order + paths (change 'to' to your real routes)
 const items = [
-  { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/dashboard',  variant: 'muted' },
-  { title: 'Roles',            icon: 'mdi-account-badge-outline',  to: '/roles' },
-  { title: 'Users',            icon: 'mdi-account-outline',        to: '/users' },
-  { title: 'Schedules',        icon: 'mdi-calendar-outline',       to: '/schedules' },
-  { title: 'Professors',       icon: 'mdi-account-tie-outline',    to: '/professors' },
-  { title: 'Subjects',         icon: 'mdi-book-open-variant',      to: '/subjects' },
-  { title: 'Classrooms',       icon: 'mdi-grid',                   to: '/classrooms' },
-  { title: 'Request leave',    icon: 'mdi-account-arrow-left',     to: '/leave' },
-  { title: 'Report',           icon: 'mdi-chart-donut',            to: '/reports' },
+  { title: 'Dashboard', icon: 'mdi-view-dashboard-outline', to: '/admin/dashboard', variant: 'muted' },
+  { title: 'Roles', icon: 'mdi-account-badge-outline', to: '/admin/roles' },
+  { title: 'Users', icon: 'mdi-account-outline', to: '/admin/users' },
+  { title: 'Schedules', icon: 'mdi-calendar-outline', to: '/admin/schedules' },
+  { title: 'Professors', icon: 'mdi-account-tie-outline', to: '/admin/profs' },
+  { title: 'Classes', icon: 'mdi-google-classroom', to: '/admin/classes' },
+  { title: 'Groups', icon: 'mdi-account-multiple-outline', to: '/admin/groups' },
+  { title: 'Report', icon: 'mdi-chart-donut', to: '/admin/reports' },
 ]
 
 // active state like in the image (Users highlighted)
 const isActive = (item) => route.path.startsWith(item.to)
 const onClickItem = () => { /* auto-close on mobile if you want */ }
 </script>
+
 
 <style scoped>
 /* Drawer base */
@@ -99,7 +85,6 @@ const onClickItem = () => { /* auto-close on mobile if you want */ }
 .uas-title {
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: 0.2px;
 }
 .uas-version {
   font-size: 12px;
@@ -112,37 +97,59 @@ const onClickItem = () => { /* auto-close on mobile if you want */ }
   border-radius: 16px;
   padding-left: 10px;
   min-height: 52px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 .uas-item-title {
   font-size: 16px;
   font-weight: 500;
 }
 .uas-item-icon {
-  opacity: 0.9;
+  transition: color 0.2s ease;
+}
+.uas-chevron {
+  color: #7acb2e;
+  transition: color 0.2s ease;
 }
 
-/* Grey pill (first row) */
+/* Grey pill (muted) */
 .uas-item--muted {
-  background: #e9edf2; /* soft grey like screenshot */
+  background: #e9edf2;
   color: #2b3a55;
 }
 
-/* Active navy pill (e.g., Users) */
+/* Active navy pill */
 .uas-item--active {
-  background: #0d2142;     /* dark navy */
+  background: #0d2142;
   color: #ffffff !important;
 }
 .uas-item--active :deep(.v-icon) {
   color: #ffffff !important;
 }
 
-/* Green chevron on the right */
-.uas-chevron {
-  color: #7acb2e;          /* soft green */
+/* Hover effect (⚡️ THIS PART ADDED) */
+.uas-item:hover {
+  background: #0d2142;  /* navy background */
+  color: #ffffff;
+}
+.uas-item:hover :deep(.v-icon) {
+  color: #ffffff !important;
+}
+.uas-item--active:hover {
+  filter: brightness(1.1);
 }
 
-/* Make inactive items’ chevron still green (like screenshot) */
+/* Special: muted item hover (grey one) */
+.uas-item--muted:hover {
+  background: #0d2142;   /* navy on hover */
+  color: #ffffff;
+}
+.uas-item--muted:hover :deep(.v-icon) {
+  color: #ffffff !important;
+}
+
+/* Chevron stays green */
 .uas-item :deep(.v-list-item__append .v-icon) {
   color: #7acb2e;
 }
 </style>
+
