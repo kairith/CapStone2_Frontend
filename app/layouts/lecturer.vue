@@ -11,9 +11,7 @@
     
     <!-- Main Content Area -->
     <v-main class="main-content">
-      <v-container fluid>
-        <slot />
-      </v-container>
+      <slot />
     </v-main>
   </v-app>
 </template>
@@ -44,5 +42,7 @@ const toggleDrawer = () => {
 <style scoped>
 .main-content {
   background-color: #f5f5f5;
+  height: 100vh;
+  overflow-y: auto;
 }
 </style>
