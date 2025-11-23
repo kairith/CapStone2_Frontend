@@ -288,6 +288,22 @@
             </template>
             <VListItemTitle v-if="!isRail" class="uas-item-title">Leave Request</VListItemTitle>
           </VListItem>
+
+          <!-- Attendance -->
+          <VListItem :to="'/lecturer/attendance'" nav :active="isActivePath('/lecturer/attendance')"
+            :class="['uas-item', isActivePath('/lecturer/attendance') && 'uas-item--active']" @click="onClickItem">
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Attendance" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-calendar-clock" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-calendar-clock" class="uas-item-icon" />
+              </div>
+            </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Attendance</VListItemTitle>
+          </VListItem>
         </template>
       </VList>
     </div>
