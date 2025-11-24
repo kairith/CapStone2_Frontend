@@ -16,20 +16,45 @@
         <VIcon icon="mdi-earth" class="earth-btn"/>
         <VIcon icon="mdi-chevron-down" size="16" />
       </VBtn>
-      <VMenu>
+      <VMenu offset-y min-width="280">
         <template #activator="{ props }">
           <VBtn v-bind="props" class="user-btn header-icon">
             <VAvatar color="primary" size="32" class="avatar-circle">
               <span class="text-white">A</span>
             </VAvatar>
-            <span class="username">ADM</span>
+            <span class="username">admin</span>
             <VIcon icon="mdi-chevron-down" size="16" />
           </VBtn>
         </template>
-        <VList>
-          <VListItem title="Profile" />
-          <VListItem title="Logout" />
-        </VList>
+        <VCard class="user-dropdown" elevation="8">
+          <!-- User Info Header -->
+          <div class="user-info-header">
+            <VAvatar color="primary" size="48" class="user-avatar">
+              <span class="text-white avatar-text">A</span>
+            </VAvatar>
+            <div class="user-details">
+              <div class="user-name">admin</div>
+              <div class="user-email">admin@gmail.com</div>
+            </div>
+          </div>
+          <VDivider />
+          <!-- Menu Items -->
+          <VList class="user-menu" nav density="compact">
+            <VListItem @click="$router.push('/profile')" class="menu-item">
+              <template #prepend>
+                <VIcon color="primary" size="20">mdi-account-circle</VIcon>
+              </template>
+              <VListItemTitle>View profile</VListItemTitle>
+            </VListItem>
+            <VDivider class="my-1" />
+            <VListItem class="menu-item sign-out">
+              <template #prepend>
+                <VIcon color="error" size="20">mdi-logout</VIcon>
+              </template>
+              <VListItemTitle>Sign out</VListItemTitle>
+            </VListItem>
+          </VList>
+        </VCard>
       </VMenu>
     </div>
   </VAppBar>
@@ -114,6 +139,85 @@ defineEmits(['toggle-drawer'])
 }
 .earth-btn {
   color: #64748b;
+}
+
+/* User Dropdown Styles */
+.user-dropdown {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+}
+
+.user-info-header {
+  padding: 20px 20px 16px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+.avatar-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.user-email {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.user-menu {
+  padding: 8px 0;
+  background: #fff;
+}
+
+.menu-item {
+  margin: 0 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.menu-item:hover {
+  background: #f1f5f9 !important;
+}
+
+.menu-item.sign-out:hover {
+  background: #fef2f2 !important;
+}
+
+.menu-item .v-list-item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.menu-item.sign-out .v-list-item-title {
+  color: #dc2626;
+}
+
+.menu-item :deep(.v-list-item__prepend) {
+  margin-inline-end: 12px !important;
 }
 </style>
 
