@@ -1,0 +1,238 @@
+/* Global Font Styling for UAS System */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
+
+/* Global font family application */
+* {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+html,
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Global font size classes */
+.title,
+h1,
+.v-toolbar-title,
+.section-title,
+.page-title,
+.card-title {
+  font-size: 30px !important;
+  font-weight: 600;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.subtitle,
+h2,
+.section-subtitle {
+  font-size: 24px !important;
+  font-weight: 500;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.body-text,
+p,
+.text-body-1,
+.v-list-item-title,
+.v-btn,
+label,
+.field-label,
+.v-field input,
+.v-field textarea,
+.v-text-field input,
+.v-select .v-field,
+.v-chip,
+.v-tab,
+.v-table th,
+.v-table td,
+.v-card-text,
+.v-list-item-subtitle {
+  font-size: 16px !important;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+/* Specific Vuetify component overrides */
+.v-application {
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+.v-btn {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+  text-transform: none !important;
+}
+
+.v-list-item-title {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-card-title {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 30px !important;
+}
+
+.v-toolbar-title {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 30px !important;
+}
+
+.v-field .v-field__input {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-text-field .v-field__input {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-select .v-field__input {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-chip .v-chip__content {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-tab {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-data-table th {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-data-table td {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Navigation and Menu items */
+.v-navigation-drawer .v-list-item-title {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Form labels */
+label,
+.v-label,
+.v-field-label {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Avatar text */
+.v-avatar .v-avatar__content {
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+/* Dialog and Modal titles */
+.v-dialog .v-card-title {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 30px !important;
+}
+
+/* Snackbar and Alert text */
+.v-snackbar .v-snackbar__content {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+.v-alert {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Breadcrumbs */
+.v-breadcrumbs {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Menu items */
+.v-menu .v-list-item {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Pagination */
+.v-pagination .v-btn {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Stepper */
+.v-stepper-header .v-stepper-item {
+  font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+/* Timeline */
+.v-timeline-item .v-timeline-item__content {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Ensure responsive font scaling */
+@media (max-width: 768px) {
+  .title,
+  h1,
+  .v-toolbar-title,
+  .section-title,
+  .page-title,
+  .card-title,
+  .v-card-title {
+    font-size: 24px !important;
+  }
+  
+  .subtitle,
+  h2,
+  .section-subtitle {
+    font-size: 20px !important;
+  }
+  
+  .body-text,
+  p,
+  .text-body-1,
+  .v-list-item-title,
+  .v-btn,
+  label {
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .title,
+  h1,
+  .v-toolbar-title,
+  .section-title,
+  .page-title,
+  .card-title,
+  .v-card-title {
+    font-size: 22px !important;
+  }
+  
+  .subtitle,
+  h2,
+  .section-subtitle {
+    font-size: 18px !important;
+  }
+  
+  .body-text,
+  p,
+  .text-body-1,
+  .v-list-item-title,
+  .v-btn,
+  label {
+    font-size: 14px !important;
+  }
+}

@@ -202,15 +202,23 @@ const userInitials = computed(() => {
 </script>
 
 <style scoped>
+/* Global font application */
+* {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
 .profile-page {
   background: #f5f5f5;
   min-height: 100vh;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
 }
 
 .profile-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 24px 16px;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .profile-row {
@@ -252,18 +260,78 @@ const userInitials = computed(() => {
 }
 
 .user-main-name {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 600;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .user-main-email {
-  font-size: 14px;
+  font-size: 16px;
   opacity: 0.9;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+/* Navigation and other text elements */
+.sidebar-nav {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.nav-item {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
 }
 
 .user-role-chip {
   background: rgba(255, 255, 255, 0.2) !important;
   color: white !important;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+}
+
+.field-label {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.user-name {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.user-role {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* Form inputs */
+.profile-field :deep(.v-field) {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+}
+
+.edit-btn {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
+}
+
+/* Button text */
+:deep(.v-btn) {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px;
+}
+
+/* List item titles */
+:deep(.v-list-item-title) {
+  font-family: 'Source Sans Pro', sans-serif !important;
+  font-size: 16px;
 }
 
 /* Main content */
@@ -280,13 +348,15 @@ const userInitials = computed(() => {
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 600;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .section-subtitle {
-  font-size: 14px;
+  font-size: 16px;
   color: #6b7280;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .edit-btn {
@@ -321,12 +391,6 @@ const userInitials = computed(() => {
 
 .password-form {
   width: 100%;
-}
-
-.edit-btn {
-  border-radius: 8px;
-  font-weight: 500;
-  text-transform: none;
 }
 
 /* Responsive fixes */

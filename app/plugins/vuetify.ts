@@ -17,6 +17,37 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       },
     },
+    defaults: {
+      global: {
+        style: {
+          fontFamily: "'Source Sans Pro', sans-serif",
+        },
+      },
+      VBtn: {
+        style: {
+          fontFamily: "'Source Sans Pro', sans-serif",
+          fontSize: "16px",
+          textTransform: "none",
+        },
+      },
+      VCard: {
+        style: {
+          fontFamily: "'Source Sans Pro', sans-serif",
+        },
+      },
+      VTextField: {
+        style: {
+          fontFamily: "'Source Sans Pro', sans-serif",
+          fontSize: "16px",
+        },
+      },
+      VSelect: {
+        style: {
+          fontFamily: "'Source Sans Pro', sans-serif",
+          fontSize: "16px",
+        },
+      },
+    },
   });
 
   nuxtApp.vueApp.use(vuetify);
