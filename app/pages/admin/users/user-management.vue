@@ -3,83 +3,143 @@
         <v-main>
             <div class="user-management-container">
                 <!-- Header Section -->
-                <v-row class="mb-6" align="center">
-                    <v-col cols="12" class="d-flex justify-space-between align-center">
+                <div class="page-header mb-6">
+                    <div class="d-flex align-center justify-space-between">
                         <div>
-                            <h1 class="text-h4 font-weight-bold">Manage user(s)</h1>
-                            <p class="text-subtitle-2 text-grey">Manage user(s)</p>
+                            <h1 class="text-h5 font-weight-bold mb-2">User Management</h1>
+                            <p class="text-body-2 text-grey-darken-1">Manage students, lecturers, and admin accounts</p>
                         </div>
-                        <v-btn color="primary" size="large" prepend-icon="mdi-plus" @click="navigateToAddUser">
-                            Add new user
+                        <v-btn color="primary" prepend-icon="mdi-plus" class="text-none" @click="navigateToAddUser">
+                            Add New User
                         </v-btn>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <v-row class="mb-6">
+                    <v-col cols="12" md="3">
+                        <v-card elevation="1">
+                            <v-card-text class="pa-4">
+                                <div class="text-caption text-grey-darken-1 mb-1">Total Users</div>
+                                <div class="text-h4 font-weight-bold">{{ allUsers.length }}</div>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-card elevation="1">
+                            <v-card-text class="pa-4">
+                                <div class="text-caption text-grey-darken-1 mb-1">Students</div>
+                                <div class="text-h4 font-weight-bold">{{ studentCount }}</div>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-card elevation="1">
+                            <v-card-text class="pa-4">
+                                <div class="text-caption text-grey-darken-1 mb-1">Lecturers</div>
+                                <div class="text-h4 font-weight-bold">{{ lecturerCount }}</div>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-card elevation="1">
+                            <v-card-text class="pa-4">
+                                <div class="text-caption text-grey-darken-1 mb-1">Admins</div>
+                                <div class="text-h4 font-weight-bold">{{ adminCount }}</div>
+                            </v-card-text>
+                        </v-card>
                     </v-col>
                 </v-row>
 
                 <!-- Filters Section -->
-                <v-card flat class="mb-4 pa-4">
-                    <div class="d-flex align-center flex-wrap ga-3 mb-4">
-                        <span class="text-subtitle-2 font-weight-bold">Filters</span>
+                <v-card elevation="2" class="mb-6 filter-card">
+                    <v-card-title class="bg-grey-lighten-4 py-4">
+                        <v-icon class="mr-2" color="indigo">mdi-filter-variant</v-icon>
+                        <span class="text-subtitle-1 font-weight-bold">Filter Users</span>
+                    </v-card-title>
+                    <v-card-text class="pa-5">
+                        <v-row class="mb-4">
+                            <v-col cols="12" md="3">
+                                <v-select v-model="filters.userRole" :items="userRoleOptions" label="User Role"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-account-circle" bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- User Role Filter -->
-                        <v-select v-model="filters.userRole" :items="userRoleOptions" label="User Role"
-                            variant="outlined" density="compact" hide-details style="max-width: 150px" />
+                            <v-col cols="12" md="3" v-if="filters.userRole === 'Student'">
+                                <v-select v-model="filters.generation" :items="generationOptions" label="Generation"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-school" bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- Generation (Student only) -->
-                        <v-select v-if="filters.userRole === 'Student'" v-model="filters.generation"
-                            :items="generationOptions" label="Generation" variant="outlined" density="compact"
-                            hide-details style="max-width: 150px" />
+                            <v-col cols="12" md="3">
+                                <v-select v-model="filters.year" :items="yearOptions" label="Academic Year"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-calendar" bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- Year -->
-                        <v-select v-model="filters.year" :items="yearOptions" label="Year" variant="outlined"
-                            density="compact" hide-details style="max-width: 150px" />
+                            <v-col cols="12" md="3" v-if="filters.userRole === 'Student'">
+                                <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined"
+                                    density="comfortable" hide-details prepend-inner-icon="mdi-account-group"
+                                    bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- Group (Student only) -->
-                        <v-select v-if="filters.userRole === 'Student'" v-model="filters.group" :items="groupOptions"
-                            label="Group" variant="outlined" density="compact" hide-details style="max-width: 150px" />
+                            <v-col cols="12" md="3" v-if="filters.userRole === 'Student'">
+                                <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialization"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-book-education" bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- Specialize (Student only) -->
-                        <v-select v-if="filters.userRole === 'Student'" v-model="filters.specialize"
-                            :items="specializeOptions" label="Specialize" variant="outlined" density="compact"
-                            hide-details style="max-width: 150px" />
+                            <v-col cols="12" md="3" v-if="filters.userRole === 'Lecturer'">
+                                <v-select v-model="filters.department" :items="departmentOptions" label="Department"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-domain" bg-color="white" color="indigo" />
+                            </v-col>
 
-                        <!-- Department (Lecturer only) -->
-                        <v-select v-if="filters.userRole === 'Lecturer'" v-model="filters.department"
-                            :items="departmentOptions" label="Department" variant="outlined" density="compact"
-                            hide-details style="max-width: 180px" />
+                            <v-col cols="12" md="3">
+                                <v-select v-model="filters.status" :items="statusOptions" label="Status"
+                                    variant="outlined" density="comfortable" hide-details
+                                    prepend-inner-icon="mdi-toggle-switch" bg-color="white" color="indigo" />
+                            </v-col>
+                        </v-row>
 
-                        <!-- Status Filter -->
-                        <v-select v-model="filters.status" :items="statusOptions" label="Status" variant="outlined"
-                            density="compact" hide-details style="max-width: 150px" />
-
-                        <v-btn color="primary" prepend-icon="mdi-magnify">
-                            Search
-                        </v-btn>
-
-                        <v-btn variant="text" color="grey" @click="resetFilters">
-                            Reset
-                        </v-btn>
-                    </div>
-
-                    <!-- Import/Export Buttons -->
-                    <div class="d-flex justify-end ga-3">
-                        <v-btn color="success" prepend-icon="mdi-download" size="large">
-                            Import
-                        </v-btn>
-                        <v-btn color="#1e293b" prepend-icon="mdi-upload" size="large" class="text-white">
-                            Export
-                        </v-btn>
-                    </div>
+                        <v-row>
+                            <v-col cols="12" class="d-flex justify-space-between align-center">
+                                <div class="d-flex ga-3">
+                                    <v-btn color="indigo" variant="flat" prepend-icon="mdi-magnify" size="large"
+                                        class="text-none font-weight-medium">
+                                        Apply Filters
+                                    </v-btn>
+                                    <v-btn color="grey-darken-1" variant="outlined" prepend-icon="mdi-refresh"
+                                        size="large" @click="resetFilters" class="text-none font-weight-medium">
+                                        Reset
+                                    </v-btn>
+                                </div>
+                                <div class="d-flex ga-3">
+                                    <v-btn color="green-darken-1" variant="tonal" prepend-icon="mdi-file-import"
+                                        size="large" class="text-none font-weight-medium">
+                                        Import Users
+                                    </v-btn>
+                                    <v-btn color="blue-darken-1" variant="tonal" prepend-icon="mdi-file-export"
+                                        size="large" class="text-none font-weight-medium">
+                                        Export Data
+                                    </v-btn>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
                 </v-card>
 
                 <!-- User Information Table -->
-                <v-card elevation="2">
-                    <v-card-title class="d-flex justify-space-between align-center pa-4">
-                        <span class="text-h6 font-weight-bold">{{ tableTitle }}</span>
-                        <div class="d-flex align-center ga-3">
-                            <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search ...."
-                                variant="outlined" density="compact" hide-details style="max-width: 250px" />
-                            <v-select v-model="tableOrder" :items="['A-Z', 'Z-A']" label="Order" variant="outlined"
-                                density="compact" hide-details style="max-width: 120px" />
+                <v-card elevation="1" class="data-table-card">
+                    <v-card-title class="pa-4">
+                        <div class="d-flex justify-space-between align-center w-100">
+                            <span class="text-h6 font-weight-bold">{{ tableTitle }}</span>
+                            <div class="d-flex align-center ga-3">
+                                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search..."
+                                    variant="outlined" density="compact" hide-details style="min-width: 250px" />
+                                <v-select v-model="tableOrder" :items="['A-Z', 'Z-A']" label="Sort" variant="outlined"
+                                    density="compact" hide-details style="max-width: 120px" />
+                            </div>
                         </div>
                     </v-card-title>
 
@@ -87,85 +147,106 @@
                         <v-table class="user-table">
                             <thead>
                                 <tr class="table-header">
-                                    <th class="text-center">#</th>
-                                    <th class="text-left">Full Name</th>
-                                    <th class="text-center">Role</th>
-                                    <th class="text-center">Email</th>
-                                    <th class="text-center">Phone</th>
-                                    <th class="text-center">{{ dynamicColumnHeader }}</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center">Action</th>
+                                    <th class="text-center\" style="width: 60px">#</th>
+                                    <th class="text-left" style="min-width: 180px">Full Name</th>
+                                    <th class="text-center" style="width: 100px">Role</th>
+                                    <th class="text-left" style="min-width: 180px">Email</th>
+                                    <th class="text-center" style="width: 130px">Phone</th>
+                                    <th class="text-center" style="width: 150px">{{ dynamicColumnHeader }}</th>
+                                    <th class="text-center" style="width: 100px">Status</th>
+                                    <th class="text-center" style="width: 120px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(user, index) in filteredUsers" :key="user.id"
-                                    :class="index % 2 === 0 ? 'row-even' : 'row-odd'">
-                                    <td class="text-center">{{ String(index + 1).padStart(2, '0') }}</td>
+                                <tr v-for="(user, index) in paginatedUsers" :key="user.id" class="table-row">
+                                    <td class="text-center">
+                                        <span class="text-body-2 text-grey-darken-1">
+                                            {{ index + 1 + (currentPage - 1) * itemsPerPage }}
+                                        </span>
+                                    </td>
                                     <td class="text-left">
-                                        <div class="d-flex align-center ga-2">
-                                            <v-avatar size="32" :color="getRoleColor(user.role)">
-                                                <span class="text-white text-caption">{{ user.name.charAt(0) }}</span>
+                                        <div class="d-flex align-center ga-3 py-2">
+                                            <v-avatar color="grey-darken-2" size="36">
+                                                <span class="text-white font-weight-medium">{{ user.name.charAt(0)
+                                                }}</span>
                                             </v-avatar>
-                                            <span>{{ user.name }}</span>
+                                            <div>
+                                                <div class="font-weight-medium">{{ user.name }}</div>
+                                                <div class="text-caption text-grey">{{ getUserId(user) }}</div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <v-chip :color="getRoleColor(user.role)" size="small" variant="flat"
-                                            class="text-white">
+                                        <v-chip size="small" variant="outlined">
                                             {{ user.role }}
                                         </v-chip>
                                     </td>
-                                    <td class="text-center">{{ user.email }}</td>
-                                    <td class="text-center">{{ user.phone }}</td>
-                                    <td class="text-center">{{ getDynamicColumnValue(user) }}</td>
+                                    <td class="text-left">
+                                        <div class="d-flex align-center">
+                                            <v-icon size="16" class="mr-2" color="grey-darken-1">mdi-email</v-icon>
+                                            {{ user.email }}
+                                        </div>
+                                    </td>
                                     <td class="text-center">
-                                        <v-chip :color="user.status === 'Active' ? 'success' : 'error'" size="small"
+                                        <div class="d-flex align-center justify-center">
+                                            <v-icon size="16" class="mr-2" color="grey-darken-1">mdi-phone</v-icon>
+                                            {{ user.phone }}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <v-chip size="small" variant="outlined">
+                                            {{ getDynamicColumnValue(user) }}
+                                        </v-chip>
+                                    </td>
+                                    <td class="text-center">
+                                        <v-chip :color="user.status === 'Active' ? 'success' : 'default'" size="small"
                                             variant="flat">
                                             {{ user.status }}
                                         </v-chip>
                                     </td>
                                     <td class="text-center">
-                                        <div class="d-flex justify-center ga-2">
-                                            <v-tooltip text="Edit">
-                                                <template v-slot:activator="{ props }">
-                                                    <v-icon v-bind="props" color="blue" size="small"
-                                                        @click="editUser(user)">
-                                                        mdi-pencil
-                                                    </v-icon>
-                                                </template>
-                                            </v-tooltip>
+                                        <div class="d-flex justify-center ga-1">
+                                            <v-btn icon size="small" variant="text" @click="editUser(user)">
+                                                <v-icon>mdi-pencil</v-icon>
+                                                <v-tooltip activator="parent" location="top">Edit</v-tooltip>
+                                            </v-btn>
 
-                                            <v-tooltip text="Delete">
-                                                <template v-slot:activator="{ props }">
-                                                    <v-icon v-bind="props" color="red" size="small"
-                                                        @click="deleteUser(user)">
-                                                        mdi-delete
-                                                    </v-icon>
-                                                </template>
-                                            </v-tooltip>
+                                            <v-btn icon size="small" variant="text" @click="toggleUserStatus(user)">
+                                                <v-icon>
+                                                    {{ user.status === 'Active' ? 'mdi-account-off' :
+                                                        'mdi-account-check' }}
+                                                </v-icon>
+                                                <v-tooltip activator="parent" location="top">
+                                                    {{ user.status === 'Active' ? 'Deactivate' : 'Activate' }}
+                                                </v-tooltip>
+                                            </v-btn>
 
-                                            <v-tooltip :text="user.status === 'Active' ? 'Deactivate' : 'Activate'">
-                                                <template v-slot:activator="{ props }">
-                                                    <v-icon v-bind="props"
-                                                        :color="user.status === 'Active' ? 'orange' : 'green'"
-                                                        size="small" @click="toggleUserStatus(user)">
-                                                        {{ user.status === 'Active' ? 'mdi-account-off' :
-                                                            'mdi-account-check' }}
-                                                    </v-icon>
-                                                </template>
-                                            </v-tooltip>
+                                            <v-btn icon size="small" variant="text" color="error"
+                                                @click="deleteUser(user)">
+                                                <v-icon>mdi-delete</v-icon>
+                                                <v-tooltip activator="parent" location="top">Delete</v-tooltip>
+                                            </v-btn>
                                         </div>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredUsers.length === 0">
+                                    <td colspan="8" class="text-center py-8">
+                                        <v-icon size="64" color="grey-lighten-1">mdi-account-off-outline</v-icon>
+                                        <p class="text-h6 text-grey-darken-1 mt-3">No users found</p>
+                                        <p class="text-body-2 text-grey">Try adjusting your filters</p>
                                     </td>
                                 </tr>
                             </tbody>
                         </v-table>
 
                         <!-- Pagination -->
-                        <div class="d-flex justify-space-between align-center pa-4">
-                            <span class="text-caption text-grey">
-                                Showing {{ filteredUsers.length }} of {{ allUsers.length }} users
+                        <v-divider></v-divider>
+                        <div class="d-flex justify-space-between align-center pa-4\">
+                            <span class="text-body-2 text-grey-darken-1">
+                                Showing {{ paginatedUsers.length }} of {{ filteredUsers.length }} users
                             </span>
-                            <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small">
+                            <v-pagination v-model="currentPage" :length="totalPages" :total-visible="5" size="small"
+                                rounded="circle">
                             </v-pagination>
                         </div>
                     </v-card-text>
@@ -301,18 +382,53 @@ const totalPages = computed(() => {
     return Math.ceil(filteredUsers.value.length / itemsPerPage)
 })
 
+const paginatedUsers = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return filteredUsers.value.slice(start, end)
+})
+
+const studentCount = computed(() => {
+    return allUsers.value.filter(u => u.role === 'Student').length
+})
+
+const lecturerCount = computed(() => {
+    return allUsers.value.filter(u => u.role === 'Lecturer').length
+})
+
+const adminCount = computed(() => {
+    return allUsers.value.filter(u => u.role === 'Admin').length
+})
+
 // Helper functions
 const getRoleColor = (role) => {
     switch (role) {
         case 'Student':
-            return 'primary'
+            return 'blue-darken-1'
         case 'Lecturer':
-            return 'success'
+            return 'green-darken-1'
         case 'Admin':
-            return 'error'
+            return 'purple-darken-1'
         default:
             return 'grey'
     }
+}
+
+const getRoleIcon = (role) => {
+    switch (role) {
+        case 'Student':
+            return 'mdi-school'
+        case 'Lecturer':
+            return 'mdi-account-tie'
+        case 'Admin':
+            return 'mdi-shield-account'
+        default:
+            return 'mdi-account'
+    }
+}
+
+const getUserId = (user) => {
+    return user.studentId || user.employeeId || user.adminId || 'N/A'
 }
 
 const getDynamicColumnValue = (user) => {
@@ -379,39 +495,35 @@ const toggleUserStatus = (user) => {
     min-height: 100vh;
 }
 
+.page-header {
+    margin-bottom: 24px;
+}
+
+.data-table-card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .user-table {
     width: 100%;
 }
 
 .table-header {
-    background-color: #5b7cff !important;
+    background-color: #f5f5f5;
 }
 
 .table-header th {
-    color: white !important;
-    font-weight: 600;
-    padding: 16px 12px;
-    font-size: 14px;
-}
-
-.user-table tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.row-even {
-    background-color: #ffffff;
-}
-
-.row-odd {
-    background-color: #f8f9fa;
+    font-weight: 600 !important;
+    padding: 16px !important;
+    color: #616161 !important;
 }
 
 .user-table tbody td {
-    padding: 16px 12px;
-    font-size: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.user-table tbody tr:hover {
-    background-color: #f0f4ff !important;
+.table-row:hover {
+    background-color: #fafafa !important;
 }
 </style>

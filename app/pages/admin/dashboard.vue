@@ -1,447 +1,524 @@
 <template>
-    <div class="dashboard-container">
-        <!-- Header Section -->
-        <v-row class="mb-6">
-            <v-col cols="12" class="d-flex justify-space-between align-center">
-                <div>
-                    <h1 class="text-h4 font-semibold">Hello, Admin 👋</h1>
+  <v-container fluid class="bg-grey-lighten-5 fill-height align-start pa-6">
+    <div class="w-100" style="max-width: 1400px; margin: 0 auto;">
+
+      <!-- Header Section -->
+      <v-row class="mb-8 align-center">
+        <v-col cols="12" md="8">
+          <h1 class="text-h4 font-weight-bold text-grey-darken-3">Hello, Admin 👋</h1>
+          <p class="text-subtitle-1 text-grey-darken-1 mt-1">Here's what's happening with your students today.</p>
+        </v-col>
+        <v-col cols="12" md="4" class="d-flex justify-md-end">
+          <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search anything..."
+            variant="outlined" density="comfortable" bg-color="white" hide-details rounded="lg" class="search-field"
+            style="max-width: 300px; width: 100%;"></v-text-field>
+        </v-col>
+      </v-row>
+
+      <!-- Filters Section -->
+      <v-card flat rounded="lg" class="mb-8 border-thin">
+        <v-card-text class="pa-4">
+          <div class="d-flex align-center flex-wrap gap-4">
+            <div class="d-flex align-center mr-4">
+              <v-icon icon="mdi-filter-variant" class="mr-2 text-primary"></v-icon>
+              <span class="text-subtitle-2 font-weight-bold text-grey-darken-2">Filters</span>
+            </div>
+
+            <v-select v-model="filters.generation" :items="generationOptions" label="Generation" variant="outlined"
+              density="compact" hide-details bg-color="white" class="filter-select"></v-select>
+
+            <v-select v-model="filters.year" :items="yearOptions" label="Year" variant="outlined" density="compact"
+              hide-details bg-color="white" class="filter-select"></v-select>
+
+            <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined" density="compact"
+              hide-details bg-color="white" class="filter-select"></v-select>
+
+            <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialize" variant="outlined"
+              density="compact" hide-details bg-color="white" class="filter-select"></v-select>
+
+            <v-spacer></v-spacer>
+
+            <v-select v-model="filters.order" :items="orderOptions" label="Sort By" prepend-inner-icon="mdi-sort"
+              variant="outlined" density="compact" hide-details bg-color="white" class="filter-select"
+              style="min-width: 140px;"></v-select>
+          </div>
+        </v-card-text>
+      </v-card>
+
+      <!-- Stats Cards -->
+      <v-row class="mb-8">
+        <v-col cols="12" md="4">
+          <v-card flat rounded="lg" class="h-100 border-thin card-hover">
+            <v-card-text class="d-flex align-center justify-space-between pa-6">
+              <div>
+                <div class="text-caption text-uppercase font-weight-bold text-blue mb-1">Total Students</div>
+                <div class="text-h3 font-weight-bold text-grey-darken-3">45</div>
+                <div class="d-flex align-center mt-2 text-caption text-grey-darken-1">
+                  <v-icon size="small" icon="mdi-gender-female" class="mr-1"></v-icon> 23
+                  <v-divider vertical class="mx-2"></v-divider>
+                  <v-icon size="small" icon="mdi-gender-male" class="mr-1"></v-icon> 22
                 </div>
-                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search ..."
-                    variant="outlined" density="compact" hide-details style="max-width: 300px" rounded />
-            </v-col>
-        </v-row>
+              </div>
+              <v-avatar size="64" color="blue-lighten-5" rounded="lg">
+                <v-icon size="32" color="blue-darken-1">mdi-account-group</v-icon>
+              </v-avatar>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-        <!-- Filters Section -->
-        <v-row class="mb-4">
-            <v-col cols="12">
-                <v-card flat class="pa-4">
-                    <div class="d-flex align-center flex-wrap ga-3">
-                        <span class="text-subtitle-2 font-weight-bold">Filters</span>
+        <v-col cols="12" md="4">
+          <v-card flat rounded="lg" class="h-100 border-thin card-hover">
+            <v-card-text class="d-flex align-center justify-space-between pa-6">
+              <div>
+                <div class="text-caption text-uppercase font-weight-bold text-orange mb-1">Present Today</div>
+                <div class="text-h3 font-weight-bold text-grey-darken-3">45</div>
+                <div class="d-flex align-center mt-2 text-caption text-grey-darken-1">
+                  <span class="text-success font-weight-bold">100%</span>&nbsp;attendance rate
+                </div>
+              </div>
+              <v-avatar size="64" color="orange-lighten-5" rounded="lg">
+                <v-icon size="32" color="orange-darken-1">mdi-account-check</v-icon>
+              </v-avatar>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-                        <v-select v-model="filters.generation" :items="generationOptions" label="Generation"
-                            variant="outlined" density="compact" hide-details style="max-width: 120px" />
+        <v-col cols="12" md="4">
+          <v-card flat rounded="lg" class="h-100 border-thin card-hover">
+            <v-card-text class="d-flex align-center justify-space-between pa-6">
+              <div>
+                <div class="text-caption text-uppercase font-weight-bold text-red mb-1">Absent Today</div>
+                <div class="text-h3 font-weight-bold text-grey-darken-3">0</div>
+                <div class="d-flex align-center mt-2 text-caption text-grey-darken-1">
+                  Needs attention
+                </div>
+              </div>
+              <v-avatar size="64" color="red-lighten-5" rounded="lg">
+                <v-icon size="32" color="red-darken-1">mdi-account-remove</v-icon>
+              </v-avatar>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
-                        <v-select v-model="filters.year" :items="yearOptions" label="Year" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+      <!-- Charts Section -->
+      <v-row class="mb-8">
+        <v-col cols="12" md="8">
+          <v-card flat rounded="lg" class="h-100 border-thin">
+            <v-card-item class="pa-6 pb-2">
+              <v-card-title class="text-h6 font-weight-bold text-grey-darken-3">Weekly Attendance Average</v-card-title>
+              <v-card-subtitle>Overview of student presence over the last 12 weeks</v-card-subtitle>
+            </v-card-item>
+            <v-card-text class="pa-6">
+              <div class="bar-chart-container">
+                <div v-for="(week, index) in weeklyData" :key="index" class="bar-item">
+                  <div class="bar-wrapper">
+                    <div class="bar" :style="{ height: (week.value / maxWeeklyValue * 100) + '%' }"
+                      v-tooltip="`Week ${index + 1}: ${week.value} students`"></div>
+                  </div>
+                  <div class="bar-label">W{{ index + 1 }}</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-                        <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+        <v-col cols="12" md="4">
+          <v-card flat rounded="lg" class="h-100 border-thin">
+            <v-card-item class="pa-6 pb-2">
+              <v-card-title class="text-h6 font-weight-bold text-grey-darken-3">Attendance Status</v-card-title>
+              <v-card-subtitle>Current distribution</v-card-subtitle>
+            </v-card-item>
+            <v-card-text class="d-flex flex-column align-center justify-center pa-6">
+              <div class="position-relative mb-6">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#e0f2fe" stroke-width="30"></circle>
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#1e3a8a" stroke-width="30"
+                    :stroke-dasharray="`${calculateDashArray(62.5)} ${calculateDashArray(37.5)}`" stroke-dashoffset="25"
+                    transform="rotate(-90 100 100)"></circle>
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#f97316" stroke-width="30"
+                    :stroke-dasharray="`${calculateDashArray(12.5)} ${calculateDashArray(87.5)}`"
+                    :stroke-dashoffset="`${25 - calculateDashArray(62.5)}`" transform="rotate(-90 100 100)"></circle>
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="#22c55e" stroke-width="30"
+                    :stroke-dasharray="`${calculateDashArray(25)} ${calculateDashArray(75)}`"
+                    :stroke-dashoffset="`${25 - calculateDashArray(62.5) - calculateDashArray(12.5)}`"
+                    transform="rotate(-90 100 100)"></circle>
+                </svg>
+                <div class="chart-center-text">
+                  <div class="text-h4 font-weight-bold">100%</div>
+                  <div class="text-caption text-grey">Total</div>
+                </div>
+              </div>
 
-                        <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialize"
-                            variant="outlined" density="compact" hide-details style="max-width: 120px" />
+              <div class="d-flex justify-center gap-6 w-100">
+                <div class="text-center">
+                  <div class="d-flex align-center justify-center mb-1">
+                    <v-icon icon="mdi-circle-small" color="blue-darken-3" class="mr-1"></v-icon>
+                    <span class="text-caption font-weight-bold text-grey-darken-2">Present</span>
+                  </div>
+                  <div class="text-h6 font-weight-bold">62.5%</div>
+                </div>
+                <div class="text-center">
+                  <div class="d-flex align-center justify-center mb-1">
+                    <v-icon icon="mdi-circle-small" color="orange" class="mr-1"></v-icon>
+                    <span class="text-caption font-weight-bold text-grey-darken-2">Leave</span>
+                  </div>
+                  <div class="text-h6 font-weight-bold">12.5%</div>
+                </div>
+                <div class="text-center">
+                  <div class="d-flex align-center justify-center mb-1">
+                    <v-icon icon="mdi-circle-small" color="green" class="mr-1"></v-icon>
+                    <span class="text-caption font-weight-bold text-grey-darken-2">Absence</span>
+                  </div>
+                  <div class="text-h6 font-weight-bold">25%</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
-                        <v-select v-model="filters.order" :items="orderOptions" label="Order" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+      <!-- Student Lists Table -->
+      <v-card flat rounded="lg" class="border-thin">
+        <v-card-item class="pa-6 border-bottom">
+          <div class="d-flex justify-space-between align-center flex-wrap gap-4">
+            <div>
+              <v-card-title class="text-h6 font-weight-bold text-grey-darken-3 pa-0">Student Attendance
+                Records</v-card-title>
+              <v-card-subtitle class="pa-0 mt-1">Detailed daily logs for all students</v-card-subtitle>
+            </div>
+            <div class="d-flex align-center gap-3">
+              <v-text-field v-model="studentSearch" prepend-inner-icon="mdi-magnify" placeholder="Search student..."
+                variant="outlined" density="compact" hide-details bg-color="grey-lighten-5"
+                style="width: 250px"></v-text-field>
+              <v-btn variant="outlined" color="grey-darken-1" prepend-icon="mdi-download" class="text-capitalize">
+                Export
+              </v-btn>
+            </div>
+          </div>
+        </v-card-item>
+
+        <v-card-text class="pa-0">
+          <v-table class="attendance-table" hover>
+            <thead>
+              <tr class="bg-grey-lighten-4">
+                <th class="text-left font-weight-bold text-grey-darken-3 py-4" style="min-width: 200px;">Student Name
+                </th>
+                <th class="text-center font-weight-bold text-grey-darken-3">Gender</th>
+                <th class="text-center font-weight-bold text-grey-darken-3">Gen</th>
+                <th class="text-center font-weight-bold text-grey-darken-3" style="min-width: 100px;">DOB</th>
+                <th class="text-center font-weight-bold text-grey-darken-3">Status</th>
+                <!-- Complex Header Structure Simplified Visually -->
+                <th class="text-center font-weight-bold text-grey-darken-3 px-0" colspan="14">
+                  <div class="d-flex w-100 border-bottom">
+                    <div class="flex-grow-1 text-center py-1 border-right text-caption font-weight-bold text-blue-grey">
+                      Week 1</div>
+                    <div class="flex-grow-1 text-center py-1 border-right text-caption font-weight-bold text-blue-grey">
+                      Week 2</div>
+                    <div class="flex-grow-1 text-center py-1 text-caption font-weight-bold text-blue-grey">Week 3</div>
+                  </div>
+                  <div class="d-flex w-100">
+                    <div v-for="i in 5" :key="'w1d' + i" class="flex-grow-1 text-center py-1 text-caption text-grey"
+                      style="width: 30px">D{{ i }}</div>
+                    <div class="border-right mx-1"></div>
+                    <div v-for="i in 5" :key="'w2d' + i" class="flex-grow-1 text-center py-1 text-caption text-grey"
+                      style="width: 30px">D{{ i }}</div>
+                    <div class="border-right mx-1"></div>
+                    <div v-for="i in 2" :key="'w3d' + i" class="flex-grow-1 text-center py-1 text-caption text-grey"
+                      style="width: 30px">D{{ i }}</div>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="student in filteredStudents" :key="student.id" class="student-row">
+                <td class="font-weight-medium text-body-2">
+                  <div class="d-flex align-center">
+                    <v-avatar size="32" color="grey-lighten-3" class="mr-3">
+                      <span class="text-caption font-weight-bold text-primary">{{ student.name.charAt(0) }}</span>
+                    </v-avatar>
+                    {{ student.name }}
+                  </div>
+                </td>
+                <td class="text-center text-caption text-grey-darken-1">{{ student.gender }}</td>
+                <td class="text-center text-caption text-grey-darken-1">{{ student.generation }}</td>
+                <td class="text-center text-caption text-grey-darken-1">{{ student.dob }}</td>
+                <td class="text-center">
+                  <v-chip :color="student.status === 'Active' ? 'success' : 'default'" size="x-small" variant="flat"
+                    class="font-weight-bold">
+                    {{ student.status }}
+                  </v-chip>
+                </td>
+                <td colspan="14" class="pa-0">
+                  <div class="d-flex align-center justify-center h-100 py-2">
+                    <div v-for="(attendance, index) in student.attendanceRecord" :key="index"
+                      class="d-flex justify-center" style="flex: 1;">
+                      <div :class="['attendance-dot', getAttendanceClass(attendance)]"
+                        v-tooltip="`Day ${index + 1}: ${getAttendanceLabel(attendance)}`">
+                        {{ attendance }}
+                      </div>
+                      <div v-if="index === 4 || index === 9" class="mx-1 border-right" style="height: 20px;"></div>
                     </div>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Stats Cards -->
-        <v-row class="mb-6">
-            <v-col cols="12" md="4">
-                <v-card class="stat-card blue-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-semibold">Count of student</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
-                        </div>
-                        <v-avatar size="60" color="blue-lighten-4">
-                            <v-icon size="40" color="blue">mdi-account-group</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-
-            <v-col cols="12" md="4">
-                <v-card class="stat-card orange-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-weight-bold">Count of present</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
-                        </div>
-                        <v-avatar size="60" color="orange-lighten-4">
-                            <v-icon size="40" color="orange">mdi-account-check</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-
-            <v-col cols="12" md="4">
-                <v-card class="stat-card yellow-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-weight-bold">Count of absent</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
-                        </div>
-                        <v-avatar size="60" color="yellow-lighten-4">
-                            <v-icon size="40" color="yellow-darken-2">mdi-account-remove</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Charts Section -->
-        <v-row class="mb-6">
-            <v-col cols="12" md="8">
-                <v-card elevation="2">
-                    <v-card-title class="text-h6 font-weight-bold">Average in weeks</v-card-title>
-                    <v-card-text>
-                        <canvas ref="barChartCanvas" height="300"></canvas>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-
-            <v-col cols="12" md="4">
-                <v-card elevation="2">
-                    <v-card-title class="text-h6 font-weight-bold">Attendance in view</v-card-title>
-                    <v-card-text class="d-flex flex-column align-center">
-                        <canvas ref="doughnutChartCanvas" width="250" height="250"></canvas>
-                        <div class="d-flex justify-center ga-4 mt-4 flex-wrap">
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #1e3a8a"></div>
-                                <span class="text-caption">Present 62.5%</span>
-                            </div>
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #f97316"></div>
-                                <span class="text-caption">Leave 12.5%</span>
-                            </div>
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #22c55e"></div>
-                                <span class="text-caption">Absence 25%</span>
-                            </div>
-                        </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Student Lists Table -->
-        <v-row>
-            <v-col cols="12">
-                <v-card elevation="2">
-                    <v-card-title class="d-flex justify-space-between align-center">
-                        <span class="text-h6 font-weight-bold">Student lists</span>
-                        <div class="d-flex align-center ga-3">
-                            <v-text-field v-model="studentSearch" prepend-inner-icon="mdi-magnify"
-                                placeholder="Search ..." variant="outlined" density="compact" hide-details
-                                style="max-width: 250px" />
-                            <v-select v-model="studentOrder" :items="['A-Z', 'Z-A']" label="Order" variant="outlined"
-                                density="compact" hide-details style="max-width: 100px" />
-                        </div>
-                    </v-card-title>
-                    <v-card-text>
-                        <v-table class="attendance-table">
-                            <thead>
-                                <tr>
-                                    <th class="text-left font-weight-bold">Student name</th>
-                                    <th class="text-center font-weight-bold">Gender</th>
-                                    <th class="text-center font-weight-bold">Generation</th>
-                                    <th class="text-center font-weight-bold">DOB</th>
-                                    <th class="text-center font-weight-bold">Status</th>
-                                    <th class="text-center font-weight-bold" colspan="14">Attendance record</th>
-                                </tr>
-                                <tr>
-                                    <th colspan="5"></th>
-                                    <th class="text-center week-header" colspan="2">W1</th>
-                                    <th class="text-center week-header" colspan="2">W2</th>
-                                    <th class="text-center week-header" colspan="2">W3</th>
-                                </tr>
-                                <tr>
-                                    <th colspan="5"></th>
-                                    <th class="text-center day-header">D1</th>
-                                    <th class="text-center day-header">D2</th>
-                                    <th class="text-center day-header">D3</th>
-                                    <th class="text-center day-header">D4</th>
-                                    <th class="text-center day-header">D5</th>
-                                    <th class="text-center day-header">D1</th>
-                                    <th class="text-center day-header">D2</th>
-                                    <th class="text-center day-header">D3</th>
-                                    <th class="text-center day-header">D4</th>
-                                    <th class="text-center day-header">D5</th>
-                                    <th class="text-center day-header">D1</th>
-                                    <th class="text-center day-header">D2</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="student in filteredStudents" :key="student.id">
-                                    <td>{{ student.name }}</td>
-                                    <td class="text-center">{{ student.gender }}</td>
-                                    <td class="text-center">{{ student.generation }}</td>
-                                    <td class="text-center">{{ student.dob }}</td>
-                                    <td class="text-center">
-                                        <v-chip :color="student.status === 'Active' ? 'success' : 'grey'" size="small">
-                                            {{ student.status }}
-                                        </v-chip>
-                                    </td>
-                                    <td v-for="(attendance, index) in student.attendanceRecord" :key="index"
-                                        :class="['text-center attendance-cell', getAttendanceClass(attendance)]">
-                                        {{ attendance }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </v-table>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </v-card-text>
+        <v-card-actions class="justify-center pa-4 border-top">
+          <v-pagination v-model="page" :length="3" rounded="circle" density="comfortable"
+            active-color="primary"></v-pagination>
+        </v-card-actions>
+      </v-card>
     </div>
+  </v-container>
 </template>
+
 <script setup>
+import { ref, computed } from 'vue'
+
+// Nuxt Page Meta
 definePageMeta({
-    layout: 'admin', // ✅ Use admin layout to show Navbar
-    // middleware: ['auth', 'role-admin'] // Commented out for testing
+  layout: 'admin',
+  title: 'Dashboard'
 })
 
-// Search and filters
+// State
 const search = ref('')
 const studentSearch = ref('')
 const studentOrder = ref('A-Z')
+const page = ref(1)
 
 const filters = ref({
-    generation: '9',
-    year: '2025',
-    group: 'G1',
-    specialize: 'CS',
-    order: 'A-Z'
+  generation: '9',
+  year: '2025',
+  group: 'G1',
+  specialize: 'CS',
+  order: 'A-Z'
 })
 
+// Options
 const generationOptions = ['9', '10', '11', '12']
 const yearOptions = ['2023', '2024', '2025', '2026']
 const groupOptions = ['G1', 'G2', 'G3', 'G4']
 const specializeOptions = ['CS', 'IT', 'IS', 'SE']
 const orderOptions = ['A-Z', 'Z-A']
 
-// Stats data
-const stats = ref({
-    totalStudents: { count: 45, female: 23, male: 22 },
-    present: { count: 45, female: 23, male: 22 },
-    absent: { count: 45, female: 23, male: 22 }
-})
+// Weekly Data for Bar Chart
+const weeklyData = ref([
+  { value: 45 },
+  { value: 43 },
+  { value: 44 },
+  { value: 42 },
+  { value: 45 },
+  { value: 44 },
+  { value: 43 },
+  { value: 45 },
+  { value: 44 },
+  { value: 45 },
+  { value: 44 },
+  { value: 45 }
+])
 
-// Student data
+const maxWeeklyValue = computed(() => Math.max(...weeklyData.value.map(w => w.value)))
+
+// Mock Data
 const students = ref([
-    {
-        id: 1,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    },
-    {
-        id: 2,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'A', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    },
-    {
-        id: 3,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    }
+  {
+    id: 1,
+    name: 'MEAN Piseth',
+    gender: 'M',
+    generation: '9',
+    dob: 'Sep 01, 2004',
+    status: 'Active',
+    attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
+  },
+  {
+    id: 2,
+    name: 'SOK Dara',
+    gender: 'M',
+    generation: '9',
+    dob: 'Aug 15, 2004',
+    status: 'Active',
+    attendanceRecord: ['P', 'P', 'P', 'A', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
+  },
+  {
+    id: 3,
+    name: 'CHAN Thida',
+    gender: 'F',
+    generation: '9',
+    dob: 'Jul 22, 2004',
+    status: 'Active',
+    attendanceRecord: ['P', 'P', 'L', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
+  },
+  {
+    id: 4,
+    name: 'KEO Vanna',
+    gender: 'F',
+    generation: '9',
+    dob: 'Oct 10, 2004',
+    status: 'Active',
+    attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'A', 'A', 'P', 'P', 'P', 'P', 'P']
+  }
 ])
 
 const filteredStudents = computed(() => {
-    let result = students.value
-
-    if (studentSearch.value) {
-        result = result.filter(s =>
-            s.name.toLowerCase().includes(studentSearch.value.toLowerCase())
-        )
-    }
-
-    if (studentOrder.value === 'Z-A') {
-        result = [...result].reverse()
-    }
-
-    return result
+  let result = students.value
+  if (studentSearch.value) {
+    result = result.filter(s =>
+      s.name.toLowerCase().includes(studentSearch.value.toLowerCase())
+    )
+  }
+  if (filters.value.order === 'Z-A') {
+    result = [...result].reverse()
+  }
+  return result
 })
 
-// Chart references
-const barChartCanvas = ref(null)
-const doughnutChartCanvas = ref(null)
-
+// Helpers
 const getAttendanceClass = (attendance) => {
-    if (attendance === 'P') return 'present'
-    if (attendance === 'A') return 'absent'
-    if (attendance === 'L') return 'leave'
-    return ''
+  if (attendance === 'P') return 'status-present'
+  if (attendance === 'A') return 'status-absent'
+  if (attendance === 'L') return 'status-leave'
+  return ''
 }
 
-// Initialize charts on mount
-onMounted(() => {
-    // Use nextTick to ensure DOM is fully rendered
-    nextTick(() => {
-        initBarChart()
-        initDoughnutChart()
-    })
-})
-
-const initBarChart = () => {
-    if (!barChartCanvas.value) return
-
-    try {
-        const ctx = barChartCanvas.value.getContext('2d')
-        if (!ctx) return
-
-        // Simple bar chart implementation
-        const data = [10, 6, 7, 7, 12, 10, 5, 4, 3, 2, 1, 6]
-        const labels = ['Week-1', 'Week-2', 'Week-3', 'Week-4', 'Week-5', 'Week-6', 'Week-7', 'Week-8', 'Week-9', 'Week-10', 'Week-11', 'Week->3']
-
-        const maxValue = Math.max(...data)
-        const canvas = barChartCanvas.value
-        const width = canvas.width || 800
-        const height = canvas.height || 300
-        const barWidth = width / (data.length * 1.5)
-        const padding = 40
-
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height)
-
-        // Draw bars
-        data.forEach((value, index) => {
-            const barHeight = (value / maxValue) * (height - padding * 2)
-            const x = padding + index * (barWidth * 1.5)
-            const y = height - padding - barHeight
-
-            ctx.fillStyle = '#0000FF'
-            ctx.fillRect(x, y, barWidth, barHeight)
-
-            // Draw labels
-            ctx.fillStyle = '#666'
-            ctx.font = '10px Arial'
-            ctx.save()
-            ctx.translate(x + barWidth / 2, height - 10)
-            ctx.rotate(-Math.PI / 4)
-            ctx.textAlign = 'right'
-            ctx.fillText(labels[index], 0, 0)
-            ctx.restore()
-        })
-    } catch (error) {
-        console.error('Error initializing bar chart:', error)
-    }
+const getAttendanceLabel = (code) => {
+  const map = { 'P': 'Present', 'A': 'Absent', 'L': 'Leave' }
+  return map[code] || code
 }
 
-const initDoughnutChart = () => {
-    if (!doughnutChartCanvas.value) return
-
-    try {
-        const ctx = doughnutChartCanvas.value.getContext('2d')
-        if (!ctx) return
-
-        const centerX = 125
-        const centerY = 125
-        const radius = 80
-        const innerRadius = 50
-
-        const data = [
-            { value: 62.5, color: '#1e3a8a', label: 'Present' },
-            { value: 12.5, color: '#f97316', label: 'Leave' },
-            { value: 25, color: '#22c55e', label: 'Absence' }
-        ]
-
-        let currentAngle = -Math.PI / 2
-
-        data.forEach(segment => {
-            const sliceAngle = (segment.value / 100) * 2 * Math.PI
-
-            // Draw outer arc
-            ctx.beginPath()
-            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle)
-            ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true)
-            ctx.closePath()
-            ctx.fillStyle = segment.color
-            ctx.fill()
-
-            currentAngle += sliceAngle
-        })
-    } catch (error) {
-        console.error('Error initializing doughnut chart:', error)
-    }
+// Donut Chart Helper
+const calculateDashArray = (percentage) => {
+  const circumference = 2 * Math.PI * 80
+  return (percentage / 100) * circumference
 }
 </script>
 
 <style scoped>
-.dashboard-container {
-    padding: 20px;
+.gap-4 {
+  gap: 16px;
 }
 
-.stat-card {
-    border-left: 4px solid;
-    height: 100%;
-    border-radius: 12px;
+.gap-3 {
+  gap: 12px;
 }
 
-.stat-card.blue-border {
-    border-left-color: #2196F3;
+.gap-6 {
+  gap: 24px;
 }
 
-.stat-card.orange-border {
-    border-left-color: #FF9800;
+.border-thin {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
-.stat-card.yellow-border {
-    border-left-color: #FFC107;
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
-.attendance-table {
-    width: 100%;
+.filter-select {
+  max-width: 140px;
+  min-width: 120px;
 }
 
-.attendance-table th {
-    background-color: #f5f5f5;
-    padding: 12px 8px;
-    font-size: 13px;
+.card-hover {
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.week-header {
-    background-color: #c8e6c9 !important;
-    border: 1px solid #4caf50;
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
-.day-header {
-    background-color: #f5f5f5;
-    font-size: 11px;
+/* Bar Chart Styles */
+.bar-chart-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 300px;
+  padding: 20px 0;
+  gap: 8px;
 }
 
-.attendance-cell {
-    padding: 8px;
-    font-weight: 500;
-    font-size: 13px;
+.bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
 }
 
-.attendance-cell.present {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+.bar-wrapper {
+  width: 100%;
+  height: calc(100% - 30px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-.attendance-cell.absent {
-    background-color: #ffebee;
-    color: #c62828;
+.bar {
+  width: 70%;
+  background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 6px 6px 0 0;
+  transition: all 0.3s ease;
+  min-height: 4px;
 }
 
-.attendance-cell.leave {
-    background-color: #fff3e0;
-    color: #e65100;
+.bar:hover {
+  background: linear-gradient(180deg, #2563eb 0%, #3b82f6 100%);
+  transform: scaleY(1.05);
 }
 
-.legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 6px;
+.bar-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.chart-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.attendance-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: default;
+}
+
+.status-present {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.status-absent {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-leave {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+/* Custom Scrollbar for table if needed */
+.v-table__wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.v-table__wrapper::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0;
+  border-radius: 4px;
 }
 </style>

@@ -422,10 +422,16 @@
 </template>
 
 <script setup>
+import { useClassStore } from '~/stores/useClassStore'
+import { useAuthStore } from '~/stores/useAuthStore'
+
 definePageMeta({
     layout: 'lecturer',
     middleware: ['auth', 'role-lecturer']
 })
+
+const classStore = useClassStore()
+const authStore = useAuthStore()
 
 // State
 const searchQuery = ref('')
@@ -467,93 +473,14 @@ const colorOptions = [
     { title: 'Teal Gradient', value: 'linear-gradient(135deg, #009688 0%, #00695C 100%)' },
 ]
 
-// Mock Data
-const classes = ref([
-    {
-        id: 1,
-        subject: 'Data Structures & Algorithms',
-        code: 'CS201',
-        group: 'CS-9-G1',
-        schedule: 'Mon/Wed 8:00-10:00',
-        room: 'Lab 301',
-        students: 42,
-        attendance: 87,
-        status: 'active',
-        semester: 'Fall 2024',
-        color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        sessions: 24
-    },
-    {
-        id: 2,
-        subject: 'Database Management Systems',
-        code: 'CS303',
-        group: 'IT-10-G2',
-        schedule: 'Tue/Thu 10:30-12:30',
-        room: 'Room 205',
-        students: 38,
-        attendance: 92,
-        status: 'active',
-        semester: 'Fall 2024',
-        color: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
-        sessions: 22
-    },
-    {
-        id: 3,
-        subject: 'Web Development',
-        code: 'CS405',
-        group: 'CS-11-G1',
-        schedule: 'Mon/Wed 14:00-16:00',
-        room: 'Lab 302',
-        students: 35,
-        attendance: 85,
-        status: 'active',
-        semester: 'Fall 2024',
-        color: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)',
-        sessions: 20
-    },
-    {
-        id: 4,
-        subject: 'Mobile App Development',
-        code: 'CS407',
-        group: 'CS-10-G2',
-        schedule: 'Tue/Fri 8:00-10:00',
-        room: 'Lab 303',
-        students: 40,
-        attendance: 89,
-        status: 'active',
-        semester: 'Fall 2024',
-        color: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-        sessions: 26
-    },
-    {
-        id: 5,
-        subject: 'Software Engineering',
-        code: 'CS501',
-        group: 'IT-9-G1',
-        schedule: 'Wed/Fri 10:00-12:00',
-        room: 'Room 210',
-        students: 45,
-        attendance: 91,
-        status: 'active',
-        semester: 'Spring 2025',
-        color: 'linear-gradient(135deg, #009688 0%, #00695C 100%)',
-        sessions: 18
-    },
-    {
-        id: 6,
-        subject: 'Computer Networks',
-        code: 'CS305',
-        group: 'CS-9-G2',
-        schedule: 'Mon/Thu 14:00-16:00',
-        room: 'Lab 304',
-        students: 36,
-        attendance: 78,
-        status: 'inactive',
-        semester: 'Summer 2025',
-        color: 'linear-gradient(135deg, #F44336 0%, #C62828 100%)',
-        sessions: 15
-    }
-])
+// Get classes for current lecturer
+// TODO: Replace with actual lecturer ID from auth
+const currentLecturerId = computed(() => authStore.user?.id || 1)
+
+const classes = computed(() => {
+    // Filter classes assigned to this lecturer
+    return classStore.classesByLecturer(currentLecturerId.value)
+})
 
 // Computed
 const filteredClasses = computed(() => {
@@ -704,6 +631,11 @@ const generateReport = (classItem) => {
     // Generate and download report
     console.log('Generate report for:', classItem.subject)
 }
+
+// Initialize - fetch classes on mount
+onMounted(async () => {
+    await classStore.fetchClasses()
+})
 </script>
 
 <style scoped>

@@ -17,6 +17,14 @@
     <v-btn color="success" class="ml-2" @click="$router.push('/lecturer/dashboard')">
       Go to Lecturer Dashboard
     </v-btn>
+
+    <v-btn color="success" class="ml-2" @click="$router.push('/lecturer/class')">
+      Go to Lecturer Classes
+    </v-btn>
+
+    <v-btn color="classes" class="ml-2" @click="$router.push('/admin/classes')">
+      create classes by admin
+    </v-btn>
   </div>
 </template>
 
