@@ -71,7 +71,7 @@
                 <div class="table-toolbar">
                     <div class="toolbar-left">
                         <h2 class="table-title">
-                            <v-icon icon="mdi-format-list-bulleted" class="title-icon" />
+                            <v-icon icon="mdi-format-list-bulleted"  size="20" class="mr-2"  />
                             Leave Requests
                         </h2>
                         <div class="table-subtitle">View and monitor all leave requests</div>
@@ -150,7 +150,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="request in filteredLeaveRequests" :key="request.id" class="modern-table-row">
+                            <tr v-for="request in filteredLeaveRequests" :key="request.leave_id" class="modern-table-row">
                                 <td class="modern-table-cell id-column">
                                     <div class="id-badge">{{ request.leave_id }}</div>
                                 </td>
@@ -191,8 +191,9 @@
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <div class="action-group">
-                                        <v-btn icon="mdi-eye" variant="outlined" size="small" color="primary" 
-                                            @click="viewRequest(request)" class="action-btn view-btn" />
+                                        <v-btn icon class="action-btn" @click="viewRequest(request)">
+                                            <v-icon color="#3b82f6">mdi-eye</v-icon>
+                                        </v-btn>
                                     </div>
                                 </td>
                             </tr>
@@ -236,7 +237,7 @@
                         <!-- Student Information -->
                         <div class="detail-section">
                             <div class="section-title">
-                                <v-icon icon="mdi-account" color="primary" />
+                                <v-icon icon="mdi-view-grid" color="primary" />
                                 Student Information
                             </div>
                             <div class="detail-grid">
@@ -514,20 +515,8 @@ const getStatusIcon = (status) => {
 }
 
 const getLeaveTypeColor = (leaveType) => {
-    switch (leaveType?.toLowerCase()) {
-        case 'sick leave':
-            return 'red'
-        case 'medical leave':
-            return 'pink'
-        case 'personal leave':
-            return 'blue'
-        case 'emergency leave':
-            return 'orange'
-        case 'family leave':
-            return 'purple'
-        default:
-            return 'grey'
-    }
+    // Return light blue for all leave types
+    return 'light-blue'
 }
 
 const getLeaveTypeIcon = (leaveType) => {
@@ -919,7 +908,7 @@ const handleExportPDF = () => {
 .header-content {
     display: flex;
     align-items: center;
-    color: white !important;
+    color: #45474b  !important;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
@@ -989,7 +978,7 @@ const handleExportPDF = () => {
 }
 
 .student-name {
-    font-weight: 500;
+    font-weight: 600;
     color: #1e293b;
     font-size: 14px;
     line-height: 1.2;
@@ -1004,6 +993,8 @@ const handleExportPDF = () => {
 .leave-type-chip {
     text-transform: none;
     font-weight: 500;
+    background-color: #e3f2fd !important;
+    color: #1565c0 !important;
 }
 
 .duration-info {
@@ -1215,14 +1206,15 @@ const handleExportPDF = () => {
     gap: 12px;
 }
 
-.action-btn {
+.dialog-actions .action-btn {
     height: 44px;
     border-radius: 12px;
     text-transform: none;
     font-weight: 500;
     font-size: 14px;
-    padding: 0 24px;
+    padding: 0 32px;
     transition: all 0.2s ease;
+    min-width: 120px;
 }
 
 /* Responsive Design */

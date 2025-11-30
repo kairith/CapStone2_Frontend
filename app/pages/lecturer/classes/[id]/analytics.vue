@@ -40,7 +40,8 @@
                 <div class="action-section">
                     <v-menu offset-y>
                         <template v-slot:activator="{ props }">
-                            <v-btn class="modern-btn export-btn" prepend-icon="mdi-download" variant="outlined" v-bind="props">
+                            <v-btn class="modern-btn export-btn" prepend-icon="mdi-download" variant="outlined"
+                                v-bind="props">
                                 Export
                                 <v-icon size="16">mdi-chevron-down</v-icon>
                             </v-btn>
@@ -55,15 +56,8 @@
                         </v-list>
                     </v-menu>
 
-                    <v-btn 
-                        class="modern-btn refresh-btn" 
-                        prepend-icon="mdi-refresh" 
-                        variant="flat" 
-                        color="primary"
-                        @click="refreshData" 
-                        :loading="loading" 
-                        elevation="2"
-                    >
+                    <v-btn class="modern-btn refresh-btn" prepend-icon="mdi-refresh" variant="flat" color="primary"
+                        @click="refreshData" :loading="loading" elevation="2">
                         Refresh Data
                     </v-btn>
                 </div>
@@ -75,10 +69,82 @@
 
             <!-- Students Table -->
             <div class="table-container">
+                <!-- Table Header with Search and Filters -->
+                <div class="table-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="table-title">
+                            <v-icon icon="mdi-format-list-bulleted" size="20" class="mr-2" />
+                            Student Analytics
+                        </h2>
+                        <div class="table-subtitle">View and analyze student attendance data</div>
+                    </div>
+
+                    <div class="toolbar-right">
+                        <div class="search-container">
+                            <v-text-field 
+                                v-model="searchQuery" 
+                                placeholder="Search students..."
+                                prepend-inner-icon="mdi-magnify" 
+                                variant="outlined" 
+                                density="comfortable" 
+                                class="search-input" 
+                                clearable 
+                            />
+                        </div>
+
+                        <v-select 
+                            v-model="generationFilter" 
+                            :items="generationOptions" 
+                            label="Generation" 
+                            variant="outlined" 
+                            density="comfortable" 
+                            class="filter-select" 
+                        />
+
+                        <v-btn 
+                            icon="mdi-filter-variant" 
+                            variant="outlined" 
+                            class="filter-btn" 
+                            @click="showFilters = !showFilters" 
+                            :color="showFilters ? 'primary' : 'grey'" 
+                        />
+                    </div>
+                </div>
+
+                <!-- Quick Filters (collapsible) -->
+                <v-expand-transition>
+                    <div v-show="showFilters" class="filters-panel">
+                        <div class="filters-content">
+                            <div class="filter-group">
+                                <div class="filter-label">Status</div>
+                                <v-select 
+                                    v-model="statusFilter" 
+                                    :items="statusOptions" 
+                                    variant="outlined" 
+                                    density="compact" 
+                                    class="filter-input" 
+                                />
+                            </div>
+                            <div class="filter-group">
+                                <div class="filter-label">Date Range</div>
+                                <v-text-field 
+                                    v-model="dateFilter" 
+                                    type="date" 
+                                    variant="outlined" 
+                                    density="compact" 
+                                    class="filter-input" 
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </v-expand-transition>
+
                 <table class="students-table">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Student</th>
+                            <th>Student ID</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Type</th>
@@ -87,149 +153,93 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="student in filteredStudents" :key="student.id" class="table-row">
+                        <tr v-for="(student, index) in filteredStudents" :key="student.id" class="table-row">
+                            <td class="id-cell">
+                                <div class="id-badge">{{ index + 1 }}</div>
+                            </td>
                             <td class="student-cell">
                                 <div class="student-info">
-                                    <v-avatar size="32" class="student-avatar" :color="getAvatarColor(student.name)">
-                                        {{ getInitials(student.name) }}
-                                    </v-avatar>
                                     <div class="student-details">
                                         <div class="student-name">{{ student.name }}</div>
-                                        <div class="student-id">Student ID: {{ student.student_id }}</div>
+                                        <div class="student-meta">{{ student.email }}</div>
                                     </div>
                                 </div>
+                            </td>
+                            <td class="student-id-cell">
+                                <span class="student-id-badge">{{ student.student_id }}</span>
                             </td>
                             <td class="date-cell">{{ formatTableDate(student.scan_time || '2024-01-25') }}</td>
                             <td class="date-cell">{{ formatTableDate(student.scan_time || '2024-01-26') }}</td>
                             <td class="type-cell">
-                                <span class="type-badge" :class="getTypeClass(student.status)">
-                                    {{ getAttendanceType(student.status) }}
-                                </span>
-                            </td>
-                            <td class="status-cell">
                                 <v-chip 
-                                    :color="getStatusChipColor(student.status)"
+                                    :color="getTypeChipColor(student.status)"
                                     variant="flat"
                                     size="small"
-                                    class="status-chip"
+                                    class="type-chip"
                                 >
+                                    {{ student.status }}
+                                </v-chip>
+                            </td>
+                            <td class="status-cell">
+                                <v-chip variant="flat" size="small" class="status-chip">
                                     {{ student.status }}
                                 </v-chip>
                             </td>
                             <td class="actions-cell">
                                 <div class="action-buttons">
-                                    <v-btn
-                                        icon
-                                        variant="text"
-                                        size="small"
-                                        @click="approveAttendance(student)"
-                                        :disabled="student.status === 'Present'"
-                                        class="action-btn-sm approve-btn"
-                                    >
-                                        <v-icon size="18">mdi-check</v-icon>
-                                        <v-tooltip activator="parent">Mark Present</v-tooltip>
+                                    <v-btn icon class="action-btn" @click="viewStudent(student)">
+                                        <v-icon color="#fde047">mdi-pencil</v-icon>
+                                        <v-tooltip activator="parent">Edit Student</v-tooltip>
                                     </v-btn>
-                                    <v-btn
-                                        icon
-                                        variant="text"
-                                        size="small"
-                                        @click="rejectAttendance(student)"
-                                        :disabled="student.status === 'Absent'"
-                                        class="action-btn-sm reject-btn"
-                                    >
-                                        <v-icon size="18">mdi-close</v-icon>
-                                        <v-tooltip activator="parent">Mark Absent</v-tooltip>
-                                    </v-btn>
-                                    <v-btn
-                                        icon
-                                        variant="text"
-                                        size="small"
-                                        @click="viewStudent(student)"
-                                        class="action-btn-sm view-btn"
-                                    >
-                                        <v-icon size="18">mdi-eye</v-icon>
-                                        <v-tooltip activator="parent">View Details</v-tooltip>
+                                    <v-btn icon class="action-btn" @click="rejectAttendance(student)">
+                                        <v-icon color="#dc2626">mdi-delete</v-icon>
+                                        <v-tooltip activator="parent">Delete Student</v-tooltip>
                                     </v-btn>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination-section">
-                <div class="pagination-info">
-                    <span class="pagination-label">Items per page:</span>
-                    <v-select
-                        v-model="itemsPerPage"
-                        :items="[5, 10, 15, 20]"
-                        variant="outlined"
-                        density="compact"
-                        hide-details
-                        class="items-per-page-select"
-                    />
-                    <span class="pagination-status">{{ paginationText }}</span>
-                </div>
-                <div class="pagination-controls">
-                    <v-btn
-                        icon
-                        variant="text"
-                        size="small"
-                        @click="goToFirstPage"
-                        :disabled="currentPage === 1"
-                        class="pagination-btn"
-                    >
-                        <v-icon>mdi-page-first</v-icon>
-                    </v-btn>
-                    <v-btn
-                        icon
-                        variant="text"
-                        size="small"
-                        @click="goToPrevPage"
-                        :disabled="currentPage === 1"
-                        class="pagination-btn"
-                    >
-                        <v-icon>mdi-chevron-left</v-icon>
-                    </v-btn>
-                    <v-btn
-                        icon
-                        variant="text"
-                        size="small"
-                        @click="goToNextPage"
-                        :disabled="currentPage >= totalPages"
-                        class="pagination-btn"
-                    >
-                        <v-icon>mdi-chevron-right</v-icon>
-                    </v-btn>
-                    <v-btn
-                        icon
-                        variant="text"
-                        size="small"
-                        @click="goToLastPage"
-                        :disabled="currentPage >= totalPages"
-                        class="pagination-btn"
-                    >
-                        <v-icon>mdi-page-last</v-icon>
-                    </v-btn>
-                </div>
-            </div>
+            </table>
         </div>
 
-        <!-- Error Snackbar -->
-        <v-snackbar
-            v-model="showError"
-            :timeout="5000"
-            color="error"
-            location="top"
-        >
-            {{ errorMessage }}
-            <template v-slot:actions>
-                <v-btn variant="text" @click="showError = false">
-                    Close
+        <!-- Pagination -->
+        <div class="pagination-section">
+            <div class="pagination-info">
+                <span class="pagination-label">Items per page:</span>
+                <v-select v-model="itemsPerPage" :items="[5, 10, 15, 20]" variant="outlined" density="compact"
+                    hide-details class="items-per-page-select" />
+                <span class="pagination-status">{{ paginationText }}</span>
+            </div>
+            <div class="pagination-controls">
+                <v-btn icon variant="text" size="small" @click="goToFirstPage" :disabled="currentPage === 1"
+                    class="pagination-btn">
+                    <v-icon>mdi-page-first</v-icon>
                 </v-btn>
-            </template>
-        </v-snackbar>
+                <v-btn icon variant="text" size="small" @click="goToPrevPage" :disabled="currentPage === 1"
+                    class="pagination-btn">
+                    <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <v-btn icon variant="text" size="small" @click="goToNextPage" :disabled="currentPage >= totalPages"
+                    class="pagination-btn">
+                    <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+                <v-btn icon variant="text" size="small" @click="goToLastPage" :disabled="currentPage >= totalPages"
+                    class="pagination-btn">
+                    <v-icon>mdi-page-last</v-icon>
+                </v-btn>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Snackbar -->
+    <v-snackbar v-model="showError" :timeout="5000" color="error" location="top">
+        {{ errorMessage }}
+        <template v-slot:actions>
+            <v-btn variant="text" @click="showError = false">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
     </div>
 </template>
 
@@ -255,6 +265,19 @@ const errorMessage = ref('')
 const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
+const showFilters = ref(false)
+const generationFilter = ref('All')
+const statusFilter = ref('All')
+const dateFilter = ref('')
+
+// Filter options
+const generationOptions = ['All', '8', '9', '10', '11', '12']
+const statusOptions = [
+    { title: 'All', value: 'All' },
+    { title: 'Present', value: 'Present' },
+    { title: 'Late', value: 'Late' },
+    { title: 'Absent', value: 'Absent' }
+]
 
 // Mock data - replace with actual API calls
 const classInfo = ref({
@@ -329,15 +352,15 @@ const studentsList = ref([
 ])
 
 // Computed properties
-const studentsPresent = computed(() => 
+const studentsPresent = computed(() =>
     studentsList.value.filter(s => s.status === 'Present').length
 )
 
-const studentsLate = computed(() => 
+const studentsLate = computed(() =>
     studentsList.value.filter(s => s.status === 'Late').length
 )
 
-const studentsAbsent = computed(() => 
+const studentsAbsent = computed(() =>
     studentsList.value.filter(s => s.status === 'Absent').length
 )
 
@@ -347,7 +370,7 @@ const filteredStudents = computed(() => {
     // Filter by search query
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(student => 
+        filtered = filtered.filter(student =>
             student.name.toLowerCase().includes(query) ||
             student.student_id.toLowerCase().includes(query) ||
             student.email.toLowerCase().includes(query)
@@ -400,6 +423,15 @@ const getTypeClass = (status: string) => {
 }
 
 const getStatusChipColor = (status: string) => {
+    switch (status) {
+        case 'Present': return 'success'
+        case 'Late': return 'warning'
+        case 'Absent': return 'error'
+        default: return 'grey'
+    }
+}
+
+const getTypeChipColor = (status: string) => {
     switch (status) {
         case 'Present': return 'success'
         case 'Late': return 'warning'
@@ -481,15 +513,14 @@ useHead({
 /* Modern Header Styles */
 .modern-header {
     background: white;
-    padding: 32px 0;
     border-bottom: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 24px 32px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -508,41 +539,42 @@ useHead({
 }
 
 .title-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #1976d2, #2196f3);
-    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.title-content h1.page-title {
+.page-title {
     font-size: 28px;
     font-weight: 700;
     color: #1e293b;
     margin: 0 0 4px 0;
+    letter-spacing: -0.025em;
 }
 
 .breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
 }
 
 .breadcrumb-item {
     font-size: 14px;
     color: #64748b;
-}
-
-.breadcrumb-item.active {
-    color: #1976d2;
     font-weight: 500;
 }
 
-.breadcrumb-divider {
-    color: #cbd5e1;
+.breadcrumb-item.active {
+    color: #3b82f6;
+}
+
+.breadcrumb-separator {
+    opacity: 0.5;
 }
 
 .stats-cards {
@@ -552,28 +584,35 @@ useHead({
 }
 
 .stat-card {
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 16px 20px;
+    min-width: 100px;
     text-align: center;
-    min-width: 120px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-number {
     font-size: 24px;
     font-weight: 700;
     color: #1e293b;
+    line-height: 1;
     margin-bottom: 4px;
 }
 
 .stat-label {
     font-size: 12px;
+    font-weight: 500;
     color: #64748b;
     text-transform: uppercase;
-    font-weight: 500;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
 }
 
 .action-section {
@@ -624,7 +663,7 @@ useHead({
 .table-container {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }
 
@@ -632,8 +671,8 @@ useHead({
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 24px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .toolbar-left {
@@ -647,11 +686,13 @@ useHead({
     margin: 0 0 4px 0;
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
 .table-subtitle {
     font-size: 14px;
     color: #64748b;
+    margin: 0;
 }
 
 .toolbar-right {
@@ -664,31 +705,53 @@ useHead({
     min-width: 300px;
 }
 
-.search-field {
-    min-width: 280px;
+.search-input :deep(.v-field) {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.search-field :deep(.v-field) {
-    border-radius: 8px;
+.filter-select {
+    min-width: 140px;
 }
 
-.modern-table-card {
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+.filter-select :deep(.v-field) {
+    border-radius: 12px;
 }
 
-.modern-data-table {
-    border-radius: 16px;
-    font-size: 1rem;
-    background: white;
+.filter-btn {
+    height: 40px;
+    width: 40px;
+    border-radius: 12px;
 }
 
-.modern-empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+.filters-panel {
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.filters-content {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-input {
+    min-width: 150px;
 }
 
 /* Table Styles */
@@ -739,10 +802,6 @@ useHead({
     gap: 12px;
 }
 
-.student-avatar {
-    flex-shrink: 0;
-}
-
 .student-details {
     flex: 1;
 }
@@ -750,12 +809,48 @@ useHead({
 .student-name {
     font-weight: 600;
     color: #1e293b;
+    font-size: 14px;
+    line-height: 1.2;
     margin-bottom: 2px;
 }
 
-.student-id {
-    font-size: 0.8rem;
+.student-meta {
+    font-size: 12px;
     color: #64748b;
+    margin-top: 2px;
+}
+
+/* ID Cell */
+.id-cell {
+    width: 80px;
+    text-align: left !important;
+}
+
+.id-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    color: #3730a3;
+    font-weight: 600;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+/* Student ID Cell */
+.student-id-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 8px;
 }
 
 /* Date Cell */
@@ -788,37 +883,38 @@ useHead({
     color: #991b1b;
 }
 
+/* Type Cell */
+.type-chip {
+    text-transform: none;
+    font-weight: 500;
+}
+
 /* Status Cell */
 .status-chip {
-    font-weight: 600;
+    font-weight: 500;
     min-width: 80px;
+    background-color: #e3f2fd !important;
+    color: #1565c0 !important;
+    text-transform: none;
 }
 
 /* Actions Cell */
 .action-buttons {
     display: flex;
     gap: 4px;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
-.action-btn-sm {
-    width: 32px;
-    height: 32px;
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
-.approve-btn:hover {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.reject-btn:hover {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-.view-btn:hover {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
+.action-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Pagination */
@@ -950,6 +1046,7 @@ useHead({
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

@@ -6,7 +6,7 @@
                 <div class="title-section">
                     <div class="title-wrapper">
                         <div class="title-icon">
-                            <v-icon icon="mdi-account-group" size="32" color="primary" />
+                            <v-icon icon="mdi-account-group" size="32" color="white" />
                         </div>
                         <div class="title-content">
                             <h1 class="page-title">Group Management</h1>
@@ -105,7 +105,7 @@
                                 class="search-input" clearable />
                         </div>
 
-                        <v-select v-model="tableSortOrder" :items="tableSortOptions" label="Sort by" variant="outlined"
+                        <v-select v-model="tableSortOrder" :items="tableSortOptions" label="Generation" variant="outlined"
                             density="compact" hide-details class="sort-select" />
 
                         <v-btn icon="mdi-filter-variant" variant="outlined" class="filter-btn"
@@ -143,6 +143,9 @@
                                 <th class="modern-header-cell">
                                     <div class="header-content">Global ID</div>
                                 </th>
+                                <th class="modern-header-cell">
+                                    <div class="header-content">Generation</div>
+                                </th>
                                 <th class="modern-header-cell center-align">
                                     <div class="header-content">Status</div>
                                 </th>
@@ -172,6 +175,13 @@
                                 </td>
                                 <td class="modern-table-cell">
                                     <span class="global-id-badge">{{ group.global_id }}</span>
+                                </td>
+                                <td class="modern-table-cell">
+                                    <div class="generation-info">
+                                        <v-chip color="info" variant="outlined" size="small">
+                                            {{ group.generation || 'N/A' }}
+                                        </v-chip>
+                                    </div>
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <v-chip :color="group.active ? 'success' : 'error'" class="status-chip" size="small">
@@ -255,6 +265,14 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="form-label">Generation</label>
+                            <v-select v-model="formData.generation" :items="generationOptions.slice(1)" 
+                                placeholder="Select generation" variant="outlined" density="comfortable" 
+                                prepend-inner-icon="mdi-school" hide-details="auto" :rules="generationRules" 
+                                class="form-field" />
+                        </div>
+
+                        <div class="form-group">
                             <div class="switch-container">
                                 <div class="switch-info">
                                     <label class="form-label">Status</label>
@@ -309,9 +327,9 @@
                                 You are about to permanently delete
                                 <strong class="group-name">{{ selectedGroup?.group_name }}</strong>
                             </p>
-                            <p class="warning-details">
+                            <!-- <p class="warning-details">
                                 All associated data will be removed and cannot be recovered.
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                 </v-card-text>
@@ -343,7 +361,6 @@ definePageMeta({
     // middleware: ['auth', 'role-admin'] // Commented out for testing
 })
 
-import Navbar from '@/components/ui/Navbar.vue'
 // Import mock data for testing
 import mockGroups from '@/mock/groups.json'
 
@@ -353,13 +370,11 @@ const { importFromCSV, validateGroupData } = useImport()
 
 // Reactive data
 const groups = ref([...mockGroups])
-const loading = ref(false)
 const searchQuery = ref('')
 const statusFilter = ref('All')
 const generationFilter = ref('All')
-const yearFilter = ref('All')
 const sortOrder = ref('A-Z')
-const tableSortOrder = ref('A-Z')
+const tableSortOrder = ref('1st')
 const dialogOpen = ref(false)
 const deleteDialog = ref(false)
 const selectedGroup = ref(null)
@@ -374,6 +389,7 @@ const showFilters = ref(false)
 const formData = reactive({
     global_id: '',
     group_name: '',
+    generation: '',
     active: true
 })
 
@@ -390,27 +406,19 @@ const groupNameRules = [
     v => (v && v.length <= 50) || 'Group name must be less than 50 characters'
 ]
 
+const generationRules = [
+    v => !!v || 'Generation is required'
+]
+
 // Filter options
 const generationOptions = [
-    'All', '1st', '2nd', '3rd', '4th', '5th'
+    'All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th'
 ]
 
-const yearOptions = [
-    'All', '2020', '2021', '2022', '2023', '2024', '2025'
-]
 
-const statusOptions = [
-    { title: 'All', value: 'All' },
-    { title: 'Active', value: 1 },
-    { title: 'Inactive', value: 0 }
-]
-
-const sortOptions = [
-    'A-Z', 'Z-A', 'Newest', 'Oldest'
-]
 
 const tableSortOptions = [
-    'A-Z', 'Z-A'
+    '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', 'A-Z', 'Z-A'
 ]
 
 // Computed filtered groups
@@ -422,7 +430,8 @@ const filteredGroups = computed(() => {
         const query = searchQuery.value.toLowerCase()
         filtered = filtered.filter(group =>
             group.group_name?.toLowerCase().includes(query) ||
-            group.global_id?.toLowerCase().includes(query)
+            group.global_id?.toLowerCase().includes(query) ||
+            group.generation?.toLowerCase().includes(query)
         )
     }
 
@@ -431,17 +440,34 @@ const filteredGroups = computed(() => {
         filtered = filtered.filter(group => group.active === statusFilter.value)
     }
 
+    // Generation filter
+    if (generationFilter.value !== 'All' && generationFilter.value !== null) {
+        filtered = filtered.filter(group => group.generation === generationFilter.value)
+    }
+
     // Sort
     filtered.sort((a, b) => {
-        switch (sortOrder.value) {
+        switch (tableSortOrder.value) {
+            case '1st':
+            case '2nd':
+            case '3rd':
+            case '4th':
+            case '5th':
+            case '6th':
+            case '7th':
+            case '8th':
+            case '9th':
+                // Filter by specific generation, then sort alphabetically
+                const isAGeneration = a.generation === tableSortOrder.value;
+                const isBGeneration = b.generation === tableSortOrder.value;
+                if (isAGeneration && !isBGeneration) return -1;
+                if (!isAGeneration && isBGeneration) return 1;
+                if (isAGeneration && isBGeneration) return a.group_name?.localeCompare(b.group_name) || 0;
+                return a.group_name?.localeCompare(b.group_name) || 0;
             case 'A-Z':
                 return a.group_name?.localeCompare(b.group_name) || 0
             case 'Z-A':
                 return b.group_name?.localeCompare(a.group_name) || 0
-            case 'Newest':
-                return new Date(b.created_at) - new Date(a.created_at)
-            case 'Oldest':
-                return new Date(a.created_at) - new Date(b.created_at)
             default:
                 return 0
         }
@@ -485,6 +511,7 @@ const openCreateDialog = () => {
     // Reset form data
     formData.global_id = ''
     formData.group_name = ''
+    formData.generation = ''
     formData.active = true
     dialogOpen.value = true
 }
@@ -495,6 +522,7 @@ const openEditDialog = (group) => {
     // Populate form data
     formData.global_id = group.global_id
     formData.group_name = group.group_name
+    formData.generation = group.generation || ''
     formData.active = group.active === 1
     dialogOpen.value = true
 }
@@ -506,6 +534,7 @@ const closeDialog = () => {
     // Reset form
     formData.global_id = ''
     formData.group_name = ''
+    formData.generation = ''
     formData.active = true
 }
 
@@ -519,6 +548,7 @@ const submitForm = async () => {
         const groupData = {
             global_id: formData.global_id,
             group_name: formData.group_name,
+            generation: formData.generation,
             active: formData.active ? 1 : 0
         }
 
@@ -555,11 +585,6 @@ const submitForm = async () => {
 }
 
 // CRUD operations
-const handleFormSubmit = (groupData) => {
-    // This function is no longer needed as we handle it in submitForm
-    closeDialog()
-}
-
 const confirmDelete = (group) => {
     selectedGroup.value = group
     deleteDialog.value = true
@@ -1028,16 +1053,12 @@ const handleExportPDF = () => {
     align-items: center;
     padding: 6px 12px;
     background: #f1f5f9;
-    color: #475569;
-    font-weight: 500;
-                                display: block;
-                                color: #1e293b !important;
-                                font-weight: 600;
-                                font-size: 15px;
-                                text-transform: uppercase;
-                                letter-spacing: 0.05em;
-                                padding: 0;
-    border-radius: 8px !important;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 8px;
 }
 
 .date-info {
@@ -1152,38 +1173,7 @@ const handleExportPDF = () => {
     }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-    }
 
-    .action-buttons {
-        justify-content: center;
-    }
-
-    .filters-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filter-select {
-        max-width: none;
-    }
-
-    .table-controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .search-field,
-    .order-select {
-        min-width: auto;
-    }
-}
 
 /* Modern Dialog Styles */
 .modern-dialog {
@@ -1195,7 +1185,7 @@ const handleExportPDF = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px 24px 20px;
+    padding: 20px 24px;
     background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
 }
 
@@ -1225,15 +1215,15 @@ const handleExportPDF = () => {
     font-size: 20px;
     font-weight: 600;
     color: #1a1a1a;
-    margin: 0 0 4px 0;
-    line-height: 1.2;
+    margin: 0;
+    line-height: 1.3;
 }
 
 .dialog-subtitle {
     font-size: 14px;
     color: #6b7280;
-    margin: 0;
-    line-height: 1.3;
+    margin: 2px 0 0 0;
+    line-height: 1.4;
 }
 
 .close-btn {
@@ -1380,7 +1370,6 @@ const handleExportPDF = () => {
     display: flex;
     gap: 12px;
     padding: 16px;
-    background: #fef3cd;
     border: 1px solid #fde047;
     border-radius: 12px;
 }
@@ -1402,7 +1391,7 @@ const handleExportPDF = () => {
 }
 
 .group-name {
-    color: #dc2626;
+    color: black;
     font-weight: 600;
 }
 
@@ -1416,6 +1405,8 @@ const handleExportPDF = () => {
 .delete-actions {
     padding: 20px 24px 24px !important;
     gap: 12px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .delete-btn {

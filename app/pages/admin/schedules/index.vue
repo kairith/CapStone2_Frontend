@@ -6,7 +6,7 @@
         <div class="title-section">
           <div class="title-wrapper">
             <div class="title-icon">
-              <v-icon icon="mdi-calendar-clock" size="32" color="primary" />
+              <v-icon icon="mdi-calendar-clock" size="32" color="white" />
             </div>
             <div class="title-content">
               <h1 class="page-title">Schedule Management</h1>
@@ -66,38 +66,50 @@
     </div>
 
     <!-- Schedule Cards Grid -->
-    <div class="schedules-grid">
-      <div class="schedules-container">
-        <!-- Filter and Search Bar -->
-        <div class="toolbar-section">
-          <div class="search-section">
-            <v-text-field v-model="searchQuery" placeholder="Search schedules..." prepend-inner-icon="mdi-magnify"
-              variant="outlined" density="compact" hide-details class="search-input" clearable />
+    <div class="modern-table-section">
+      <div class="table-container">
+        <!-- Table Header with Search and Filters -->
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <h2 class="table-title">
+              <v-icon icon="mdi-calendar-clock" size="20" class="mr-2" />
+              Schedule Information
+            </h2>
+            <div class="table-subtitle">Manage and organize your schedules</div>
           </div>
-          <div class="filter-section">
+
+          <div class="toolbar-right">
+            <div class="search-container">
+              <v-text-field v-model="searchQuery" placeholder="Search schedules..." prepend-inner-icon="mdi-magnify"
+                variant="outlined" density="compact" hide-details class="search-input" clearable />
+            </div>
+
             <v-select v-model="generationFilter" :items="generationOptions" label="Generation" variant="outlined"
               density="compact" hide-details class="filter-select" />
+            
             <v-select v-model="yearFilter" :items="yearOptions" label="Year" variant="outlined" density="compact"
               hide-details class="filter-select" />
+            
             <v-select v-model="statusFilter" :items="statusOptions" label="Status" variant="outlined" density="compact"
               hide-details class="filter-select" />
           </div>
         </div>
 
         <!-- Schedule Cards -->
-        <div v-if="filteredSchedules.length === 0" class="empty-state">
-          <v-icon icon="mdi-calendar-clock" size="64" color="grey-lighten-1" class="mb-4" />
-          <h3 class="text-h6 text-grey-darken-1 mb-2">No schedules found</h3>
-          <p class="text-body-2 text-grey">Create your first schedule to get started</p>
-          <v-btn color="primary" variant="flat" @click="openCreateDialog" class="mt-4">
-            <v-icon start>mdi-plus</v-icon>
-            Create Schedule
-          </v-btn>
-        </div>
+        <div class="cards-content">
+          <div v-if="filteredSchedules.length === 0" class="empty-state">
+            <v-icon icon="mdi-calendar-clock" size="64" color="grey-lighten-1" class="mb-4" />
+            <h3 class="text-h6 text-grey-darken-1 mb-2">No schedules found</h3>
+            <p class="text-body-2 text-grey">Create your first schedule to get started</p>
+            <v-btn color="primary" variant="flat" @click="openCreateDialog" class="mt-4">
+              <v-icon start>mdi-plus</v-icon>
+              Create Schedule
+            </v-btn>
+          </div>
 
-        <div v-else class="cards-grid">
-          <v-card v-for="schedule in filteredSchedules" :key="schedule.id" class="schedule-card" elevation="2"
-            @click="viewSchedule(schedule)">
+          <div v-else class="cards-grid">
+            <v-card v-for="schedule in filteredSchedules" :key="schedule.id" class="schedule-card" elevation="2"
+              @click="viewSchedule(schedule)">
             <div class="card-header">
               <div class="group-info">
                 <h3 class="group-name">{{ schedule.group_name }}</h3>
@@ -160,6 +172,7 @@
               </v-btn>
             </div>
           </v-card>
+          </div>
         </div>
       </div>
     </div>
@@ -333,9 +346,9 @@
                 You are about to permanently delete the schedule for
                 <strong class="group-name">{{ scheduleToDelete?.group_name }}</strong>
               </p>
-              <p class="warning-details">
+              <!-- <p class="warning-details">
                 All schedule data will be removed and cannot be recovered.
-              </p>
+              </p> -->
             </div>
           </div>
         </v-card-text>
@@ -619,15 +632,14 @@ onMounted(() => {
 /* Header Styles */
 .modern-header {
   background: white;
-  padding: 32px 0;
   border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .header-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 24px 32px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -646,37 +658,42 @@ onMounted(() => {
 }
 
 .title-icon {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.title-content h1.page-title {
+.page-title {
   font-size: 28px;
   font-weight: 700;
   color: #1e293b;
   margin: 0 0 4px 0;
+  letter-spacing: -0.025em;
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .breadcrumb-item {
   font-size: 14px;
   color: #64748b;
+  font-weight: 500;
 }
 
 .breadcrumb-item.active {
   color: #3b82f6;
-  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  opacity: 0.5;
 }
 
 .stats-cards {
@@ -686,28 +703,35 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 16px 20px;
+  min-width: 100px;
   text-align: center;
-  min-width: 120px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-number {
   font-size: 24px;
   font-weight: 700;
   color: #1e293b;
+  line-height: 1;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 12px;
+  font-weight: 500;
   color: #64748b;
   text-transform: uppercase;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 .action-section {
@@ -718,67 +742,81 @@ onMounted(() => {
 }
 
 .modern-btn {
-  height: 42px;
-  padding: 0 20px;
-  border-radius: 8px;
-  font-weight: 500;
+  height: 44px;
+  border-radius: 12px;
   text-transform: none;
-  letter-spacing: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 20px;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
 }
 
-.export-btn {
-  border-color: #e2e8f0;
-  color: #374151;
-}
-
-.export-btn:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  background: #f8fafc;
+.modern-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.add-btn:hover {
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  color: white !important;
 }
 
 /* Main Content Styles */
-.schedules-grid {
-  max-width: 1200px;
+.modern-table-section {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 24px 32px;
 }
 
-.toolbar-section {
+.table-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-toolbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.search-section {
+.toolbar-left {
   flex: 1;
-  max-width: 400px;
 }
 
-.search-input {
-  background: white;
-  border-radius: 8px;
+.table-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
 }
 
-.filter-section {
+.table-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.toolbar-right {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-container {
+  min-width: 300px;
+}
+
+.search-input :deep(.v-field) {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .filter-select {
@@ -787,33 +825,43 @@ onMounted(() => {
   border-radius: 8px;
 }
 
+.filter-select :deep(.v-field) {
+  border-radius: 12px;
+}
+
+/* Cards Content */
+.cards-content {
+  padding: 16px 24px 24px;
+}
+
 /* Cards Grid */
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
 }
 
 .schedule-card {
   background: white;
-  border-radius: 16px;
-  padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
   cursor: pointer;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .schedule-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
   border-color: #3b82f6;
 }
 
@@ -1045,13 +1093,13 @@ onMounted(() => {
   display: flex;
   gap: 12px;
   padding: 16px;
-  background: #fef3cd;
   border: 1px solid #fde047;
   border-radius: 12px;
+  background: #f9fafb;
 }
 
 .warning-icon {
-  flex-shrink: 0;
+  flex-shrink: 0; 
   margin-top: 2px;
 }
 
@@ -1091,24 +1139,6 @@ onMounted(() => {
 .delete-btn:hover {
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
   transform: translateY(-1px);
-}
-
-/* Animation for dialogs */
-.modern-dialog,
-.delete-dialog {
-  animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes dialogSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
 
 /* Schedule Detail Dialog */
@@ -1153,86 +1183,6 @@ onMounted(() => {
 .schedule-content {
   flex: 1;
   overflow-y: auto;
-}
-
-/* Delete Dialog */
-.delete-dialog {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.delete-header {
-  text-align: center;
-  padding: 32px 24px 20px;
-}
-
-.delete-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #dc2626;
-  margin: 12px 0 8px 0;
-}
-
-.delete-subtitle {
-  font-size: 14px;
-  color: #64748b;
-  margin: 0;
-}
-
-.delete-content {
-  padding: 20px 24px !important;
-}
-
-.warning-box {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: #fef3cd;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-}
-
-.warning-icon {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.warning-text {
-  flex: 1;
-}
-
-.warning-message {
-  font-size: 14px;
-  color: #92400e;
-  margin: 0 0 4px 0;
-  line-height: 1.4;
-}
-
-.group-name {
-  color: #dc2626;
-  font-weight: 600;
-}
-
-.warning-details {
-  font-size: 13px;
-  color: #a16207;
-  margin: 0;
-  line-height: 1.4;
-}
-
-.delete-actions {
-  padding: 20px 24px 24px !important;
-  gap: 12px;
-}
-
-.delete-btn {
-  min-width: 130px;
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
-}
-
-.delete-btn:hover {
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
-  transform: translateY(-1px);
 }
 
 /* Responsive Design */
