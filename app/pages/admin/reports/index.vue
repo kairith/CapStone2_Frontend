@@ -157,10 +157,8 @@
 
                 <!-- Modern Table Wrapper -->
                 <div class="modern-table-wrapper">
-<<<<<<< HEAD
-
-                    <v-data-table :headers="headers" :items="filteredRows" :search="search" :loading="isLoading"
-                        density="comfortable" class="modern-table" :items-per-page="10" hover>
+                    <v-data-table :headers="headers" :items="filteredRows" :search="search"
+                        :loading="isLoading" density="comfortable" class="modern-table" :items-per-page="10" hover>
                         <!-- Instructor -->
                         <template #item.instructor="{ item }">
                             <div class="py-3">
@@ -253,210 +251,195 @@
                                 </p>
                             </div>
                         </template>
-                    </v-data-table>
-=======
-                    <v-table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th class="modern-header-cell id-column">
-                                    <div class="header-content">
-                                        ID
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Instructor
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Subject
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Group / Generation
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Term
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell center-align">
-                                    <div class="header-content">
-                                        Students
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Sessions
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">
-                                        Attendance
-                                    </div>
-                                </th>
-                                <th class="modern-header-cell center-align">
-                                    <div class="header-content">
-                                        Actions
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, index) in paginatedReports" :key="item.id" class="modern-table-row">
-                                <!-- ID -->
-                                <td class="modern-table-cell id-column">
-                                    <div class="id-badge">{{ index + 1 + (currentPage - 1) * itemsPerPage }}</div>
-                                </td>
-                                
-                                <!-- Instructor -->
-                                <td class="modern-table-cell">
-                                    <div class="instructor-info">
-                                        <div class="instructor-avatar">
-                                            <v-icon icon="mdi-account-tie" size="20" />
+                        </v-data-table>
+                        =======
+                        <v-table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th class="modern-header-cell id-column">
+                                        <div class="header-content">
+                                            ID
                                         </div>
-                                        <div class="instructor-details">
-                                            <div class="instructor-name">{{ item.instructorName }}</div>
-                                            <div class="instructor-position">{{ item.instructorPosition }} • ID: {{ item.instructorId }}</div>
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Instructor
                                         </div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Subject -->
-                                <td class="modern-table-cell">
-                                    <div class="subject-info">
-                                        <div class="subject-name">{{ item.subjectName }}</div>
-                                        <div class="subject-code">{{ item.subjectCode }} • {{ item.departmentName }}</div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Group / Generation -->
-                                <td class="modern-table-cell">
-                                    <div class="group-info">
-                                        <v-chip color="primary" size="small" variant="flat" class="font-weight-medium group-chip">
-                                            {{ item.groupName }}
-                                        </v-chip>
-                                        <div class="generation-text">Gen {{ item.generation }}</div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Term -->
-                                <td class="modern-table-cell">
-                                    <v-chip color="indigo-lighten-4" text-color="indigo-darken-4" size="small" class="term-chip">
-                                        {{ item.term }}
-                                    </v-chip>
-                                </td>
-                                
-                                <!-- Students -->
-                                <td class="modern-table-cell center-align">
-                                    <div class="students-count">
-                                        <div class="count-number">{{ item.totalStudents }}</div>
-                                        <div class="count-label">students</div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Sessions -->
-                                <td class="modern-table-cell">
-                                    <div class="sessions-info">
-                                        <div class="completed-sessions">
-                                            <strong>{{ item.completedSessions }}</strong> completed
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Subject
                                         </div>
-                                        <div class="session-details">
-                                            {{ item.plannedSessions }} planned • {{ item.canceledSessions }} cancelled
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Group / Generation
                                         </div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Attendance -->
-                                <td class="modern-table-cell">
-                                    <div class="attendance-info">
-                                        <v-progress-linear 
-                                            :model-value="item.attendanceRate"
-                                            :color="getAttendanceColor(item.attendanceRate)" 
-                                            height="8" 
-                                            rounded
-                                            class="attendance-progress mb-2" 
-                                        />
-                                        <div class="attendance-rate">
-                                            {{ item.attendanceRate.toFixed(1) }}%
-                                            <v-chip 
-                                                :color="getAttendanceColor(item.attendanceRate)" 
-                                                size="x-small"
-                                                class="ml-1 attendance-status" 
-                                                variant="flat"
-                                            >
-                                                {{ getAttendanceLabel(item.attendanceRate) }}
-                                            </v-chip>
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Term
                                         </div>
-                                        <div class="attendance-breakdown">
-                                            P: {{ item.presentCount }} • L: {{ item.lateCount }} • A: {{ item.absentCount }} • E: {{ item.excusedCount }}
+                                    </th>
+                                    <th class="modern-header-cell center-align">
+                                        <div class="header-content">
+                                            Students
                                         </div>
-                                    </div>
-                                </td>
-                                
-                                <!-- Actions -->
-                                <td class="modern-table-cell center-align">
-                                    <div class="action-group">
-                                        <v-tooltip text="View Details" location="top">
-                                            <template v-slot:activator="{ props }">
-                                                <v-btn 
-                                                    v-bind="props"
-                                                    icon="mdi-eye" 
-                                                    variant="flat" 
-                                                    size="small" 
-                                                    class="action-btn view-detail-btn"
-                                                    @click="openOfferingDetails(item)"
-                                                />
-                                            </template>
-                                        </v-tooltip>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </v-table>
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Sessions
+                                        </div>
+                                    </th>
+                                    <th class="modern-header-cell">
+                                        <div class="header-content">
+                                            Attendance
+                                        </div>
+                                    </th>
+                                    <th class="modern-header-cell center-align">
+                                        <div class="header-content">
+                                            Actions
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in paginatedReports" :key="item.id" class="modern-table-row">
+                                    <!-- ID -->
+                                    <td class="modern-table-cell id-column">
+                                        <div class="id-badge">{{ index + 1 + (currentPage - 1) * itemsPerPage }}</div>
+                                    </td>
 
-                    <!-- Empty State -->
-                    <div v-if="paginatedReports.length === 0" class="empty-state">
-                        <v-icon icon="mdi-chart-box-outline" size="64" color="grey-lighten-1" />
-                        <h3 class="empty-title">No reports found</h3>
-                        <p class="empty-subtitle">
-                            {{ search ? 'Try adjusting your search terms' : 'No records match your filters' }}
-                        </p>
-                    </div>
-                    
-                    <!-- Pagination Footer -->
-                    <div v-if="paginatedReports.length > 0" class="pagination-section">
-                        <v-btn 
-                            variant="outlined" 
-                            :disabled="currentPage <= 1" 
-                            @click="goToPrevPage"
-                            class="pagination-btn"
-                        >
-                            <v-icon icon="mdi-chevron-left" class="mr-1" />
-                            Previous
-                        </v-btn>
-                        
-                        <div class="pagination-info">
-                            <span class="pagination-text">
-                                Page {{ currentPage }} of {{ totalPages }} 
-                                ({{ filteredReports.length }} total records)
-                            </span>
+                                    <!-- Instructor -->
+                                    <td class="modern-table-cell">
+                                        <div class="instructor-info">
+                                            <div class="instructor-avatar">
+                                                <v-icon icon="mdi-account-tie" size="20" />
+                                            </div>
+                                            <div class="instructor-details">
+                                                <div class="instructor-name">{{ item.instructorName }}</div>
+                                                <div class="instructor-position">{{ item.instructorPosition }} • ID: {{
+                                                    item.instructorId }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Subject -->
+                                    <td class="modern-table-cell">
+                                        <div class="subject-info">
+                                            <div class="subject-name">{{ item.subjectName }}</div>
+                                            <div class="subject-code">{{ item.subjectCode }} • {{ item.departmentName }}
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Group / Generation -->
+                                    <td class="modern-table-cell">
+                                        <div class="group-info">
+                                            <v-chip color="primary" size="small" variant="flat"
+                                                class="font-weight-medium group-chip">
+                                                {{ item.groupName }}
+                                            </v-chip>
+                                            <div class="generation-text">Gen {{ item.generation }}</div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Term -->
+                                    <td class="modern-table-cell">
+                                        <v-chip color="indigo-lighten-4" text-color="indigo-darken-4" size="small"
+                                            class="term-chip">
+                                            {{ item.term }}
+                                        </v-chip>
+                                    </td>
+
+                                    <!-- Students -->
+                                    <td class="modern-table-cell center-align">
+                                        <div class="students-count">
+                                            <div class="count-number">{{ item.totalStudents }}</div>
+                                            <div class="count-label">students</div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Sessions -->
+                                    <td class="modern-table-cell">
+                                        <div class="sessions-info">
+                                            <div class="completed-sessions">
+                                                <strong>{{ item.completedSessions }}</strong> completed
+                                            </div>
+                                            <div class="session-details">
+                                                {{ item.plannedSessions }} planned • {{ item.canceledSessions }}
+                                                cancelled
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Attendance -->
+                                    <td class="modern-table-cell">
+                                        <div class="attendance-info">
+                                            <v-progress-linear :model-value="item.attendanceRate"
+                                                :color="getAttendanceColor(item.attendanceRate)" height="8" rounded
+                                                class="attendance-progress mb-2" />
+                                            <div class="attendance-rate">
+                                                {{ item.attendanceRate.toFixed(1) }}%
+                                                <v-chip :color="getAttendanceColor(item.attendanceRate)" size="x-small"
+                                                    class="ml-1 attendance-status" variant="flat">
+                                                    {{ getAttendanceLabel(item.attendanceRate) }}
+                                                </v-chip>
+                                            </div>
+                                            <div class="attendance-breakdown">
+                                                P: {{ item.presentCount }} • L: {{ item.lateCount }} • A: {{
+                                                item.absentCount }}
+                                                • E: {{ item.excusedCount }}
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="modern-table-cell center-align">
+                                        <div class="action-group">
+                                            <v-tooltip text="View Details" location="top">
+                                                <template v-slot:activator="{ props }">
+                                                    <v-btn v-bind="props" icon="mdi-eye" variant="flat" size="small"
+                                                        class="action-btn view-detail-btn"
+                                                        @click="openOfferingDetails(item)" />
+                                                </template>
+                                            </v-tooltip>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+
+                        <!-- Empty State -->
+                        <div v-if="paginatedReports.length === 0" class="empty-state">
+                            <v-icon icon="mdi-chart-box-outline" size="64" color="grey-lighten-1" />
+                            <h3 class="empty-title">No reports found</h3>
+                            <p class="empty-subtitle">
+                                {{ search ? 'Try adjusting your search terms' : 'No records match your filters' }}
+                            </p>
                         </div>
-                        
-                        <v-btn 
-                            variant="outlined" 
-                            :disabled="currentPage >= totalPages" 
-                            @click="goToNextPage"
-                            class="pagination-btn"
-                        >
-                            Next
-                            <v-icon icon="mdi-chevron-right" class="ml-1" />
-                        </v-btn>
-                    </div>
->>>>>>> 84c43ed586806ed80ade50f84f0aab7f20afc3de
+
+                        <!-- Pagination Footer -->
+                        <div v-if="paginatedReports.length > 0" class="pagination-section">
+                            <v-btn variant="outlined" :disabled="currentPage <= 1" @click="goToPrevPage"
+                                class="pagination-btn">
+                                <v-icon icon="mdi-chevron-left" class="mr-1" />
+                                Previous
+                            </v-btn>
+
+                            <div class="pagination-info">
+                                <span class="pagination-text">
+                                    Page {{ currentPage }} of {{ totalPages }}
+                                    ({{ filteredReports.length }} total records)
+                                </span>
+                            </div>
+
+                            <v-btn variant="outlined" :disabled="currentPage >= totalPages" @click="goToNextPage"
+                                class="pagination-btn">
+                                Next
+                                <v-icon icon="mdi-chevron-right" class="ml-1" />
+                            </v-btn>
+                        </div>
                 </div>
             </div>
         </div>
@@ -595,10 +578,6 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-
-definePageMeta({
-    layout: 'admin'
-})
 
 definePageMeta({
     layout: 'admin'
