@@ -240,15 +240,15 @@
             <!-- Dialog Header -->
             <div class="dialog-header">
                 <div class="header-content">
-                    <div class="header-icon">
+                    <div class="header-icon edit-icon">
                         <v-icon icon="mdi-pencil" color="warning" size="28" />
                     </div>
                     <div class="header-text">
-                        <h2 class="dialog-title">Edit Student Attendance</h2>
-                        <p class="dialog-subtitle">Update student attendance information</p>
+                        <h2 class="dialog-title edit-title">EDIT PROFESSOR</h2>
+                        <p class="dialog-subtitle">UPDATE PROFESSOR INFORMATION</p>
                     </div>
                 </div>
-                <v-btn icon="mdi-close" variant="text" size="small" @click="editDialog" class="close-btn" />
+                <v-btn icon="mdi-close" variant="text" size="small" @click="editDialog = false" class="close-btn" />
             </div>
 
             <v-divider />
@@ -318,7 +318,7 @@
 
             <!-- Dialog Actions -->
             <v-card-actions class="dialog-actions">
-                <v-btn variant="outlined" color="grey-darken-1" @click="closeEditDialog" class="action-btn cancel-btn">
+                <v-btn variant="outlined" color="grey-darken-1" @click="editDialog = false" class="action-btn cancel-btn">
                     <v-icon start>mdi-close</v-icon>
                     Cancel
                 </v-btn>
@@ -337,9 +337,9 @@
             <!-- Delete Header -->
             <div class="delete-header">
                 <div class="delete-icon-container">
-                    <v-icon icon="mdi-alert-circle" color="error" size="48" />
+                    <v-icon icon="mdi-delete" color="error" size="48" />
                 </div>
-                <h2 class="delete-title">Delete Student Record</h2>
+                <h2 class="delete-title">Delete Professor</h2>
                 <p class="delete-subtitle">This action cannot be undone</p>
             </div>
 
@@ -348,11 +348,11 @@
             <!-- Delete Content -->
             <v-card-text class="delete-content">
                 <div class="warning-box">
-                    <v-icon icon="mdi-alert" color="warning" size="24" class="warning-icon" />
+                    <v-icon icon="mdi-alert" color="#F97316" size="24" class="warning-icon" />
                     <div class="warning-text">
                         <p class="warning-message">
-                            Are you sure you want to delete the attendance record for
-                            <strong class="student-name">{{ selectedStudent?.name }}</strong>?
+                            You are about to permanently delete the professor
+                            <strong class="professor-name">{{ selectedStudent?.name }}</strong>
                         </p>
                     </div>
                 </div>
@@ -362,14 +362,14 @@
 
             <!-- Delete Actions -->
             <v-card-actions class="delete-actions">
-                <v-btn variant="outlined" color="grey-darken-1" @click="closeDeleteDialog" :disabled="deleteLoading" class="action-btn cancel-btn">
-                    <v-icon start>mdi-close</v-icon>
+                <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false" :disabled="deleteLoading" class="action-btn cancel-btn">
+                    <v-icon start>mdi-close-circle-outline</v-icon>
                     Cancel
                 </v-btn>
 
                 <v-btn color="error" variant="flat" @click="confirmDeleteStudent" :loading="deleteLoading" class="action-btn delete-btn">
                     <v-icon start>mdi-delete</v-icon>
-                    Delete Record
+                    Delete Professor
                 </v-btn>
             </v-card-actions>
         </v-card>
@@ -601,17 +601,88 @@ const rejectAttendance = (student: any) => {
 
 const editStudent = (student: any) => {
     console.log('Edit student:', student.name)
-    showErrorMessage('Edit student feature coming soon!')
+    // Populate edit form with selected student's data and open dialog
+    editFormData.value = {
+        name: student.name || '',
+        student_id: student.student_id || '',
+        status: student.status || 'Pending',
+        scan_time: student.scan_time || '',
+        location: student.location || ''
+    }
+    selectedStudent.value = student
+    editDialog.value = true
+}
+
+const submitEdit = async () => {
+    // Basic validation: ensure status is set
+    if (!editFormData.value.status) {
+        showErrorMessage('Status is required')
+        return
+    }
+
+    try {
+        editLoading.value = true
+        // simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 600))
+
+        // Update the student in the local list if selectedStudent is set
+        if (selectedStudent.value) {
+            const idx = studentsList.value.findIndex(s => s.id === selectedStudent.value.id)
+            if (idx !== -1) {
+                // Update fields in-place to preserve the original object shape and satisfy TypeScript types
+                const studentToUpdate = studentsList.value[idx]
+                if (studentToUpdate) {
+                    studentToUpdate.status = editFormData.value.status
+                    studentToUpdate.scan_time = editFormData.value.scan_time
+                    studentToUpdate.location = editFormData.value.location
+                }
+            }
+        }
+
+        successMessage.value = 'Student attendance updated successfully'
+        showSuccess.value = true
+
+        // Close dialog and reset selection
+        editDialog.value = false
+        selectedStudent.value = null
+    } catch (err) {
+        console.error('Error saving student edit:', err)
+        showErrorMessage('Failed to save changes')
+    } finally {
+        editLoading.value = false
+    }
 }
 
 const deleteStudent = (student: any) => {
-    console.log('Delete student:', student.name)
-    if (confirm(`Are you sure you want to delete ${student.name}?`)) {
-        const index = studentsList.value.findIndex(s => s.id === student.id)
+    // Open confirm delete dialog and set selected student
+    selectedStudent.value = student
+    deleteDialog.value = true
+}
+
+const confirmDeleteStudent = async () => {
+    if (!selectedStudent.value) return
+    try {
+        deleteLoading.value = true
+        // simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        const index = studentsList.value.findIndex(s => s.id === selectedStudent.value.id)
         if (index !== -1) {
+            const deletedName = studentsList.value[index]?.name || 'Student'
             studentsList.value.splice(index, 1)
-            showErrorMessage(`${student.name} has been deleted successfully!`)
+            // show success snackbar
+            successMessage.value = `${deletedName} has been deleted successfully!`
+            showSuccess.value = true
         }
+
+        // reset selection and close dialog
+        selectedStudent.value = null
+        deleteDialog.value = false
+    } catch (err) {
+        console.error('Error deleting student:', err)
+        showErrorMessage('Failed to delete student')
+    } finally {
+        deleteLoading.value = false
     }
 }
 
@@ -1211,6 +1282,248 @@ useHead({
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* Modern Dialog Styles */
+.modern-dialog {
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.edit-icon {
+    background: #FEF3C7;
+}
+
+.header-text {
+    flex: 1;
+}
+
+.dialog-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+}
+
+.dialog-subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0 0;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.close-btn {
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.dialog-content {
+    padding: 24px !important;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-field {
+    margin-bottom: 0 !important;
+}
+
+.form-field :deep(.v-field) {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.form-field :deep(.v-field:hover) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.form-field :deep(.v-field--focused) {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dialog-actions {
+    padding: 20px 24px 24px !important;
+    gap: 12px;
+}
+
+.action-btn {
+    height: 44px;
+    border-radius: 12px;
+    text-transform: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 24px;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    min-width: 100px;
+}
+
+.submit-btn {
+    min-width: 140px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.submit-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Delete Dialog Styles */
+.delete-dialog {
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+.delete-header {
+    text-align: center;
+    padding: 32px 24px 24px;
+    background: linear-gradient(135deg, #fef7f7 0%, #fdf2f2 100%);
+}
+
+.delete-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+}
+
+.delete-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #dc2626;
+    margin: 0 0 4px 0;
+}
+
+.delete-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.delete-content {
+    padding: 24px !important;
+}
+
+.warning-box {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 12px;
+}
+
+.warning-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.warning-text {
+    flex: 1;
+}
+
+.warning-message {
+    font-size: 14px;
+    color: #92400e;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.professor-name {
+    color: #000000;
+    font-weight: 600;
+}
+
+.delete-actions {
+    padding: 20px 24px 24px !important;
+    gap: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.delete-btn {
+    min-width: 130px;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.delete-btn:hover {
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Animation for dialogs */
+.modern-dialog,
+.delete-dialog {
+    animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes dialogSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
     }
 }
 </style>
