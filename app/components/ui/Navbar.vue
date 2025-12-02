@@ -472,7 +472,7 @@ const isSectionActive = (base: string) =>
   route.path === base || route.path.startsWith(base + '/')
 /* ---------- Menu: Users sub-roles ---------- */
 const userRoles = [
-  { title: 'Admin', icon: 'mdi-shield-account-outline', to: '/admin/admin' },
+  { title: 'Admin', icon: 'mdi-shield-account-outline', to: '/admin/admins' },
   { title: 'Student', icon: 'mdi-school-outline', to: '/admin/student' },
   { title: 'Lecturer', icon: 'mdi-account-tie-outline', to: '/admin/lecturer' },
 ]

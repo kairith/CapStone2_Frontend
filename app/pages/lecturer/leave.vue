@@ -75,13 +75,32 @@
                         </v-list>
                     </v-menu>
 
-                    <v-btn
-                        class="modern-btn add-btn"
-                        prepend-icon="mdi-plus"
-                        @click="showNewLeaveDialog = true"
-                    >
-                        Add Leave Request
-                    </v-btn>
+                    <v-menu>
+                        <template v-slot:activator="{ props }">
+                            <v-btn
+                                v-bind="props"
+                                class="modern-btn add-btn"
+                                prepend-icon="mdi-plus"
+                                append-icon="mdi-chevron-down"
+                            >
+                                Add Leave Request
+                            </v-btn>
+                        </template>
+                        <v-list class="modern-menu">
+                            <v-list-item class="menu-item" @click="openStudentLeaveForm">
+                                <v-list-item-title>
+                                    <v-icon start size="20">mdi-account-school</v-icon>
+                                    Student Leave Request
+                                </v-list-item-title>
+                            </v-list-item>
+                            <v-list-item class="menu-item" @click="openLecturerLeaveForm">
+                                <v-list-item-title>
+                                    <v-icon start size="20">mdi-account-tie</v-icon>
+                                    My Leave Request
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </div>
             </div>
         </div>
@@ -154,25 +173,55 @@
                                 class="modern-table"
                                 hover
                             >
+                                <template #bottom="{ page, pageCount, itemsLength }">
+                                    <div class="custom-table-footer">
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === 1"
+                                            @click="page--"
+                                        >
+                                            <v-icon size="20">mdi-chevron-left</v-icon>
+                                            Previous
+                                        </v-btn>
+                                        <div class="footer-info">
+                                            Page {{ page }} of {{ pageCount }} ({{ itemsLength }} total records)
+                                        </div>
+                                            <v-btn
+                                                variant="outlined"
+                                                size="large"
+                                                class="footer-btn"
+                                                :disabled="page === pageCount"
+                                                @click="page++"
+                                        >
+                                            Next
+                                            <v-icon size="20">mdi-chevron-right</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </template>
                                 <template #headers>
                                     <tr class="modern-header-row">
                                         <th class="modern-header-cell id-column">
-                                            <div class="header-content">ID</div>
+                                            <div class="header-content">#</div>
                                         </th>
                                         <th class="modern-header-cell">
-                                            <div class="header-content">Name</div>
+                                            <div class="header-content">Student</div>
                                         </th>
                                         <th class="modern-header-cell">
-                                            <div class="header-content">Global ID</div>
+                                            <div class="header-content">Class</div>
                                         </th>
                                         <th class="modern-header-cell">
                                             <div class="header-content">Type</div>
                                         </th>
                                         <th class="modern-header-cell">
+                                            <div class="header-content">Dates</div>
+                                        </th>
+                                        <th class="modern-header-cell">
                                             <div class="header-content">Status</div>
                                         </th>
                                         <th class="modern-header-cell">
-                                            <div class="header-content">Created</div>
+                                            <div class="header-content">Approval</div>
                                         </th>
                                         <th class="modern-header-cell">
                                             <div class="header-content">Actions</div>
@@ -199,35 +248,99 @@
                                             <div class="global-id-badge">{{ item.class }}</div>
                                         </td>
                                         <td class="modern-table-cell">
-                                            <div class="global-id-badge">{{ item.type }}</div>
-                                        </td>
-                                        <td class="modern-table-cell">
-                                            <v-chip :color="getStatusColor(item.status)" text-color="white" variant="flat" size="small">
-                                                {{ item.status }}
+                                            <v-chip :color="getTypeColor(item.type)" variant="flat" size="small" text-color="white">
+                                                {{ item.type }}
                                             </v-chip>
                                         </td>
                                         <td class="modern-table-cell">
                                             <div class="date-info">
-                                                <div class="date-primary">{{ formatDate(item.submittedAt) }}</div>
-                                                <div class="date-secondary">{{ formatTime(item.submittedAt) }}</div>
+                                                <div class="date-primary">{{ formatDate(item.startDate) }}</div>
+                                                <div class="date-secondary">to {{ formatDate(item.endDate) }}</div>
+                                            </div>
+                                        </td>
+                                        <td class="modern-table-cell">
+                                            <v-chip :color="getStatusColor(item.status)" text-color="white" variant="flat" size="small">
+                                                <v-icon :icon="getStatusIcon(item.status)" size="16" class="mr-1"></v-icon>
+                                                {{ item.status }}
+                                            </v-chip>
+                                        </td>
+                                        <td class="modern-table-cell">
+                                            <div class="approval-actions">
+                                                <template v-if="item.status === 'Pending'">
+                                                    <v-tooltip text="Approve Request">
+                                                        <template v-slot:activator="{ props }">
+                                                            <v-btn 
+                                                                v-bind="props"
+                                                                variant="elevated" 
+                                                                icon="mdi-check-circle" 
+                                                                size="small"
+                                                                color="green"
+                                                                class="modern-action-btn approve-btn mr-2"
+                                                                @click="approveRequest(item)"
+                                                            ></v-btn>
+                                                        </template>
+                                                    </v-tooltip>
+
+                                                    <v-tooltip text="Reject Request">
+                                                        <template v-slot:activator="{ props }">
+                                                            <v-btn 
+                                                                v-bind="props"
+                                                                variant="elevated" 
+                                                                icon="mdi-close-circle" 
+                                                                size="small"
+                                                                color="orange"
+                                                                class="modern-action-btn reject-btn"
+                                                                @click="rejectRequest(item)"
+                                                            ></v-btn>
+                                                        </template>
+                                                    </v-tooltip>
+                                                </template>
+                                                <template v-else>
+                                                    <span class="text-grey text-caption">{{ item.status }}</span>
+                                                </template>
                                             </div>
                                         </td>
                                         <td class="modern-table-cell">
                                             <div class="action-group">
-                                                <v-btn 
-                                                    variant="elevated" 
-                                                    icon="mdi-pencil" 
-                                                    size="small"
-                                                    class="modern-action-btn edit-btn"
-                                                    @click="editStudentRequest(item)"
-                                                ></v-btn>
-                                                <v-btn 
-                                                    variant="elevated" 
-                                                    icon="mdi-delete" 
-                                                    size="small"
-                                                    class="modern-action-btn delete-btn"
-                                                    @click="deleteRequest(item)"
-                                                ></v-btn>
+                                                <v-tooltip text="View Details">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-eye" 
+                                                            size="small"
+                                                            color="blue"
+                                                            class="modern-action-btn view-btn"
+                                                            @click="viewStudentRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                
+                                                <v-tooltip text="Edit Request">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-pencil" 
+                                                            size="small"
+                                                            class="modern-action-btn edit-btn"
+                                                            @click="editStudentRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                
+                                                <v-tooltip text="Delete Request">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-delete" 
+                                                            size="small"
+                                                            class="modern-action-btn delete-btn"
+                                                            @click="deleteRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
                                             </div>
                                         </td>
                                     </tr>
@@ -255,7 +368,7 @@
                                 </h2>
                                 <p class="table-subtitle">Manage your personal leave applications</p>
                             </div>
-                            <div class="toolbar-right">
+                            <!-- <div class="toolbar-right">
                                 <v-btn
                                     class="modern-btn add-btn"
                                     prepend-icon="mdi-plus"
@@ -263,7 +376,7 @@
                                 >
                                     Submit New Request
                                 </v-btn>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- My Requests Data Table -->
@@ -275,6 +388,33 @@
                                 class="modern-table"
                                 hover
                             >
+                                <template #bottom="{ page, pageCount, itemsLength }">
+                                    <div class="custom-table-footer">
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === 1"
+                                            @click="page--"
+                                        >
+                                            <v-icon size="20">mdi-chevron-left</v-icon>
+                                            Previous
+                                        </v-btn>
+                                        <div class="footer-info">
+                                            Page {{ page }} of {{ pageCount }} ({{ itemsLength }} total records)
+                                        </div>
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === pageCount"
+                                            @click="page++"
+                                        >
+                                            Next
+                                            <v-icon size="20">mdi-chevron-right</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </template>
                                 <template #headers>
                                     <tr class="modern-header-row">
                                         <th class="modern-header-cell">
@@ -326,21 +466,45 @@
                                         </td>
                                         <td class="modern-table-cell">
                                             <div class="action-group">
-                                                <v-btn 
-                                                    variant="elevated" 
-                                                    icon="mdi-pencil" 
-                                                    size="small"
-                                                    class="modern-action-btn edit-btn"
-                                                    @click="viewMyRequest(item)"
-                                                ></v-btn>
-                                                <v-btn 
-                                                    v-if="item.status === 'Pending'"
-                                                    variant="elevated" 
-                                                    icon="mdi-delete" 
-                                                    size="small"
-                                                    class="modern-action-btn delete-btn"
-                                                    @click="cancelMyRequest(item)"
-                                                ></v-btn>
+                                                <v-tooltip text="View Details">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-eye" 
+                                                            size="small"
+                                                            color="blue"
+                                                            class="modern-action-btn view-btn"
+                                                            @click="viewMyRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                
+                                                <v-tooltip v-if="item.status === 'Pending'" text="Edit Request">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-pencil" 
+                                                            size="small"
+                                                            class="modern-action-btn edit-btn"
+                                                            @click="editMyRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
+                                                
+                                                <v-tooltip text="Delete Request">
+                                                    <template v-slot:activator="{ props }">
+                                                        <v-btn 
+                                                            v-bind="props"
+                                                            variant="elevated" 
+                                                            icon="mdi-delete" 
+                                                            size="small"
+                                                            class="modern-action-btn delete-btn"
+                                                            @click="deleteRequest(item)"
+                                                        ></v-btn>
+                                                    </template>
+                                                </v-tooltip>
                                             </div>
                                         </td>
                                     </tr>
@@ -371,10 +535,10 @@
                         </div>
                         <div class="header-text">
                             <h2 class="dialog-title">
-                                {{ isEditMode ? 'Edit Leave Request' : 'New Leave Request' }}
+                                {{ isLecturerRequest ? (isEditMode ? 'Edit My Leave Request' : 'New Personal Leave Request') : (isEditMode ? 'Edit Student Leave Request' : 'New Student Leave Request') }}
                             </h2>
                             <p class="dialog-subtitle">
-                                {{ isEditMode ? 'Update leave request information' : 'Submit a new leave request for student' }}
+                                {{ isLecturerRequest ? 'Submit your personal leave request' : 'Create a leave request for a student' }}
                             </p>
                         </div>
                     </div>
@@ -389,8 +553,8 @@
 
                 <div class="dialog-content">
                     <v-form ref="leaveFormRef" v-model="leaveFormValid" @submit.prevent="submitLeaveRequest">
-                        <!-- Student Information Section -->
-                        <div class="form-section">
+                        <!-- Student Information Section (only for student requests) -->
+                        <div v-if="!isLecturerRequest" class="form-section">
                             <h3 class="section-title">
                                 <v-icon class="mr-2" color="primary">mdi-account-school</v-icon>
                                 Student Information
@@ -452,6 +616,114 @@
                                         density="comfortable"
                                         color="primary"
                                         prepend-inner-icon="mdi-phone"
+                                        placeholder="e.g., +855 12 345 678"
+                                        class="form-field"
+                                        :loading="formLoading"
+                                    />
+                                </v-col>
+                            </v-row>
+                        </div>
+
+                        <!-- Lecturer Information Section (only for lecturer requests) -->
+                        <div v-if="isLecturerRequest" class="form-section">
+                            <h3 class="section-title">
+                                <v-icon class="mr-2" color="primary">mdi-account-tie</v-icon>
+                                Personal Information
+                            </h3>
+                            
+                            <v-row>
+                                <v-col cols="12" md="6">
+                                    <label class="form-label">Full Name</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.lecturerName"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        prepend-inner-icon="mdi-account"
+                                        readonly
+                                        bg-color="grey-lighten-3"
+                                        class="form-field"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <label class="form-label">Employee ID</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.employeeId"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        prepend-inner-icon="mdi-badge-account"
+                                        readonly
+                                        bg-color="grey-lighten-3"
+                                        class="form-field"
+                                    />
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col cols="12" md="4">
+                                    <label class="form-label">Department</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.department"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        prepend-inner-icon="mdi-domain"
+                                        readonly
+                                        bg-color="grey-lighten-3"
+                                        class="form-field"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <label class="form-label">Contact Number *</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.contactNumber"
+                                        :rules="[rules.required, rules.phoneNumber]"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        color="primary"
+                                        prepend-inner-icon="mdi-phone"
+                                        placeholder="e.g., +855 12 345 678"
+                                        class="form-field"
+                                        :loading="formLoading"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <label class="form-label">Email Address</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.email"
+                                        :rules="[rules.email]"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        color="primary"
+                                        prepend-inner-icon="mdi-email"
+                                        placeholder="lecturer@university.edu"
+                                        class="form-field"
+                                        :loading="formLoading"
+                                    />
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col cols="12" md="6">
+                                    <label class="form-label">Emergency Contact Name</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.emergencyContact"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        color="primary"
+                                        prepend-inner-icon="mdi-account-alert"
+                                        placeholder="Emergency contact person"
+                                        class="form-field"
+                                        :loading="formLoading"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <label class="form-label">Emergency Contact Phone</label>
+                                    <v-text-field
+                                        v-model="lecturerLeaveFormData.emergencyPhone"
+                                        :rules="[rules.phoneNumber]"
+                                        variant="outlined"
+                                        density="comfortable"
+                                        color="primary"
+                                        prepend-inner-icon="mdi-phone-alert"
                                         placeholder="e.g., +855 12 345 678"
                                         class="form-field"
                                         :loading="formLoading"
@@ -817,7 +1089,96 @@
                     </v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog> <!-- Success Snackbar -->
+        </v-dialog>
+
+        <!-- Enhanced Delete Confirmation Dialog -->
+        <v-dialog v-model="deleteDialog" max-width="580" persistent>
+            <v-card elevation="12" class="rounded-lg modern-dialog">
+                <div class="dialog-header bg-gradient-red">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <v-icon color="white" size="28">mdi-delete-alert</v-icon>
+                        </div>
+                        <div class="header-text">
+                            <h2 class="dialog-title text-white">Delete Leave Request</h2>
+                            <p class="dialog-subtitle text-white opacity-90">This action cannot be undone</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dialog-content" v-if="requestToDelete">
+                    <div class="warning-box mb-4">
+                        <v-icon color="warning" size="24" class="mr-3">mdi-alert-triangle</v-icon>
+                        <div>
+                            <div class="font-weight-bold text-h6 mb-1">Warning: Permanent Deletion</div>
+                            <div class="text-body-2 text-grey-darken-1">
+                                You are about to permanently delete this leave request. This action cannot be reversed.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="request-details-box pa-4">
+                        <h4 class="text-subtitle-1 font-weight-bold mb-3 text-red-darken-2">
+                            <v-icon class="mr-2">mdi-file-document</v-icon>
+                            Request Details
+                        </h4>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex align-center">
+                                <strong class="mr-2">Student:</strong> {{ requestToDelete.student || 'Personal Request' }}
+                            </div>
+                            <div class="d-flex align-center">
+                                <strong class="mr-2">Type:</strong> {{ requestToDelete.type }}
+                            </div>
+                            <div class="d-flex align-center">
+                                <strong class="mr-2">Dates:</strong> {{ formatDate(requestToDelete.startDate) }} - {{ formatDate(requestToDelete.endDate) }}
+                            </div>
+                            <div class="d-flex align-center">
+                                <strong class="mr-2">Status:</strong> 
+                                <v-chip :color="getStatusColor(requestToDelete.status)" size="small" class="ml-1">
+                                    {{ requestToDelete.status }}
+                                </v-chip>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <v-textarea 
+                        v-model="deleteReason" 
+                        label="Reason for deletion (optional)" 
+                        variant="outlined" 
+                        rows="3"
+                        placeholder="Optional: Provide a reason for this deletion for audit purposes..."
+                        class="mt-4"
+                        bg-color="grey-lighten-5"
+                        prepend-inner-icon="mdi-note-text-outline"
+                    />
+                </div>
+                
+                <v-divider></v-divider>
+                <div class="dialog-actions">
+                    <v-btn
+                        variant="outlined"
+                        size="large"
+                        @click="deleteDialog = false; requestToDelete = null; deleteReason = ''"
+                        class="cancel-btn action-btn"
+                        prepend-icon="mdi-close"
+                    >
+                        Cancel
+                    </v-btn>
+                    <v-btn
+                        color="error"
+                        size="large"
+                        @click="confirmDelete"
+                        class="delete-confirm-btn action-btn"
+                        variant="flat"
+                        prepend-icon="mdi-delete"
+                    >
+                        Delete Permanently
+                    </v-btn>
+                </div>
+            </v-card>
+        </v-dialog>
+
+        <!-- Success Snackbar -->
         <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000">
             {{ snackbarMessage }}
             <template v-slot:actions>
@@ -839,14 +1200,18 @@ const showNewLeaveDialog = ref(false)
 const viewStudentDialog = ref(false)
 const viewMyRequestDialog = ref(false)
 const rejectDialog = ref(false)
+const deleteDialog = ref(false)
 const leaveFormValid = ref(false)
 const selectedStudentRequest = ref(null)
 const selectedMyRequest = ref(null)
 const rejectReason = ref('')
 const requestToReject = ref(null)
+const requestToDelete = ref(null)
+const deleteReason = ref('')
 const isEditMode = ref(false)
 const formLoading = ref(false)
 const leaveFormRef = ref(null)
+const isLecturerRequest = ref(false) // Track if form is for lecturer or student request
 
 // Filters
 const studentSearchQuery = ref('')
@@ -870,6 +1235,24 @@ const leaveFormData = reactive({
     type: '',
     reason: '',
     attachment: null,
+    status: 'Pending'
+})
+
+// Lecturer Personal Leave Form Data
+const lecturerLeaveFormData = reactive({
+    id: null,
+    lecturerName: 'Dr. John Smith', // This would come from auth context
+    employeeId: 'LEC001', // This would come from auth context
+    department: 'Computer Science', // This would come from auth context
+    contactNumber: '',
+    email: '',
+    startDate: '',
+    endDate: '',
+    type: '',
+    reason: '',
+    attachment: null,
+    emergencyContact: '',
+    emergencyPhone: '',
     status: 'Pending'
 })
 
@@ -1048,10 +1431,10 @@ const myLeaveRequests = ref([
 const studentRequestHeaders = [
     { title: 'Student', key: 'student' },
     { title: 'Class', key: 'class' },
-    { title: 'Dates', key: 'dates' },
-    { title: 'Duration', key: 'duration' },
     { title: 'Type', key: 'type' },
+    { title: 'Dates', key: 'dates' },
     { title: 'Status', key: 'status' },
+    { title: 'Approval', key: 'approval', sortable: false },
     { title: 'Actions', key: 'actions', sortable: false }
 ]
 
@@ -1116,21 +1499,38 @@ const rejectedMyRequests = computed(() =>
 
 // Enhanced computed properties for form functionality
 const calculateDurationText = computed(() => {
-    if (!leaveFormData.startDate || !leaveFormData.endDate) return 'Select dates'
-    const duration = calculateDuration(leaveFormData.startDate, leaveFormData.endDate)
+    const formData = isLecturerRequest.value ? lecturerLeaveFormData : leaveFormData
+    if (!formData.startDate || !formData.endDate) return 'Select dates'
+    const duration = calculateDuration(formData.startDate, formData.endDate)
     return duration === 1 ? '1 day' : `${duration} days`
 })
 
+const currentFormData = computed(() => {
+    return isLecturerRequest.value ? lecturerLeaveFormData : leaveFormData
+})
+
 const isFormValid = computed(() => {
-    return leaveFormValid.value && 
-           leaveFormData.studentName && 
-           leaveFormData.studentId && 
-           leaveFormData.class && 
-           leaveFormData.contactNumber && 
-           leaveFormData.startDate && 
-           leaveFormData.endDate && 
-           leaveFormData.type && 
-           leaveFormData.reason
+    const formData = currentFormData.value
+    if (isLecturerRequest.value) {
+        return leaveFormValid.value && 
+               formData.lecturerName && 
+               formData.employeeId && 
+               formData.contactNumber && 
+               formData.startDate && 
+               formData.endDate && 
+               formData.type && 
+               formData.reason
+    } else {
+        return leaveFormValid.value && 
+               formData.studentName && 
+               formData.studentId && 
+               formData.class && 
+               formData.contactNumber && 
+               formData.startDate && 
+               formData.endDate && 
+               formData.type && 
+               formData.reason
+    }
 })
 
 const formTitle = computed(() => {
@@ -1192,15 +1592,15 @@ const getStatusIcon = (status) => {
 
 const getTypeColor = (type) => {
     switch (type) {
-        case 'Sick Leave': return 'red'
-        case 'Personal Leave': return 'blue'
-        case 'Emergency Leave': return 'orange'
-        case 'Medical Leave': return 'purple'
-        case 'Conference': return 'green'
-        case 'Research': return 'teal'
-        case 'Vacation': return 'indigo'
-        case 'Family Emergency': return 'pink'
-        default: return 'blue-grey'
+        case 'Sick Leave': return 'light-blue'
+        case 'Personal Leave': return 'light-blue'
+        case 'Emergency Leave': return 'light-blue'
+        case 'Medical Leave': return 'light-blue'
+        case 'Conference': return 'light-blue'
+        case 'Research': return 'light-blue'
+        case 'Vacation': return 'light-blue'
+        case 'Family Emergency': return 'light-blue'
+        default: return 'light-blue'
     }
 }
 
@@ -1371,7 +1771,8 @@ const validateFormData = () => {
 
 const closeLeaveDialog = () => {
     // Confirm close if form has data and is not submitted
-    const hasFormData = Object.values(leaveFormData).some(value => 
+    const formData = isLecturerRequest.value ? lecturerLeaveFormData : leaveFormData
+    const hasFormData = Object.values(formData).some(value => 
         value !== null && value !== '' && value !== 'Pending'
     )
     
@@ -1382,6 +1783,7 @@ const closeLeaveDialog = () => {
     
     showNewLeaveDialog.value = false
     isEditMode.value = false
+    isLecturerRequest.value = false
     formLoading.value = false
     
     // Enhanced form reset
@@ -1399,6 +1801,23 @@ const closeLeaveDialog = () => {
         status: 'Pending'
     })
     
+    Object.assign(lecturerLeaveFormData, {
+        id: null,
+        lecturerName: 'Dr. John Smith',
+        employeeId: 'LEC001',
+        department: 'Computer Science',
+        contactNumber: '',
+        email: '',
+        startDate: '',
+        endDate: '',
+        type: '',
+        reason: '',
+        attachment: null,
+        emergencyContact: '',
+        emergencyPhone: '',
+        status: 'Pending'
+    })
+    
     // Reset form validation with delay to ensure proper cleanup
     nextTick(() => {
         if (leaveFormRef.value) {
@@ -1408,9 +1827,63 @@ const closeLeaveDialog = () => {
     })
 }
 
-const cancelMyRequest = (request) => {
-    myLeaveRequests.value = myLeaveRequests.value.filter(r => r.id !== request.id)
-    showSnackbar('Leave request cancelled', 'info')
+// Methods for opening different form types
+const openStudentLeaveForm = () => {
+    isLecturerRequest.value = false
+    isEditMode.value = false
+    showNewLeaveDialog.value = true
+}
+
+const openLecturerLeaveForm = () => {
+    isLecturerRequest.value = true
+    isEditMode.value = false
+    showNewLeaveDialog.value = true
+}
+
+const deleteMyRequest = async (request) => {
+    if (!confirm(`Are you sure you want to delete this leave request?\n\nRequest: ${request.type}\nDates: ${formatDate(request.startDate)} to ${formatDate(request.endDate)}\n\nThis action cannot be undone.`)) {
+        return
+    }
+    
+    try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        const index = myLeaveRequests.value.findIndex(r => r.id === request.id)
+        if (index !== -1) {
+            myLeaveRequests.value.splice(index, 1)
+            showSnackbar('Your leave request has been deleted successfully', 'success')
+        } else {
+            showSnackbar('Request not found', 'error')
+        }
+    } catch (error) {
+        console.error('Error deleting request:', error)
+        showSnackbar('Failed to delete request. Please try again.', 'error')
+    }
+}
+
+const editMyRequest = (request) => {
+    // Convert my request to student request format for editing
+    isEditMode.value = true
+    
+    // Note: For editing personal requests, we might need different form handling
+    // For now, we'll use the existing form but with personal data
+    Object.assign(leaveFormData, {
+        id: request.id,
+        studentName: 'Personal Request', // Placeholder
+        studentId: 'LECTURER', // Placeholder
+        class: 'N/A', // Not applicable for lecturers
+        contactNumber: '', // Could be lecturer's contact
+        startDate: request.startDate || '',
+        endDate: request.endDate || '',
+        type: request.type || '',
+        reason: request.reason || '',
+        attachment: request.attachment || null,
+        status: request.status || 'Pending'
+    })
+    
+    showNewLeaveDialog.value = true
+    showSnackbar('Editing personal leave requests will be implemented in a future update', 'info')
 }
 
 const showSnackbar = (message, color) => {
@@ -1447,25 +1920,54 @@ const handleExportPDF = () => {
     }
 }
 
-const deleteRequest = async (request) => {
-    if (!confirm(`Are you sure you want to delete the leave request for ${request.student}?\n\nThis action cannot be undone.`)) {
-        return
-    }
+const deleteRequest = (request) => {
+    requestToDelete.value = request
+    deleteDialog.value = true
+}
+
+const confirmDelete = async () => {
+    if (!requestToDelete.value) return
+    
+    const request = requestToDelete.value
+    const isPersonalRequest = !request.student // My requests don't have student property
     
     try {
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 800))
         
-        const index = studentLeaveRequests.value.findIndex(r => r.id === request.id)
-        if (index !== -1) {
-            studentLeaveRequests.value.splice(index, 1)
-            showSnackbar(`Leave request for ${request.student} deleted successfully`, 'success')
+        if (isPersonalRequest) {
+            // Delete from my requests
+            const index = myLeaveRequests.value.findIndex(r => r.id === request.id)
+            if (index !== -1) {
+                myLeaveRequests.value.splice(index, 1)
+                showSnackbar('Your leave request has been deleted successfully', 'success')
+            } else {
+                showSnackbar('Request not found', 'error')
+            }
         } else {
-            showSnackbar('Request not found', 'error')
+            // Delete from student requests
+            const index = studentLeaveRequests.value.findIndex(r => r.id === request.id)
+            if (index !== -1) {
+                studentLeaveRequests.value.splice(index, 1)
+                showSnackbar(`Leave request for ${request.student} deleted successfully`, 'success')
+            } else {
+                showSnackbar('Request not found', 'error')
+            }
         }
+        
+        // Log deletion reason if provided
+        if (deleteReason.value) {
+            console.log('Delete reason:', deleteReason.value)
+        }
+        
     } catch (error) {
         console.error('Error deleting request:', error)
         showSnackbar('Failed to delete request. Please try again.', 'error')
+    } finally {
+        // Reset dialog state
+        deleteDialog.value = false
+        requestToDelete.value = null
+        deleteReason.value = ''
     }
 }
 </script>
@@ -1848,10 +2350,25 @@ const deleteRequest = async (request) => {
     justify-content: flex-start;
 }
 
+.approval-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    min-width: 120px;
+}
+
+.approval-actions .modern-action-btn {
+    width: 38px !important;
+    height: 38px !important;
+}
+
 .modern-action-btn {
     width: 42px !important;
     height: 42px !important;
     border-radius: 12px !important;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
     min-width: 40px !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
@@ -1878,21 +2395,52 @@ const deleteRequest = async (request) => {
     color: #ef4444 !important;
 }
 
+/* Enhanced action button styles */
+.view-btn {
+    background: white !important;
+    color: #2563eb !important;
+}
+
+.view-btn:hover {
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+}
+
+.approve-btn {
+    background: white !important;
+    color: #16a34a !important;
+    border: 2px solid #bbf7d0 !important;
+}
+
+.approve-btn:hover {
+    background: #f0fdf4 !important;
+    border-color: #16a34a !important;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25) !important;
+}
+
+.reject-btn {
+    background: white !important;
+    color: #ea580c !important;
+    border: 2px solid #fed7aa !important;
+}
+
+.reject-btn:hover {
+    background: #fff7ed !important;
+    border-color: #ea580c !important;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25) !important;
+}
+
+.delete-btn {
+    background: white !important;
+    color: #dc2626 !important;
+}
+
 .delete-btn:hover {
     background: #fef2f2 !important;
     border-color: #fecaca !important;
-}
-
-.action-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
 }
 
 /* Empty State */
@@ -2032,12 +2580,14 @@ const deleteRequest = async (request) => {
 
 .dialog-actions {
     padding: 20px 24px 24px !important;
-    gap: 14px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
     border-top: 1px solid #e2e8f0;
     background: #f9fafb;
 }
 
-.action-btn {
+.dialog-actions .action-btn {
     height: 44px;
     border-radius: 12px;
     text-transform: none;
@@ -2045,19 +2595,29 @@ const deleteRequest = async (request) => {
     font-size: 14px;
     padding: 0 24px;
     transition: all 0.2s ease;
+    min-width: 120px;
 }
 
-.cancel-btn {
-    min-width: 100px;
+.dialog-actions .cancel-btn {
+    border-color: #d1d5db;
+    color: #6b7280;
 }
 
-.submit-btn {
-    min-width: 140px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.dialog-actions .cancel-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
 }
 
-.submit-btn:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.dialog-actions .delete-confirm-btn {
+    background: #dc2626 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.dialog-actions .delete-confirm-btn:hover {
+    background: #b91c1c !important;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
     transform: translateY(-1px);
 }
 
@@ -2160,6 +2720,55 @@ const deleteRequest = async (request) => {
 
 .rounded-lg {
     border-radius: 16px;
+}
+
+/* Custom Table Footer Styles */
+.custom-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.footer-info {
+    color: #757575;
+    font-size: 14px;
+    font-weight: 400;
+    flex: 1;
+    text-align: center;
+}
+
+.footer-btn {
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 8px !important;
+    color: #616161 !important;
+    text-transform: none !important;
+    font-weight: 400 !important;
+    padding: 0 20px !important;
+    height: 40px !important;
+    min-width: 110px !important;
+    background: white !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.footer-btn:hover:not(:disabled) {
+    background-color: #f5f5f5 !important;
+    border-color: #9e9e9e !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.footer-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #fafafa !important;
+}
+
+.footer-btn .v-icon {
+    font-size: 20px;
+    margin: 0 4px;
 }
 
 /* Responsive Design */

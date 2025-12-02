@@ -1,38 +1,34 @@
 <template>
-    <div class="students-page">
+    <div class="admins-page">
         <!-- Modern Header Section -->
         <div class="modern-header">
             <div class="header-container">
                 <div class="title-section">
                     <div class="title-wrapper">
                         <div class="title-icon">
-                            <v-icon icon="mdi-school" size="32" color="white" />
+                            <v-icon icon="mdi-shield-account" size="32" color="white" />
                         </div>
                         <div class="title-content">
-                            <h1 class="page-title">Student Management</h1>
+                            <h1 class="page-title">Admin Management</h1>
                             <div class="breadcrumb">
                                 <span class="breadcrumb-item">Admin</span>
                                 <v-icon icon="mdi-chevron-right" size="16" color="grey" class="breadcrumb-separator" />
-                                <span class="breadcrumb-item active">Students</span>
+                                <span class="breadcrumb-item active">Admins</span>
                             </div>
                         </div>
                     </div>
                     <div class="stats-cards">
                         <div class="stat-card">
-                            <div class="stat-number">{{ students.length }}</div>
-                            <div class="stat-label">Total Students</div>
+                            <div class="stat-number">{{ admins.length }}</div>
+                            <div class="stat-label">Total Admins</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ activeStudentCount }}</div>
+                            <div class="stat-number">{{ superAdminCount }}</div>
+                            <div class="stat-label">Super Admins</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ activeAdminCount }}</div>
                             <div class="stat-label">Active</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">{{ gen9Count }}</div>
-                            <div class="stat-label">Gen 9</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">{{ gen10Count }}</div>
-                            <div class="stat-label">Gen 10</div>
                         </div>
                     </div>
                 </div>
@@ -82,7 +78,7 @@
 
                     <v-btn class="modern-btn add-btn" prepend-icon="mdi-plus" variant="flat" color="primary"
                         @click="openCreateDialog" elevation="2">
-                        Add Student
+                        Add Admin
                     </v-btn>
                 </div>
             </div>
@@ -96,15 +92,15 @@
                     <div class="toolbar-left">
                         <h2 class="table-title">
                             <v-icon icon="mdi-table" size="20" class="mr-2" />
-                            Student Information
+                            Admin Information
                         </h2>
-                        <div class="table-subtitle">Manage and organize student records</div>
+                        <div class="table-subtitle">Manage and organize admin records</div>
                     </div>
 
                     <div class="toolbar-right">
                         <div class="search-container">
                             <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify"
-                                label="Search students..." variant="outlined" density="compact" hide-details
+                                label="Search admins..." variant="outlined" density="compact" hide-details
                                 class="search-input" clearable />
                         </div>
 
@@ -121,18 +117,13 @@
                     <div v-show="showFilters" class="filters-section">
                         <div class="filters-grid">
                             <div class="filter-item">
-                                <label class="filter-label">Generation</label>
-                                <v-select v-model="generationFilter" :items="generationOptions" variant="outlined"
+                                <label class="filter-label">Admin Role</label>
+                                <v-select v-model="adminRoleFilter" :items="adminRoleOptions" variant="outlined"
                                     density="compact" hide-details />
                             </div>
                             <div class="filter-item">
-                                <label class="filter-label">Group</label>
-                                <v-select v-model="groupFilter" :items="groupOptions" variant="outlined"
-                                    density="compact" hide-details />
-                            </div>
-                            <div class="filter-item">
-                                <label class="filter-label">Specialization</label>
-                                <v-select v-model="specializeFilter" :items="specializeOptions" variant="outlined"
+                                <label class="filter-label">Department</label>
+                                <v-select v-model="departmentFilter" :items="departmentOptions" variant="outlined"
                                     density="compact" hide-details />
                             </div>
                             <div class="filter-item">
@@ -145,28 +136,24 @@
                 </v-expand-transition>
 
                 <!-- Modern Table -->
-                <!-- Modern Table -->
                 <div class="modern-table-wrapper">
                     <v-table class="modern-table">
                         <thead>
                             <tr class="modern-header-row">
                                 <th class="modern-header-cell id-column">
-                                    <div class="header-content">#</div>
+                                    <div class="header-content">ID</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">Student Name</div>
+                                    <div class="header-content">Admin Name</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">Student ID</div>
+                                    <div class="header-content">Admin ID</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">Generation</div>
+                                    <div class="header-content">Admin Role</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">Group</div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">Specialization</div>
+                                    <div class="header-content">Department</div>
                                 </th>
                                 <th class="modern-header-cell center-align">
                                     <div class="header-content">Status</div>
@@ -177,74 +164,61 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(student, index) in paginatedStudents" :key="student.id" class="modern-table-row">
+                            <tr v-for="(admin, index) in paginatedAdmins" :key="admin.id" class="modern-table-row">
                                 <td class="modern-table-cell id-column">
                                     <span class="id-badge">{{ index + 1 }}</span>
                                 </td>
                                 <td class="modern-table-cell">
                                     <div class="group-info">
-                                        <v-avatar size="36" class="group-avatar" color="green">
+                                        <v-avatar size="36" class="group-avatar" color="primary">
                                             <span class="text-white text-subtitle-2 font-weight-medium">
-                                                {{ student.name.charAt(0) }}
+                                                {{ admin.name.charAt(0) }}
                                             </span>
                                         </v-avatar>
                                         <div class="group-details">
-                                            <div class="group-name">{{ student.name }}</div>
-                                            <div class="group-meta">{{ student.email }}</div>
+                                            <div class="group-name">{{ admin.name }}</div>
+                                            <div class="group-meta">{{ admin.email }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <span class="global-id-badge">{{ student.studentId }}</span>
+                                    <span class="global-id-badge">{{ admin.adminId }}</span>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <v-chip size="small" variant="tonal" color="">
-                                        Gen {{ student.generation }}
+                                    <v-chip size="small" variant="tonal" color="primary">
+                                        {{ admin.adminRole }}
                                     </v-chip>
                                 </td>
-                                <td class="modern-table-cell">
-                                    <v-chip size="small" variant="tonal" color="">
-                                        {{ student.group }}
-                                    </v-chip>
-                                </td>
-                                <td class="modern-table-cell">
-                                    <v-chip size="small" variant="tonal" color="">
-                                        {{ student.specialize }}
-                                    </v-chip>
-                                </td>
+                                <td class="modern-table-cell">{{ admin.department }}</td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip :color="student.status === 'Active' ? 'success' : 'warning'" class="status-chip" size="small">
+                                    <v-chip :color="admin.status === 'Active' ? 'success' : 'warning'" class="status-chip" size="small">
                                         <v-icon start size="16">mdi-check-circle</v-icon>
-                                        {{ student.status === 'Active' ? 'active' : 'on leave' }}
+                                        {{ admin.status === 'Active' ? 'active' : 'on leave' }}
                                     </v-chip>
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <div class="action-group">
-                                        <v-btn icon class="action-btn" @click="openEditDialog(student)">
+                                        <v-btn icon class="action-btn" @click="openEditDialog(admin)">
                                             <v-icon color="#fde047">mdi-pencil</v-icon>
                                         </v-btn>
-                                        <v-btn icon class="action-btn" @click="confirmDelete(student)">
+                                        <v-btn icon class="action-btn" @click="confirmDelete(admin)">
                                             <v-icon color="#dc2626">mdi-delete</v-icon>
                                         </v-btn>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Empty State -->
-                            <tr v-if="filteredStudents.length === 0">
-                                <td colspan="8" class="modern-table-cell">
-                                    <div class="empty-state">
-                                        <v-icon size="64" color="grey-lighten-1">mdi-school-outline</v-icon>
-                                        <p class="empty-title">No students found</p>
-                                        <p class="empty-subtitle">Try adjusting your filters or add a new student</p>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </v-table>
 
+                    <!-- Empty State -->
+                    <div v-if="filteredAdmins.length === 0" class="empty-state">
+                        <v-icon size="64" color="grey-lighten-1">mdi-account-off-outline</v-icon>
+                        <p class="empty-title">No admins found</p>
+                        <p class="empty-subtitle">Try adjusting your filters or add a new admin</p>
+                    </div>
+                    
                     <!-- Pagination Footer -->
-                    <div v-if="filteredStudents.length > 0" class="pagination-section">
+                    <div v-if="filteredAdmins.length > 0" class="pagination-section">
                         <v-btn variant="outlined" :disabled="currentPage === 1" @click="goToPrevPage"
                             class="pagination-btn">
                             Previous
@@ -264,18 +238,17 @@
         </div>
 
         <!-- Create/Edit Dialog -->
-        <v-dialog v-model="dialogOpen" max-width="700" persistent>
-            <v-card class="modern-dialog" elevation="24">
-                <!-- Dialog Header -->
+        <v-dialog v-model="dialogOpen" max-width="700px" persistent class="modern-dialog">
+            <v-card>
                 <div class="dialog-header">
                     <div class="header-content">
                         <div class="header-icon">
-                            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" :color="isEdit ? 'warning' : 'primary'" size="28" />
+                            <v-icon color="white" size="24">{{ isEdit ? 'mdi-pencil' : 'mdi-plus' }}</v-icon>
                         </div>
                         <div class="header-text">
-                            <h2 class="dialog-title">{{ isEdit ? 'Edit Student' : 'Add New Student' }}</h2>
+                            <h3 class="dialog-title">{{ isEdit ? 'Edit Admin' : 'Add New Admin' }}</h3>
                             <p class="dialog-subtitle">
-                                {{ isEdit ? 'Update student information' : 'Fill in the student details below' }}
+                                {{ isEdit ? 'Update admin information' : 'Fill in the admin details below' }}
                             </p>
                         </div>
                     </div>
@@ -287,15 +260,15 @@
                 <v-card-text class="dialog-content">
                     <v-form ref="formRef" v-model="formValid">
                         <div class="form-group">
-                            <label class="form-label">Student ID *</label>
-                            <v-text-field v-model="formData.studentId" :rules="studentIdRules" variant="outlined"
-                                density="comfortable" placeholder="e.g., IDTB090121" class="form-field" />
+                            <label class="form-label">Admin ID *</label>
+                            <v-text-field v-model="formData.adminId" :rules="adminIdRules" variant="outlined"
+                                density="comfortable" placeholder="e.g., ADM001" class="form-field" />
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Full Name *</label>
                             <v-text-field v-model="formData.name" :rules="nameRules" variant="outlined"
-                                density="comfortable" placeholder="Enter student full name" class="form-field" />
+                                density="comfortable" placeholder="Enter admin full name" class="form-field" />
                         </div>
 
                         <v-row>
@@ -303,7 +276,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Email *</label>
                                     <v-text-field v-model="formData.email" :rules="emailRules" variant="outlined"
-                                        density="comfortable" placeholder="student@example.com" class="form-field" />
+                                        density="comfortable" placeholder="admin@example.com" class="form-field" />
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -318,35 +291,17 @@
                         <v-row>
                             <v-col cols="6">
                                 <div class="form-group">
-                                    <label class="form-label">Generation *</label>
-                                    <v-select v-model="formData.generation" :items="['9', '10', '11', '12']"
-                                        :rules="generationRules" variant="outlined" density="comfortable"
-                                        class="form-field" />   
-                                </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div class="form-group">
-                                    <label class="form-label">Gender *</label>
-                                    <v-select v-model="formData.gender" :items="['M', 'F']" :rules="genderRules"
-                                        variant="outlined" density="comfortable" class="form-field" />
-                                </div>
-                            </v-col>
-                        </v-row>
-
-                        <v-row>
-                            <v-col cols="6">
-                                <div class="form-group">
-                                    <label class="form-label">Group *</label>
-                                    <v-select v-model="formData.group" :items="['G1', 'G2', 'G3', 'G4']"
-                                        :rules="groupRules" variant="outlined" density="comfortable"
+                                    <label class="form-label">Admin Role *</label>
+                                    <v-select v-model="formData.adminRole" :items="adminRoleOptions.slice(1)"
+                                        :rules="adminRoleRules" variant="outlined" density="comfortable"
                                         class="form-field" />
                                 </div>
                             </v-col>
                             <v-col cols="6">
                                 <div class="form-group">
-                                    <label class="form-label">Specialization *</label>
-                                    <v-select v-model="formData.specialize" :items="['CS', 'IT', 'IS', 'SE']"
-                                        :rules="specializeRules" variant="outlined" density="comfortable"
+                                    <label class="form-label">Department *</label>
+                                    <v-select v-model="formData.department" :items="departmentOptions.slice(1)"
+                                        :rules="departmentRules" variant="outlined" density="comfortable"
                                         class="form-field" />
                                 </div>
                             </v-col>
@@ -358,7 +313,7 @@
                                     <template v-slot:label>
                                         <div class="switch-info">
                                             <span class="form-label">Active Status</span>
-                                            <span class="switch-description">Student is currently active</span>
+                                            <span class="switch-description">Admin is currently active</span>
                                         </div>
                                     </template>
                                 </v-switch>
@@ -369,44 +324,42 @@
 
                 <v-divider />
 
-                <!-- Dialog Actions -->
                 <v-card-actions class="dialog-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn" :disabled="formLoading">
+                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn"
+                        :disabled="formLoading">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
 
-                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm" :loading="formLoading"
-                        :disabled="!formValid" class="action-btn submit-btn">
+                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm"
+                        :loading="formLoading" :disabled="!formValid" class="action-btn submit-btn">
                         <v-icon start>mdi-content-save</v-icon>
-                        {{ isEdit ? 'Save Changes' : 'Create Student' }}
+                        {{ isEdit ? 'Save Changes' : 'Create Admin' }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
 
         <!-- Delete Confirmation Dialog -->
-        <v-dialog v-model="deleteDialog" max-width="420" persistent>
-            <v-card class="delete-dialog" elevation="24">
-                <!-- Delete Header -->
+        <v-dialog v-model="deleteDialog" max-width="500px" persistent class="delete-dialog">
+            <v-card>
                 <div class="delete-header">
                     <div class="delete-icon-container">
-                        <v-icon icon="mdi-alert-circle" color="error" size="48" />
+                        <v-icon size="48" color="error">mdi-alert-circle-outline</v-icon>
                     </div>
-                    <h2 class="delete-title">Delete Student Record</h2>
+                    <h3 class="delete-title">Delete Admin</h3>
                     <p class="delete-subtitle">This action cannot be undone</p>
                 </div>
 
                 <v-divider />
 
-                <!-- Delete Content -->
                 <v-card-text class="delete-content">
                     <div class="warning-box">
-                        <v-icon icon="mdi-alert" color="warning" size="24" class="warning-icon" />
+                        <v-icon class="warning-icon" color="warning">mdi-alert</v-icon>
                         <div class="warning-text">
                             <p class="warning-message">
                                 Are you sure you want to delete
-                                <strong class="student-name">{{ selectedStudent?.name }}</strong>?
+                                <strong class="group-name">{{ selectedAdmin?.name }}</strong>?
                             </p>
                             <p class="warning-details">
                                 All associated data will be permanently removed from the system.
@@ -417,16 +370,17 @@
 
                 <v-divider />
 
-                <!-- Delete Actions -->
                 <v-card-actions class="delete-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false" :disabled="deleteLoading" class="action-btn cancel-btn">
+                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false"
+                        :disabled="deleteLoading" class="action-btn cancel-btn">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
 
-                    <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading" class="action-btn delete-btn">
+                    <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading"
+                        class="action-btn delete-btn">
                         <v-icon start>mdi-delete</v-icon>
-                        Delete Record
+                        Delete Admin
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -443,7 +397,7 @@ definePageMeta({
 const showFilters = ref(false)
 const dialogOpen = ref(false)
 const deleteDialog = ref(false)
-const selectedStudent = ref(null)
+const selectedAdmin = ref(null)
 const isEdit = ref(false)
 const formValid = ref(false)
 const formRef = ref(null)
@@ -453,32 +407,25 @@ const deleteLoading = ref(false)
 // Search and filters
 const searchQuery = ref('')
 const statusFilter = ref('All')
-const generationFilter = ref('All')
-const groupFilter = ref('All')
-const specializeFilter = ref('All')
+const adminRoleFilter = ref('All')
+const departmentFilter = ref('All')
 const tableSortOrder = ref('A-Z')
-
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
 
 // Form data
 const formData = reactive({
-    studentId: '',
+    adminId: '',
     name: '',
     email: '',
     phone: '',
-    gender: '',
-    generation: '',
-    group: '',
-    specialize: '',
+    adminRole: '',
+    department: '',
     active: true
 })
 
 // Validation rules
-const studentIdRules = [
-    v => !!v || 'Student ID is required',
-    v => (v && v.length >= 5) || 'Student ID must be at least 5 characters'
+const adminIdRules = [
+    v => !!v || 'Admin ID is required',
+    v => (v && v.length >= 5) || 'Admin ID must be at least 5 characters'
 ]
 
 const nameRules = [
@@ -491,97 +438,27 @@ const emailRules = [
     v => /.+@.+\..+/.test(v) || 'Email must be valid'
 ]
 
-const generationRules = [v => !!v || 'Generation is required']
-const genderRules = [v => !!v || 'Gender is required']
-const groupRules = [v => !!v || 'Group is required']
-const specializeRules = [v => !!v || 'Specialization is required']
+const adminRoleRules = [v => !!v || 'Admin Role is required']
+const departmentRules = [v => !!v || 'Department is required']
 
 // Filter options
-const generationOptions = ['All', '9', '10', '11', '12']
-const groupOptions = ['All', 'G1', 'G2', 'G3', 'G4']
-const specializeOptions = ['All', 'CS', 'IT', 'IS', 'SE']
+const adminRoleOptions = ['All', 'Super Admin', 'System Admin', 'Department Admin']
+const departmentOptions = ['All', 'Administration', 'IT Department', 'Academic Affairs', 'Student Affairs']
 const statusOptions = ['All', 'Active', 'Inactive']
-const tableSortOptions = ['A-Z', 'Z-A', 'Gen 9', 'Gen 10', 'Gen 11', 'Gen 12']
+const tableSortOptions = ['A-Z', 'Z-A']
 
-// Student data
-const students = ref([
-    { id: 1, name: 'MEAN Piseth', email: 'piseth@example.com', phone: '+855 12 345 678', gender: 'M', dob: 'Sep 01, 2004', studentId: 'IDTB090121', generation: '9', group: 'G1', specialize: 'CS', status: 'Active' },
-    { id: 2, name: 'CHIM Vine', email: 'vine@example.com', phone: '+855 12 345 679', gender: 'M', dob: 'Aug 15, 2004', studentId: 'IDTB090122', generation: '9', group: 'G1', specialize: 'IT', status: 'Active' },
-    { id: 3, name: 'SOK Vathana', email: 'vathana@example.com', phone: '+855 12 345 680', gender: 'M', dob: 'Jul 20, 2004', studentId: 'IDTB090123', generation: '9', group: 'G2', specialize: 'CS', status: 'Active' },
-    { id: 4, name: 'LIM Sreymom', email: 'sreymom@example.com', phone: '+855 12 345 681', gender: 'F', dob: 'Jun 10, 2004', studentId: 'IDTB090124', generation: '10', group: 'G1', specialize: 'SE', status: 'Inactive' },
-    { id: 5, name: 'KONG Sophea', email: 'sophea@example.com', phone: '+855 12 345 682', gender: 'F', dob: 'May 05, 2004', studentId: 'IDTB090125', generation: '10', group: 'G2', specialize: 'IS', status: 'Active' },
-])
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
-// Computed filtered students
-const filteredStudents = computed(() => {
-    let filtered = [...students.value]
-
-    // Search filter
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(s =>
-            s.name.toLowerCase().includes(query) ||
-            s.email.toLowerCase().includes(query) ||
-            s.studentId.toLowerCase().includes(query)
-        )
-    }
-
-    // Status filter
-    if (statusFilter.value !== 'All') {
-        filtered = filtered.filter(s => s.status === statusFilter.value)
-    }
-
-    // Generation filter
-    if (generationFilter.value !== 'All') {
-        filtered = filtered.filter(s => s.generation === generationFilter.value)
-    }
-
-    // Group filter
-    if (groupFilter.value !== 'All') {
-        filtered = filtered.filter(s => s.group === groupFilter.value)
-    }
-
-    // Specialization filter
-    if (specializeFilter.value !== 'All') {
-        filtered = filtered.filter(s => s.specialize === specializeFilter.value)
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-        if (tableSortOrder.value === 'Z-A') {
-            return b.name.localeCompare(a.name)
-        } else if (tableSortOrder.value.startsWith('Gen')) {
-            const gen = tableSortOrder.value.split(' ')[1]
-            return a.generation === gen ? -1 : b.generation === gen ? 1 : 0
-        }
-        return a.name.localeCompare(b.name)
-    })
-
-    return filtered
-})
-
-// Computed stats
-const activeStudentCount = computed(() => {
-    return students.value.filter(s => s.status === 'Active').length
-})
-
-const gen9Count = computed(() => {
-    return students.value.filter(s => s.generation === '9').length
-})
-
-const gen10Count = computed(() => {
-    return students.value.filter(s => s.generation === '10').length
-})
-
-// Pagination computed
 const totalPages = computed(() => {
-    return Math.ceil(filteredStudents.value.length / itemsPerPage.value)
+    return Math.ceil(filteredAdmins.value.length / itemsPerPage.value)
 })
 
-const paginatedStudents = computed(() => {
+const paginatedAdmins = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value
     const end = start + itemsPerPage.value
-    return filteredStudents.value.slice(start, end)
+    return filteredAdmins.value.slice(start, end)
 })
 
 const goToPrevPage = () => {
@@ -596,40 +473,93 @@ const goToNextPage = () => {
     }
 }
 
+// Admin data
+const admins = ref([
+    { id: 10, name: 'PHENG Ratanak', email: 'ratanak@example.com', phone: '+855 10 123 456', adminRole: 'Super Admin', adminId: 'ADM001', department: 'Administration', status: 'Active' },
+    { id: 11, name: 'CHHAY Bopha', email: 'bopha@example.com', phone: '+855 10 123 457', adminRole: 'System Admin', adminId: 'ADM002', department: 'IT Department', status: 'Active' },
+    { id: 12, name: 'HOR Virak', email: 'virak@example.com', phone: '+855 10 123 458', adminRole: 'Department Admin', adminId: 'ADM003', department: 'Academic Affairs', status: 'Active' },
+    { id: 13, name: 'CHAN Sopheak', email: 'sopheak@example.com', phone: '+855 10 123 459', adminRole: 'Department Admin', adminId: 'ADM004', department: 'Student Affairs', status: 'Inactive' },
+])
+
+// Computed filtered admins
+const filteredAdmins = computed(() => {
+    let filtered = [...admins.value]
+
+    // Search filter
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase()
+        filtered = filtered.filter(a =>
+            a.name.toLowerCase().includes(query) ||
+            a.email.toLowerCase().includes(query) ||
+            a.adminId.toLowerCase().includes(query)
+        )
+    }
+
+    // Status filter
+    if (statusFilter.value !== 'All') {
+        filtered = filtered.filter(a => a.status === statusFilter.value)
+    }
+
+    // Admin Role filter
+    if (adminRoleFilter.value !== 'All') {
+        filtered = filtered.filter(a => a.adminRole === adminRoleFilter.value)
+    }
+
+    // Department filter
+    if (departmentFilter.value !== 'All') {
+        filtered = filtered.filter(a => a.department === departmentFilter.value)
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+        if (tableSortOrder.value === 'Z-A') {
+            return b.name.localeCompare(a.name)
+        }
+        return a.name.localeCompare(b.name)
+    })
+
+    return filtered
+})
+
+// Computed stats
+const activeAdminCount = computed(() => {
+    return admins.value.filter(a => a.status === 'Active').length
+})
+
+const superAdminCount = computed(() => {
+    return admins.value.filter(a => a.adminRole === 'Super Admin').length
+})
+
 // Dialog methods
 const openCreateDialog = () => {
-    selectedStudent.value = null
+    selectedAdmin.value = null
     isEdit.value = false
-    formData.studentId = ''
+    formData.adminId = ''
     formData.name = ''
     formData.email = ''
     formData.phone = ''
-    formData.gender = ''
-    formData.generation = ''
-    formData.group = ''
-    formData.specialize = ''
+    formData.adminRole = ''
+    formData.department = ''
     formData.active = true
     dialogOpen.value = true
 }
 
-const openEditDialog = (student) => {
-    selectedStudent.value = student
+const openEditDialog = (admin) => {
+    selectedAdmin.value = admin
     isEdit.value = true
-    formData.studentId = student.studentId
-    formData.name = student.name
-    formData.email = student.email
-    formData.phone = student.phone
-    formData.gender = student.gender
-    formData.generation = student.generation
-    formData.group = student.group
-    formData.specialize = student.specialize
-    formData.active = student.status === 'Active'
+    formData.adminId = admin.adminId
+    formData.name = admin.name
+    formData.email = admin.email
+    formData.phone = admin.phone
+    formData.adminRole = admin.adminRole
+    formData.department = admin.department
+    formData.active = admin.status === 'Active'
     dialogOpen.value = true
 }
 
 const closeDialog = () => {
     dialogOpen.value = false
-    selectedStudent.value = null
+    selectedAdmin.value = null
     isEdit.value = false
 }
 
@@ -642,37 +572,32 @@ const submitForm = async () => {
     try {
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        if (isEdit.value && selectedStudent.value) {
-            const index = students.value.findIndex(s => s.id === selectedStudent.value.id)
+        if (isEdit.value && selectedAdmin.value) {
+            const index = admins.value.findIndex(a => a.id === selectedAdmin.value.id)
             if (index > -1) {
-                students.value[index] = {
-                    ...students.value[index],
-                    studentId: formData.studentId,
+                admins.value[index] = {
+                    ...admins.value[index],
+                    adminId: formData.adminId,
                     name: formData.name,
                     email: formData.email,
                     phone: formData.phone,
-                    gender: formData.gender,
-                    generation: formData.generation,
-                    group: formData.group,
-                    specialize: formData.specialize,
+                    adminRole: formData.adminRole,
+                    department: formData.department,
                     status: formData.active ? 'Active' : 'Inactive'
                 }
             }
         } else {
-            const newStudent = {
-                id: students.value.length + 1,
-                studentId: formData.studentId,
+            const newAdmin = {
+                id: admins.value.length + 1,
+                adminId: formData.adminId,
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
-                gender: formData.gender,
-                dob: '',
-                generation: formData.generation,
-                group: formData.group,
-                specialize: formData.specialize,
+                adminRole: formData.adminRole,
+                department: formData.department,
                 status: formData.active ? 'Active' : 'Inactive'
             }
-            students.value.push(newStudent)
+            admins.value.push(newAdmin)
         }
 
         closeDialog()
@@ -684,36 +609,42 @@ const submitForm = async () => {
 }
 
 // CRUD operations
-const confirmDelete = (student) => {
-    selectedStudent.value = student
+const confirmDelete = (admin) => {
+    selectedAdmin.value = admin
     deleteDialog.value = true
 }
 
 const handleDelete = async () => {
-    if (!selectedStudent.value) return
+    if (!selectedAdmin.value) return
 
     deleteLoading.value = true
 
     try {
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        const index = students.value.findIndex(s => s.id === selectedStudent.value.id)
+        const index = admins.value.findIndex(a => a.id === selectedAdmin.value.id)
         if (index > -1) {
-            students.value.splice(index, 1)
+            admins.value.splice(index, 1)
         }
 
         deleteDialog.value = false
-        selectedStudent.value = null
+        selectedAdmin.value = null
     } catch (error) {
-        console.error('Error deleting student:', error)
+        console.error('Error deleting admin:', error)
     } finally {
         deleteLoading.value = false
     }
 }
+
+const toggleAdminStatus = (admin) => {
+    const newStatus = admin.status === 'Active' ? 'Inactive' : 'Active'
+    admin.status = newStatus
+    console.log(`Admin ${admin.name} status changed to: ${newStatus}`)
+}
 </script>
 
 <style scoped>
-.students-page {
+.admins-page {
     background: #f5f5f5;
     min-height: 100vh;
     padding: 0;
@@ -884,11 +815,6 @@ const handleDelete = async () => {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    border: 1px solid #e0e0e0;  
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     border: 1px solid #e0e0e0;
 }
 
@@ -956,7 +882,7 @@ const handleDelete = async () => {
 
 .filters-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
 }
 
@@ -1003,7 +929,7 @@ const handleDelete = async () => {
 .header-content {
     display: flex;
     align-items: center;
-    color: #45474b !important;
+    color: #45474b  !important;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
@@ -1160,9 +1086,9 @@ const handleDelete = async () => {
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: white;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
 }
 
 .header-text {
@@ -1235,7 +1161,6 @@ const handleDelete = async () => {
 .switch-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
     padding: 16px;
     background: #f8fafc;
@@ -1250,23 +1175,13 @@ const handleDelete = async () => {
 .switch-description {
     font-size: 13px;
     color: #64748b;
-    margin: 4px 0 0 0;
-    line-height: 1.4;
+    display: block;
+    margin-top: 4px;
 }
 
 .dialog-actions {
     padding: 20px 24px 24px !important;
     gap: 12px;
-}
-
-.action-btn {
-    height: 44px;
-    border-radius: 12px;
-    text-transform: none;
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 24px;
-    transition: all 0.2s ease;
 }
 
 .cancel-btn {
@@ -1328,7 +1243,7 @@ const handleDelete = async () => {
     display: flex;
     gap: 12px;
     padding: 16px;
-    background: #fef3c7;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 1px solid #fde047;
     border-radius: 12px;
 }
@@ -1347,11 +1262,6 @@ const handleDelete = async () => {
     color: #92400e;
     margin: 0 0 4px 0;
     line-height: 1.4;
-}
-
-.student-name {
-    color: black;
-    font-weight: 600;
 }
 
 .warning-details {
@@ -1387,7 +1297,25 @@ const handleDelete = async () => {
     height: 28px !important;
 }
 
-/* Pagination Styles */
+/* Animation for dialogs */
+.modern-dialog,
+.delete-dialog {
+    animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes dialogSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Pagination Section */
 .pagination-section {
     display: flex;
     align-items: center;
@@ -1422,24 +1350,6 @@ const handleDelete = async () => {
     font-size: 14px;
     color: #666;
     font-weight: 500;
-}
-
-/* Animation for dialogs */
-.modern-dialog,
-.delete-dialog {
-    animation: dialogSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes dialogSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
 }
 
 /* Responsive Design */
