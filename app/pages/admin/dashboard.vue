@@ -1,140 +1,167 @@
 <template>
-    <div class="dashboard-container">
-        <!-- Header Section -->
-        <v-row class="mb-6">
-            <v-col cols="12" class="d-flex justify-space-between align-center">
-                <div>
-                    <h1 class="text-h4 font-weight-bold">Hello, Admin 👋</h1>
+    <div class="dashboard-page">
+        <!-- Modern Header Section -->
+        <div class="modern-header">
+            <div class="header-container">
+                <div class="title-section">
+                    <div class="title-wrapper">
+                        <div class="title-icon">
+                            <v-icon icon="mdi-view-dashboard" size="32" color="white" />
+                        </div>
+                        <div class="title-content">
+                            <h1 class="page-title">Dashboard Overview</h1>
+                            <div class="breadcrumb">
+                                <span class="breadcrumb-item">Admin</span>
+                                <v-icon icon="mdi-chevron-right" size="16" color="grey" class="breadcrumb-separator" />
+                                <span class="breadcrumb-item active">Dashboard</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="welcome-message">
+                        <span class="greeting">Hello, Admin 👋</span>
+                        <span class="sub-greeting">Welcome back to your dashboard</span>
+                    </div>
                 </div>
-                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search ..."
-                    variant="outlined" density="compact" hide-details style="max-width: 300px" rounded />
-            </v-col>
-        </v-row>
 
-        <!-- Filters Section -->
-        <v-row class="mb-4">
-            <v-col cols="12">
-                <v-card flat class="pa-4">
-                    <div class="d-flex align-center flex-wrap ga-3">
-                        <span class="text-subtitle-2 font-weight-bold">Filters</span>
+                <div class="action-section">
+                    <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" placeholder="Search ..."
+                        variant="outlined" density="compact" hide-details class="search-field" />
+                </div>
+            </div>
+        </div>
 
+        <!-- Modern Content Section -->
+        <div class="modern-content-section">
+            <div class="content-container">
+                <!-- Filters Panel -->
+                <div class="filters-panel">
+                    <div class="filters-header">
+                        <v-icon icon="mdi-filter-variant" size="18" class="mr-2" />
+                        <span class="filters-title">Filters</span>
+                    </div>
+                    <div class="filters-content">
                         <v-select v-model="filters.generation" :items="generationOptions" label="Generation"
-                            variant="outlined" density="compact" hide-details style="max-width: 120px" />
+                            variant="outlined" density="compact" hide-details class="filter-select" />
 
                         <v-select v-model="filters.year" :items="yearOptions" label="Year" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+                            density="compact" hide-details class="filter-select" />
 
                         <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+                            density="compact" hide-details class="filter-select" />
 
                         <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialize"
-                            variant="outlined" density="compact" hide-details style="max-width: 120px" />
+                            variant="outlined" density="compact" hide-details class="filter-select" />
 
                         <v-select v-model="filters.order" :items="orderOptions" label="Order" variant="outlined"
-                            density="compact" hide-details style="max-width: 120px" />
+                            density="compact" hide-details class="filter-select" />
                     </div>
-                </v-card>
-            </v-col>
-        </v-row>
+                </div>
 
-        <!-- Stats Cards -->
-        <v-row class="mb-6">
-            <v-col cols="12" md="4">
-                <v-card class="stat-card blue-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-weight-bold">Count of student</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-card-0">
+                        <div class="stat-header">
+                            <v-avatar size="56" color="#3b82f6" class="stat-icon">
+                                <v-icon size="32" color="white">mdi-account-group</v-icon>
+                            </v-avatar>
+                            <v-chip color="blue" size="x-small" variant="flat" class="stat-trend">
+                                +5%
+                            </v-chip>
                         </div>
-                        <v-avatar size="60" color="blue-lighten-4">
-                            <v-icon size="40" color="blue">mdi-account-group</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-details">Female: 23 • Male: 22</div>
+                    </div>
 
-            <v-col cols="12" md="4">
-                <v-card class="stat-card orange-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-weight-bold">Count of present</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
+                    <div class="stat-card stat-card-1">
+                        <div class="stat-header">
+                            <v-avatar size="56" color="#22c55e" class="stat-icon">
+                                <v-icon size="32" color="white">mdi-account-check</v-icon>
+                            </v-avatar>
+                            <v-chip color="green" size="x-small" variant="flat" class="stat-trend">
+                                +8%
+                            </v-chip>
                         </div>
-                        <v-avatar size="60" color="orange-lighten-4">
-                            <v-icon size="40" color="orange">mdi-account-check</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Present Today</div>
+                        <div class="stat-details">Female: 23 • Male: 22</div>
+                    </div>
 
-            <v-col cols="12" md="4">
-                <v-card class="stat-card yellow-border" elevation="2">
-                    <v-card-text class="d-flex align-center justify-space-between">
-                        <div>
-                            <div class="text-h6 font-weight-bold">Count of absent</div>
-                            <div class="text-h4 font-weight-bold mt-2">45 students</div>
-                            <div class="text-caption text-grey">Female 23 Male 22</div>
+                    <div class="stat-card stat-card-2">
+                        <div class="stat-header">
+                            <v-avatar size="56" color="#f59e0b" class="stat-icon">
+                                <v-icon size="32" color="white">mdi-account-remove</v-icon>
+                            </v-avatar>
+                            <v-chip color="orange" size="x-small" variant="flat" class="stat-trend">
+                                -2%
+                            </v-chip>
                         </div>
-                        <v-avatar size="60" color="yellow-lighten-4">
-                            <v-icon size="40" color="yellow-darken-2">mdi-account-remove</v-icon>
-                        </v-avatar>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Absent Today</div>
+                        <div class="stat-details">Female: 23 • Male: 22</div>
+                    </div>
+                </div>
 
-        <!-- Charts Section -->
-        <v-row class="mb-6">
-            <v-col cols="12" md="8">
-                <v-card elevation="2">
-                    <v-card-title class="text-h6 font-weight-bold">Average in weeks</v-card-title>
-                    <v-card-text>
-                        <canvas ref="barChartCanvas" height="300"></canvas>
-                    </v-card-text>
-                </v-card>
-            </v-col>
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-card chart-large">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <v-icon icon="mdi-chart-bar" size="20" class="mr-2" />
+                                Average in Weeks
+                            </h3>
+                        </div>
+                        <div class="chart-content">
+                            <canvas ref="barChartCanvas" height="300"></canvas>
+                        </div>
+                    </div>
 
-            <v-col cols="12" md="4">
-                <v-card elevation="2">
-                    <v-card-title class="text-h6 font-weight-bold">Attendance in view</v-card-title>
-                    <v-card-text class="d-flex flex-column align-center">
-                        <canvas ref="doughnutChartCanvas" width="250" height="250"></canvas>
-                        <div class="d-flex justify-center ga-4 mt-4 flex-wrap">
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #1e3a8a"></div>
-                                <span class="text-caption">Present 62.5%</span>
+                    <div class="chart-card chart-small">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <v-icon icon="mdi-chart-donut" size="20" class="mr-2" />
+                                Attendance Overview
+                            </h3>
+                        </div>
+                        <div class="chart-content doughnut-content">
+                            <canvas ref="doughnutChartCanvas" width="250" height="250"></canvas>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background-color: #1e3a8a"></div>
+                                    <span class="legend-text">Present 62.5%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background-color: #f97316"></div>
+                                    <span class="legend-text">Leave 12.5%</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background-color: #22c55e"></div>
+                                    <span class="legend-text">Absence 25%</span>
+                                </div>
                             </div>
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #f97316"></div>
-                                <span class="text-caption">Leave 12.5%</span>
-                            </div>
-                            <div class="d-flex align-center">
-                                <div class="legend-dot" style="background-color: #22c55e"></div>
-                                <span class="text-caption">Absence 25%</span>
-                            </div>
                         </div>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                    </div>
+                </div>
 
-        <!-- Student Lists Table -->
-        <v-row>
-            <v-col cols="12">
-                <v-card elevation="2">
-                    <v-card-title class="d-flex justify-space-between align-center">
-                        <span class="text-h6 font-weight-bold">Student lists</span>
-                        <div class="d-flex align-center ga-3">
+                <!-- Student Lists Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title-section">
+                            <h3 class="table-title">
+                                <v-icon icon="mdi-account-multiple" size="20" class="mr-2" />
+                                Student Lists
+                            </h3>
+                            <span class="table-subtitle">Attendance tracking records</span>
+                        </div>
+                        <div class="table-actions">
                             <v-text-field v-model="studentSearch" prepend-inner-icon="mdi-magnify"
                                 placeholder="Search ..." variant="outlined" density="compact" hide-details
-                                style="max-width: 250px" />
+                                class="search-field-small" />
                             <v-select v-model="studentOrder" :items="['A-Z', 'Z-A']" label="Order" variant="outlined"
-                                density="compact" hide-details style="max-width: 100px" />
+                                density="compact" hide-details class="order-select" />
                         </div>
-                    </v-card-title>
-                    <v-card-text>
+                    </div>
+                    <div class="table-content">
                         <v-table class="attendance-table">
                             <thead>
                                 <tr>
@@ -185,10 +212,10 @@
                                 </tr>
                             </tbody>
                         </v-table>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -376,72 +403,488 @@ const initDoughnutChart = () => {
 </script>
 
 <style scoped>
-.dashboard-container {
-    padding: 20px;
+.dashboard-page {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+/* Modern Header Styles */
+.modern-header {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+}
+
+.title-section {
+    flex: 1;
+}
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.title-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.title-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.025em;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.breadcrumb-item.active {
+    color: #3b82f6;
+}
+
+.breadcrumb-separator {
+    opacity: 0.5;
+}
+
+.welcome-message {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.greeting {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.sub-greeting {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.action-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-field {
+    min-width: 300px;
+}
+
+.search-field :deep(.v-field) {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Content Section */
+.modern-content-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Filters Panel */
+.filters-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.filters-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.filters-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.filters-content {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    flex: 1;
+    min-width: 120px;
+    max-width: 160px;
+}
+
+.filter-select :deep(.v-field) {
+    border-radius: 12px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
 }
 
 .stat-card {
-    border-left: 4px solid;
-    height: 100%;
+    background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+    border: 1px solid rgba(63, 81, 181, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.stat-card.blue-border {
-    border-left-color: #2196F3;
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(63, 81, 181, 0.12);
 }
 
-.stat-card.orange-border {
-    border-left-color: #FF9800;
+.stat-card-0 {
+    border-left: 4px solid #3b82f6;
 }
 
-.stat-card.yellow-border {
-    border-left-color: #FFC107;
+.stat-card-1 {
+    border-left: 4px solid #22c55e;
 }
 
-.attendance-table {
-    width: 100%;
+.stat-card-2 {
+    border-left: 4px solid #f59e0b;
 }
 
-.attendance-table th {
-    background-color: #f5f5f5;
-    padding: 12px 8px;
-    font-size: 13px;
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
-.week-header {
-    background-color: #c8e6c9 !important;
-    border: 1px solid #4caf50;
+.stat-icon {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
 
-.day-header {
-    background-color: #f5f5f5;
+.stat-trend {
+    font-weight: 600;
     font-size: 11px;
 }
 
-.attendance-cell {
-    padding: 8px;
+.stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 16px;
     font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.stat-details {
     font-size: 13px;
+    color: #64748b;
+    line-height: 1.4;
 }
 
-.attendance-cell.present {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+/* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
 }
 
-.attendance-cell.absent {
-    background-color: #ffebee;
-    color: #c62828;
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
 }
 
-.attendance-cell.leave {
-    background-color: #fff3e0;
-    color: #e65100;
+.chart-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.chart-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.doughnut-content {
+    flex-direction: column;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .legend-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    margin-right: 6px;
+}
+
+.legend-text {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Table Card */
+.table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-title-section {
+    flex: 1;
+}
+
+.table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+}
+
+.table-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.table-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-field-small {
+    max-width: 250px;
+}
+
+.search-field-small :deep(.v-field) {
+    border-radius: 12px;
+}
+
+.order-select {
+    max-width: 120px;
+}
+
+.order-select :deep(.v-field) {
+    border-radius: 12px;
+}
+
+.table-content {
+    padding: 0;
+}
+
+/* Attendance Table Styles */
+.attendance-table {
+    width: 100%;
+}
+
+.attendance-table th {
+    background-color: #1e293b;
+    color: white !important;
+    padding: 16px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+}
+
+.week-header {
+    background-color: #22c55e !important;
+    border: 1px solid #16a34a;
+    color: white !important;
+}
+
+.day-header {
+    background-color: #334155 !important;
+    font-size: 11px;
+    color: white !important;
+}
+
+.attendance-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.attendance-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.attendance-table tbody td {
+    padding: 16px 12px;
+    font-size: 14px;
+    border: none;
+}
+
+.attendance-cell {
+    padding: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+}
+
+.attendance-cell.present {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.attendance-cell.absent {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.attendance-cell.leave {
+    background-color: #fed7aa;
+    color: #c2410c;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .header-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 24px;
+    }
+
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        padding: 16px 20px;
+    }
+
+    .modern-content-section {
+        padding: 16px 20px;
+    }
+
+    .title-wrapper {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-content {
+        flex-direction: column;
+    }
+
+    .filter-select {
+        max-width: 100%;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-field-small,
+    .order-select {
+        max-width: 100%;
+    }
+
+    .attendance-table {
+        display: block;
+        overflow-x: auto;
+    }
 }
 </style>

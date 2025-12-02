@@ -173,6 +173,33 @@
                                 class="modern-table"
                                 hover
                             >
+                                <template #bottom="{ page, pageCount, itemsLength }">
+                                    <div class="custom-table-footer">
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === 1"
+                                            @click="page--"
+                                        >
+                                            <v-icon size="20">mdi-chevron-left</v-icon>
+                                            Previous
+                                        </v-btn>
+                                        <div class="footer-info">
+                                            Page {{ page }} of {{ pageCount }} ({{ itemsLength }} total records)
+                                        </div>
+                                            <v-btn
+                                                variant="outlined"
+                                                size="large"
+                                                class="footer-btn"
+                                                :disabled="page === pageCount"
+                                                @click="page++"
+                                        >
+                                            Next
+                                            <v-icon size="20">mdi-chevron-right</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </template>
                                 <template #headers>
                                     <tr class="modern-header-row">
                                         <th class="modern-header-cell id-column">
@@ -361,6 +388,33 @@
                                 class="modern-table"
                                 hover
                             >
+                                <template #bottom="{ page, pageCount, itemsLength }">
+                                    <div class="custom-table-footer">
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === 1"
+                                            @click="page--"
+                                        >
+                                            <v-icon size="20">mdi-chevron-left</v-icon>
+                                            Previous
+                                        </v-btn>
+                                        <div class="footer-info">
+                                            Page {{ page }} of {{ pageCount }} ({{ itemsLength }} total records)
+                                        </div>
+                                        <v-btn
+                                            variant="outlined"
+                                            size="large"
+                                            class="footer-btn"
+                                            :disabled="page === pageCount"
+                                            @click="page++"
+                                        >
+                                            Next
+                                            <v-icon size="20">mdi-chevron-right</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </template>
                                 <template #headers>
                                     <tr class="modern-header-row">
                                         <th class="modern-header-cell">
@@ -2666,6 +2720,55 @@ const confirmDelete = async () => {
 
 .rounded-lg {
     border-radius: 16px;
+}
+
+/* Custom Table Footer Styles */
+.custom-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.footer-info {
+    color: #757575;
+    font-size: 14px;
+    font-weight: 400;
+    flex: 1;
+    text-align: center;
+}
+
+.footer-btn {
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 8px !important;
+    color: #616161 !important;
+    text-transform: none !important;
+    font-weight: 400 !important;
+    padding: 0 20px !important;
+    height: 40px !important;
+    min-width: 110px !important;
+    background: white !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.footer-btn:hover:not(:disabled) {
+    background-color: #f5f5f5 !important;
+    border-color: #9e9e9e !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.footer-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #fafafa !important;
+}
+
+.footer-btn .v-icon {
+    font-size: 20px;
+    margin: 0 4px;
 }
 
 /* Responsive Design */
