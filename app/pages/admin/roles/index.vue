@@ -106,8 +106,9 @@
         </div>
 
         <v-card elevation="2" class="modern-table-card">
-          <v-data-table :headers="headers" :items="filteredRoles" :loading="loading"
-            class="modern-data-table elevation-0" item-key="id" show-select v-model="selectedItems">
+          <v-data-table :headers="headers" :items="paginatedRoles" :loading="loading"
+            class="modern-data-table elevation-0" item-key="id" show-select v-model="selectedItems"
+            hide-default-footer>
             <!-- Custom slot for role name with icon -->
             <template v-slot:item.name="{ item }">
               <div class="d-flex align-center">
@@ -178,6 +179,31 @@
               </div>
             </template>
           </v-data-table>
+          
+          <!-- Pagination Footer -->
+          <div class="pagination-section">
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage === 1"
+                @click="goToPrevPage"
+                class="pagination-btn"
+            >
+                Previous
+            </v-btn>
+            
+            <div class="pagination-info">
+                <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
+            </div>
+            
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage >= totalPages"
+                @click="goToNextPage"
+                class="pagination-btn"
+            >
+                Next
+            </v-btn>
+          </div>
         </v-card>
       </div>
 
@@ -201,6 +227,8 @@ const dialog = ref(false)
 const selectedRole = ref(null)
 const selectedItems = ref([])
 const searchQuery = ref('')
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 // Computed filtered roles
 const filteredRoles = computed(() => {
@@ -218,6 +246,15 @@ const filteredRoles = computed(() => {
   }
 
   return filtered
+})
+
+// Pagination computed properties
+const totalPages = computed(() => Math.ceil(filteredRoles.value.length / itemsPerPage.value))
+
+const paginatedRoles = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredRoles.value.slice(start, end)
 })
 
 // Methods
@@ -266,6 +303,15 @@ const getRoleIcon = (level) => {
   return icons[level] || 'mdi-account'
 }
 
+// Pagination methods
+const goToPrevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
+
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
 onMounted(async () => {
   // Use mock data for front-end only development
   const mockRoles = await import('@/mock/roles.json')
@@ -276,7 +322,6 @@ onMounted(async () => {
 <style scoped>
 /* Modern Roles Page Styles - Unified with Schedules Page */
 .roles-modern-page {
-  min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
@@ -489,6 +534,42 @@ onMounted(async () => {
 
 .gap-2 {
   gap: 8px;
+}
+
+/* Pagination */
+.pagination-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0;
+}
+
+.pagination-btn {
+  min-width: 100px;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-text {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 /* Responsive Design */

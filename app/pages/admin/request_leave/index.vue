@@ -123,7 +123,7 @@
 
                 <!-- Modern Data Table -->
                 <div class="modern-table-wrapper">
-                    <v-table class="modern-table" fixed-header height="500">
+                    <v-table class="modern-table">
                         <thead>
                             <tr class="modern-header-row">
                                 <th class="modern-header-cell id-column">
@@ -150,7 +150,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="request in filteredLeaveRequests" :key="request.leave_id" class="modern-table-row">
+                            <tr v-for="request in paginatedLeaveRequests" :key="request.leave_id" class="modern-table-row">
                                 <td class="modern-table-cell id-column">
                                     <div class="id-badge">{{ request.leave_id }}</div>
                                 </td>
@@ -207,6 +207,31 @@
                         <p class="empty-subtitle">
                             {{ searchQuery ? 'Try adjusting your search criteria or filters.' : 'No leave requests have been submitted yet.' }}
                         </p>
+                    </div>
+                    
+                    <!-- Pagination Footer -->
+                    <div v-if="filteredLeaveRequests.length > 0" class="pagination-section">
+                        <v-btn 
+                            variant="outlined" 
+                            :disabled="currentPage === 1"
+                            @click="goToPrevPage"
+                            class="pagination-btn"
+                        >
+                            Previous
+                        </v-btn>
+                        
+                        <div class="pagination-info">
+                            <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
+                        </div>
+                        
+                        <v-btn 
+                            variant="outlined" 
+                            :disabled="currentPage >= totalPages"
+                            @click="goToNextPage"
+                            class="pagination-btn"
+                        >
+                            Next
+                        </v-btn>
                     </div>
                 </div>
             </div>
@@ -367,6 +392,8 @@ const tableSortOrder = ref('Newest')
 const viewDialog = ref(false)
 const selectedRequest = ref(null)
 const showFilters = ref(false)
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 // Filter options
 const statusOptions = [
@@ -458,6 +485,15 @@ const filteredLeaveRequests = computed(() => {
     })
 
     return filtered
+})
+
+// Pagination computed properties
+const totalPages = computed(() => Math.ceil(filteredLeaveRequests.value.length / itemsPerPage.value))
+
+const paginatedLeaveRequests = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value
+    const end = start + itemsPerPage.value
+    return filteredLeaveRequests.value.slice(start, end)
 })
 
 // Utility functions
@@ -606,6 +642,20 @@ const handleExportPDF = () => {
         alert('Export failed: ' + error.message)
     }
 }
+
+// Pagination methods
+const goToPrevPage = () => {
+    if (currentPage.value > 1) currentPage.value--
+}
+
+const goToNextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+// Watch for filter changes and reset pagination
+watch([searchQuery, statusFilter, leaveTypeFilter, durationFilter, generationFilter, tableSortOrder], () => {
+    currentPage.value = 1
+})
 </script>
 
 <style scoped>
@@ -885,10 +935,6 @@ const handleExportPDF = () => {
     width: 100%;
 }
 
-.modern-header-row {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-}
-
 .modern-header-cell {
     padding: 20px 16px;
     border: none;
@@ -1072,6 +1118,42 @@ const handleExportPDF = () => {
     font-size: 14px;
     margin: 0;
     line-height: 1.5;
+}
+
+/* Pagination */
+.pagination-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 0;
+}
+
+.pagination-btn {
+    min-width: 100px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-text {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
 }
 
 /* Modern Dialog Styles */

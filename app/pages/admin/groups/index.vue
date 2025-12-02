@@ -158,7 +158,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(group, idx) in filteredGroups" :key="group.id" class="modern-table-row">
+                            <tr v-for="(group, idx) in paginatedGroups" :key="group.id" class="modern-table-row">
                                 <td class="modern-table-cell id-column center-align">
                                     <span class="id-badge">{{ group.id }}</span>
                                 </td>
@@ -185,7 +185,8 @@
                                 </td>
                                 <td class="modern-table-cell center-align">
                                     <v-chip :color="group.active ? 'success' : 'error'" class="status-chip" size="small">
-                                        {{ group.active ? 'Active' : 'Inactive' }}
+                                        <v-icon start size="16">mdi-check-circle</v-icon>
+                                        {{ group.active ? 'active' : 'inactive' }}
                                     </v-chip>
                                 </td>
                                 <td class="modern-table-cell">
@@ -219,6 +220,31 @@
                             class="mt-4">
                             <v-icon icon="mdi-plus" class="mr-1" />
                             Add First Group
+                        </v-btn>
+                    </div>
+                    
+                    <!-- Pagination Footer -->
+                    <div v-if="filteredGroups.length > 0" class="pagination-section">
+                        <v-btn 
+                            variant="outlined" 
+                            :disabled="currentPage === 1"
+                            @click="goToPrevPage"
+                            class="pagination-btn"
+                        >
+                            Previous
+                        </v-btn>
+                        
+                        <div class="pagination-info">
+                            <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
+                        </div>
+                        
+                        <v-btn 
+                            variant="outlined" 
+                            :disabled="currentPage >= totalPages"
+                            @click="goToNextPage"
+                            class="pagination-btn"
+                        >
+                            Next
                         </v-btn>
                     </div>
                 </div>
@@ -384,6 +410,8 @@ const formRef = ref(null)
 const formLoading = ref(false)
 const deleteLoading = ref(false)
 const showFilters = ref(false)
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 // Form data
 const formData = reactive({
@@ -474,6 +502,15 @@ const filteredGroups = computed(() => {
     })
 
     return filtered
+})
+
+// Pagination computed properties
+const totalPages = computed(() => Math.ceil(filteredGroups.value.length / itemsPerPage.value))
+
+const paginatedGroups = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value
+    const end = start + itemsPerPage.value
+    return filteredGroups.value.slice(start, end)
 })
 
 // Utility functions
@@ -676,6 +713,20 @@ const handleExportPDF = () => {
         alert('Export failed: ' + error.message)
     }
 }
+
+// Pagination methods
+const goToPrevPage = () => {
+    if (currentPage.value > 1) currentPage.value--
+}
+
+const goToNextPage = () => {
+    if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+// Watch for filter changes and reset pagination
+watch([searchQuery, statusFilter, generationFilter, tableSortOrder], () => {
+    currentPage.value = 1
+})
 </script>
 
 <style scoped>
@@ -1116,6 +1167,42 @@ const handleExportPDF = () => {
     line-height: 1.5;
 }
 
+/* Pagination */
+.pagination-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 0;
+}
+
+.pagination-btn {
+    min-width: 100px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-text {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
     .header-container {
@@ -1300,7 +1387,7 @@ const handleExportPDF = () => {
     padding: 20px 24px 24px !important;
     gap: 12px;
 }
-
+modern-action-btn 
 .action-btn {
     height: 44px;
     border-radius: 12px;
@@ -1417,6 +1504,15 @@ const handleExportPDF = () => {
 .delete-btn:hover {
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
     transform: translateY(-1px);
+}
+
+/* Status Chip Styles */
+.status-chip {
+    font-weight: 500 !important;
+    text-transform: lowercase !important;
+    border-radius: 16px !important;
+    padding: 0 12px !important;
+    height: 28px !important;
 }
 
 /* Animation for dialogs */

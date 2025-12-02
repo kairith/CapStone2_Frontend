@@ -1,3 +1,5 @@
+
+
 <template>
     <div class="class-detail-page">
         <!-- Modern Header Section -->

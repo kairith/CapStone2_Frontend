@@ -147,7 +147,7 @@
 
 <script setup>
 definePageMeta({
-    middleware: ['auth', 'role-lecturer'],
+    // middleware: ['auth', 'role-lecturer'],
     layout: 'lecturer'
 })
 

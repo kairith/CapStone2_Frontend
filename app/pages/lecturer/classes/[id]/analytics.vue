@@ -24,20 +24,29 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">{{ studentsPresent }}</div>
-                            <div class="stat-label">Present</div>
+                            <div class="stat-label">Approved</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">{{ studentsLate }}</div>
-                            <div class="stat-label">Late</div>
+                            <div class="stat-label">Pending</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">{{ studentsAbsent }}</div>
-                            <div class="stat-label">Absent</div>
+                            <div class="stat-label">Rejected</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="action-section">
+                    <v-btn 
+                        class="modern-btn back-btn" 
+                        prepend-icon="mdi-arrow-left" 
+                        variant="outlined"
+                        @click="goBackToClasses"
+                    >
+                        Back to Classes
+                    </v-btn>
+                    
                     <v-menu offset-y>
                         <template v-slot:activator="{ props }">
                             <v-btn class="modern-btn export-btn" prepend-icon="mdi-download" variant="outlined"
@@ -147,7 +156,6 @@
                             <th>Student ID</th>
                             <th>Start Date</th>
                             <th>End Date</th>
-                            <th>Type</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -170,30 +178,28 @@
                             </td>
                             <td class="date-cell">{{ formatTableDate(student.scan_time || '2024-01-25') }}</td>
                             <td class="date-cell">{{ formatTableDate(student.scan_time || '2024-01-26') }}</td>
-                            <td class="type-cell">
+                            <td class="status-cell">
                                 <v-chip 
-                                    :color="getTypeChipColor(student.status)"
+                                    :color="getStatusChipColor(student.status)"
                                     variant="flat"
                                     size="small"
-                                    class="type-chip"
+                                    class="status-chip"
                                 >
-                                    {{ student.status }}
-                                </v-chip>
-                            </td>
-                            <td class="status-cell">
-                                <v-chip variant="flat" size="small" class="status-chip">
-                                    {{ student.status }}
+                                    <v-icon 
+                                        :icon="student.status === 'Approved' ? 'mdi-check-circle' : student.status === 'Rejected' ? 'mdi-close-circle' : 'mdi-clock'"
+                                        size="16" 
+                                        class="mr-1"
+                                    />
+                                    {{ student.status.toLowerCase() }}
                                 </v-chip>
                             </td>
                             <td class="actions-cell">
-                                <div class="action-buttons">
-                                    <v-btn icon class="action-btn" @click="viewStudent(student)">
+                                <div class="action-group">
+                                    <v-btn icon class="action-btn" @click.stop="editStudent(student)">
                                         <v-icon color="#fde047">mdi-pencil</v-icon>
-                                        <v-tooltip activator="parent">Edit Student</v-tooltip>
                                     </v-btn>
-                                    <v-btn icon class="action-btn" @click="rejectAttendance(student)">
+                                    <v-btn icon class="action-btn" @click.stop="deleteStudent(student)">
                                         <v-icon color="#dc2626">mdi-delete</v-icon>
-                                        <v-tooltip activator="parent">Delete Student</v-tooltip>
                                     </v-btn>
                                 </div>
                             </td>
@@ -204,38 +210,186 @@
 
         <!-- Pagination -->
         <div class="pagination-section">
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage === 1"
+                @click="goToPrevPage"
+                class="pagination-btn"
+            >
+                Previous
+            </v-btn>
+            
             <div class="pagination-info">
-                <span class="pagination-label">Items per page:</span>
-                <v-select v-model="itemsPerPage" :items="[5, 10, 15, 20]" variant="outlined" density="compact"
-                    hide-details class="items-per-page-select" />
-                <span class="pagination-status">{{ paginationText }}</span>
+                <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
             </div>
-            <div class="pagination-controls">
-                <v-btn icon variant="text" size="small" @click="goToFirstPage" :disabled="currentPage === 1"
-                    class="pagination-btn">
-                    <v-icon>mdi-page-first</v-icon>
-                </v-btn>
-                <v-btn icon variant="text" size="small" @click="goToPrevPage" :disabled="currentPage === 1"
-                    class="pagination-btn">
-                    <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-                <v-btn icon variant="text" size="small" @click="goToNextPage" :disabled="currentPage >= totalPages"
-                    class="pagination-btn">
-                    <v-icon>mdi-chevron-right</v-icon>
-                </v-btn>
-                <v-btn icon variant="text" size="small" @click="goToLastPage" :disabled="currentPage >= totalPages"
-                    class="pagination-btn">
-                    <v-icon>mdi-page-last</v-icon>
-                </v-btn>
-            </div>
+            
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage >= totalPages"
+                @click="goToNextPage"
+                class="pagination-btn"
+            >
+                Next
+            </v-btn>
         </div>
     </div>
+
+    <!-- Edit Student Dialog -->
+    <v-dialog v-model="editDialog" max-width="600" persistent>
+        <v-card class="modern-dialog" elevation="24">
+            <!-- Dialog Header -->
+            <div class="dialog-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <v-icon icon="mdi-pencil" color="warning" size="28" />
+                    </div>
+                    <div class="header-text">
+                        <h2 class="dialog-title">Edit Student Attendance</h2>
+                        <p class="dialog-subtitle">Update student attendance information</p>
+                    </div>
+                </div>
+                <v-btn icon="mdi-close" variant="text" size="small" @click="editDialog" class="close-btn" />
+            </div>
+
+            <v-divider />
+
+            <!-- Dialog Content -->
+            <v-card-text class="dialog-content">
+                <v-form ref="editFormRef" v-model="editFormValid">
+                    <div class="form-group">
+                        <label class="form-label">Student Name</label>
+                        <v-text-field
+                            v-model="editFormData.name"
+                            variant="outlined"
+                            density="comfortable"
+                            readonly
+                            class="form-field"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Student ID</label>
+                        <v-text-field
+                            v-model="editFormData.student_id"
+                            variant="outlined"
+                            density="comfortable"
+                            readonly
+                            class="form-field"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status *</label>
+                        <v-select
+                            v-model="editFormData.status"
+                            :items="['Approved', 'Pending', 'Rejected']"
+                            variant="outlined"
+                            density="comfortable"
+                            :rules="[(v) => !!v || 'Status is required']"
+                            class="form-field"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Scan Time</label>
+                        <v-text-field
+                            v-model="editFormData.scan_time"
+                            type="datetime-local"
+                            variant="outlined"
+                            density="comfortable"
+                            class="form-field"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <v-text-field
+                            v-model="editFormData.location"
+                            variant="outlined"
+                            density="comfortable"
+                            placeholder="e.g., Room A101"
+                            class="form-field"
+                        />
+                    </div>
+                </v-form>
+            </v-card-text>
+
+            <v-divider />
+
+            <!-- Dialog Actions -->
+            <v-card-actions class="dialog-actions">
+                <v-btn variant="outlined" color="grey-darken-1" @click="closeEditDialog" class="action-btn cancel-btn">
+                    <v-icon start>mdi-close</v-icon>
+                    Cancel
+                </v-btn>
+
+                <v-btn color="warning" variant="flat" @click="submitEdit" :loading="editLoading" :disabled="!editFormValid" class="action-btn submit-btn">
+                    <v-icon start>mdi-content-save</v-icon>
+                    Save Changes
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="420" persistent>
+        <v-card class="delete-dialog" elevation="24">
+            <!-- Delete Header -->
+            <div class="delete-header">
+                <div class="delete-icon-container">
+                    <v-icon icon="mdi-alert-circle" color="error" size="48" />
+                </div>
+                <h2 class="delete-title">Delete Student Record</h2>
+                <p class="delete-subtitle">This action cannot be undone</p>
+            </div>
+
+            <v-divider />
+
+            <!-- Delete Content -->
+            <v-card-text class="delete-content">
+                <div class="warning-box">
+                    <v-icon icon="mdi-alert" color="warning" size="24" class="warning-icon" />
+                    <div class="warning-text">
+                        <p class="warning-message">
+                            Are you sure you want to delete the attendance record for
+                            <strong class="student-name">{{ selectedStudent?.name }}</strong>?
+                        </p>
+                    </div>
+                </div>
+            </v-card-text>
+
+            <v-divider />
+
+            <!-- Delete Actions -->
+            <v-card-actions class="delete-actions">
+                <v-btn variant="outlined" color="grey-darken-1" @click="closeDeleteDialog" :disabled="deleteLoading" class="action-btn cancel-btn">
+                    <v-icon start>mdi-close</v-icon>
+                    Cancel
+                </v-btn>
+
+                <v-btn color="error" variant="flat" @click="confirmDeleteStudent" :loading="deleteLoading" class="action-btn delete-btn">
+                    <v-icon start>mdi-delete</v-icon>
+                    Delete Record
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
     <!-- Error Snackbar -->
     <v-snackbar v-model="showError" :timeout="5000" color="error" location="top">
         {{ errorMessage }}
         <template v-slot:actions>
             <v-btn variant="text" @click="showError = false">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
+
+    <!-- Success Snackbar -->
+    <v-snackbar v-model="showSuccess" :timeout="3000" color="success" location="top">
+        {{ successMessage }}
+        <template v-slot:actions>
+            <v-btn variant="text" @click="showSuccess = false">
                 Close
             </v-btn>
         </template>
@@ -262,6 +416,8 @@ const classId = computed(() => route.params.id)
 const loading = ref(false)
 const showError = ref(false)
 const errorMessage = ref('')
+const showSuccess = ref(false)
+const successMessage = ref('')
 const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
@@ -270,13 +426,31 @@ const generationFilter = ref('All')
 const statusFilter = ref('All')
 const dateFilter = ref('')
 
+// Dialog state
+const editDialog = ref(false)
+const deleteDialog = ref(false)
+const selectedStudent = ref<any>(null)
+const editFormRef = ref(null)
+const editFormValid = ref(false)
+const editLoading = ref(false)
+const deleteLoading = ref(false)
+
+// Edit form data
+const editFormData = ref({
+    name: '',
+    student_id: '',
+    status: 'Pending',
+    scan_time: '',
+    location: ''
+})
+
 // Filter options
 const generationOptions = ['All', '8', '9', '10', '11', '12']
 const statusOptions = [
     { title: 'All', value: 'All' },
-    { title: 'Present', value: 'Present' },
-    { title: 'Late', value: 'Late' },
-    { title: 'Absent', value: 'Absent' }
+    { title: 'Approved', value: 'Approved' },
+    { title: 'Pending', value: 'Pending' },
+    { title: 'Rejected', value: 'Rejected' }
 ]
 
 // Mock data - replace with actual API calls
@@ -295,7 +469,7 @@ const studentsList = ref([
         name: 'John Doe',
         email: 'john.doe@example.com',
         avatar: null,
-        status: 'Present',
+        status: 'Approved',
         scan_time: '2024-11-23 08:30:00',
         location: 'Room A101'
     },
@@ -305,7 +479,7 @@ const studentsList = ref([
         name: 'Jane Smith',
         email: 'jane.smith@example.com',
         avatar: null,
-        status: 'Present',
+        status: 'Approved',
         scan_time: '2024-11-23 08:25:00',
         location: 'Room A101'
     },
@@ -315,7 +489,7 @@ const studentsList = ref([
         name: 'Bob Johnson',
         email: 'bob.johnson@example.com',
         avatar: null,
-        status: 'Absent',
+        status: 'Rejected',
         scan_time: null,
         location: null
     },
@@ -325,7 +499,7 @@ const studentsList = ref([
         name: 'Alice Brown',
         email: 'alice.brown@example.com',
         avatar: null,
-        status: 'Late',
+        status: 'Pending',
         scan_time: '2024-11-23 09:15:00',
         location: 'Room A101'
     },
@@ -335,7 +509,7 @@ const studentsList = ref([
         name: 'Charlie Wilson',
         email: 'charlie.wilson@example.com',
         avatar: null,
-        status: 'Absent',
+        status: 'Rejected',
         scan_time: null,
         location: null
     },
@@ -345,7 +519,7 @@ const studentsList = ref([
         name: 'Emily Davis',
         email: 'emily.davis@example.com',
         avatar: null,
-        status: 'Present',
+        status: 'Approved',
         scan_time: '2024-11-23 08:20:00',
         location: 'Room A101'
     }
@@ -353,15 +527,15 @@ const studentsList = ref([
 
 // Computed properties
 const studentsPresent = computed(() =>
-    studentsList.value.filter(s => s.status === 'Present').length
+    studentsList.value.filter(s => s.status === 'Approved').length
 )
 
 const studentsLate = computed(() =>
-    studentsList.value.filter(s => s.status === 'Late').length
+    studentsList.value.filter(s => s.status === 'Pending').length
 )
 
 const studentsAbsent = computed(() =>
-    studentsList.value.filter(s => s.status === 'Absent').length
+    studentsList.value.filter(s => s.status === 'Rejected').length
 )
 
 const filteredStudents = computed(() => {
@@ -404,52 +578,41 @@ const getAvatarColor = (name: string) => {
     return colors[index]
 }
 
-const getAttendanceType = (status: string) => {
-    switch (status) {
-        case 'Present': return 'Regular Attendance'
-        case 'Late': return 'Late Arrival'
-        case 'Absent': return 'Absent'
-        default: return 'Unknown'
-    }
-}
-
-const getTypeClass = (status: string) => {
-    switch (status) {
-        case 'Present': return 'type-present'
-        case 'Late': return 'type-late'
-        case 'Absent': return 'type-absent'
-        default: return 'type-default'
-    }
-}
-
 const getStatusChipColor = (status: string) => {
     switch (status) {
-        case 'Present': return 'success'
-        case 'Late': return 'warning'
-        case 'Absent': return 'error'
-        default: return 'grey'
-    }
-}
-
-const getTypeChipColor = (status: string) => {
-    switch (status) {
-        case 'Present': return 'success'
-        case 'Late': return 'warning'
-        case 'Absent': return 'error'
+        case 'Approved': return 'success'
+        case 'Pending': return 'warning'
+        case 'Rejected': return 'error'
         default: return 'grey'
     }
 }
 
 const approveAttendance = (student: any) => {
-    student.status = 'Present'
+    student.status = 'Approved'
     student.scan_time = new Date().toISOString()
     console.log('Approved attendance for:', student.name)
 }
 
 const rejectAttendance = (student: any) => {
-    student.status = 'Absent'
+    student.status = 'Rejected'
     student.scan_time = null
     console.log('Rejected attendance for:', student.name)
+}
+
+const editStudent = (student: any) => {
+    console.log('Edit student:', student.name)
+    showErrorMessage('Edit student feature coming soon!')
+}
+
+const deleteStudent = (student: any) => {
+    console.log('Delete student:', student.name)
+    if (confirm(`Are you sure you want to delete ${student.name}?`)) {
+        const index = studentsList.value.findIndex(s => s.id === student.id)
+        if (index !== -1) {
+            studentsList.value.splice(index, 1)
+            showErrorMessage(`${student.name} has been deleted successfully!`)
+        }
+    }
 }
 
 const viewStudent = (student: any) => {
@@ -489,6 +652,10 @@ const goToLastPage = () => { currentPage.value = totalPages.value }
 const showErrorMessage = (message: string) => {
     errorMessage.value = message
     showError.value = true
+}
+
+const goBackToClasses = () => {
+    router.push('/lecturer/classes')
 }
 
 // Initialize data
@@ -636,6 +803,17 @@ useHead({
 .refresh-btn {
     background: linear-gradient(135deg, #1976d2, #2196f3) !important;
     color: white !important;
+}
+
+.back-btn {
+    border-color: #64748b;
+    color: #64748b;
+}
+
+.back-btn:hover {
+    border-color: #1976d2;
+    color: #1976d2;
+    background-color: #f8fafc;
 }
 
 .modern-menu {
@@ -891,18 +1069,19 @@ useHead({
 
 /* Status Cell */
 .status-chip {
-    font-weight: 500;
-    min-width: 80px;
-    background-color: #e3f2fd !important;
-    color: #1565c0 !important;
-    text-transform: none;
+    font-weight: 500 !important;
+    text-transform: lowercase !important;
+    border-radius: 16px !important;
+    padding: 0 12px !important;
+    height: 28px !important;
+    min-width: 90px;
 }
 
 /* Actions Cell */
-.action-buttons {
+.action-group {
     display: flex;
     gap: 4px;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .action-btn {
@@ -927,48 +1106,30 @@ useHead({
     margin-top: 16px;
 }
 
-.pagination-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.pagination-label {
-    font-size: 0.9rem;
-    color: #64748b;
-    white-space: nowrap;
-}
-
-.items-per-page-select {
-    min-width: 80px;
-}
-
-.pagination-status {
-    font-size: 0.9rem;
-    color: #374151;
-    white-space: nowrap;
-}
-
-.pagination-controls {
-    display: flex;
-    gap: 4px;
-}
-
 .pagination-btn {
-    width: 32px;
-    height: 32px;
-    border: 1px solid #e2e8f0;
-    background: white;
-}
-
-.pagination-btn:hover:not(:disabled) {
-    border-color: #cbd5e1;
-    background: #f8fafc;
+    min-width: 100px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
 }
 
 .pagination-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+.pagination-info {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-text {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
 }
 
 /* Responsive Design */

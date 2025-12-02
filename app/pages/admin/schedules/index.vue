@@ -108,7 +108,7 @@
           </div>
 
           <div v-else class="cards-grid">
-            <v-card v-for="schedule in filteredSchedules" :key="schedule.id" class="schedule-card" elevation="2"
+            <v-card v-for="schedule in paginatedSchedules" :key="schedule.id" class="schedule-card" elevation="2"
               @click="viewSchedule(schedule)">
             <div class="card-header">
               <div class="group-info">
@@ -159,6 +159,10 @@
                   <span>{{ formatDateRange(schedule.start_date, schedule.end_date) }}</span>
                 </div>
                 <div class="info-row">
+                  <v-icon icon="mdi-door" size="16" class="mr-2" />
+                  <span>Classroom {{ schedule.classroom || 'TBD' }}</span>
+                </div>
+                <div class="info-row">
                   <v-icon icon="mdi-book-open-page-variant" size="16" class="mr-2" />
                   <span>Semester {{ schedule.semester }} • {{ schedule.academic_year }}</span>
                 </div>
@@ -173,6 +177,31 @@
             </div>
           </v-card>
           </div>
+          
+          <!-- Pagination Footer -->
+          <div v-if="filteredSchedules.length > 0" class="pagination-section">
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage === 1"
+                @click="goToPrevPage"
+                class="pagination-btn"
+            >
+                Previous
+            </v-btn>
+            
+            <div class="pagination-info">
+                <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
+            </div>
+            
+            <v-btn 
+                variant="outlined" 
+                :disabled="currentPage >= totalPages"
+                @click="goToNextPage"
+                class="pagination-btn"
+            >
+                Next
+            </v-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -184,7 +213,7 @@
         <div class="dialog-header">
           <div class="header-content">
             <div class="header-icon">
-              <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" color="primary" size="24" />
+              <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" color="#fde047" size="24" />
             </div>
             <div class="header-text">
               <h2 class="dialog-title">{{ isEdit ? 'Edit Schedule' : 'Create New Schedule' }}</h2>
@@ -247,6 +276,14 @@
                   <label class="form-label">Academic Year</label>
                   <v-text-field v-model="formData.academic_year" variant="outlined"
                     density="comfortable" hide-details="auto" :rules="requiredRules" class="form-field" />
+                </div>
+              </v-col>
+              <v-col cols="12" md="6">
+                <div class="form-group">
+                  <label class="form-label">Classroom</label>
+                  <v-text-field v-model="formData.classroom" variant="outlined"
+                    density="comfortable" hide-details="auto" :rules="classroomRules" class="form-field" 
+                    placeholder="e.g., A101, B205" />
                 </div>
               </v-col>
               <v-col cols="12" md="6">
@@ -390,6 +427,8 @@ const searchQuery = ref('')
 const generationFilter = ref('All')
 const yearFilter = ref('All')
 const statusFilter = ref('All')
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 const scheduleDialog = ref(false)
 const scheduleDetailDialog = ref(false)
@@ -410,6 +449,7 @@ const formData = reactive({
   specialize: '',
   semester: null,
   academic_year: '',
+  classroom: '',
   start_date: '',
   end_date: '',
   status: 'active',
@@ -451,6 +491,15 @@ const filteredSchedules = computed(() => {
   return filtered
 })
 
+// Pagination computed properties
+const totalPages = computed(() => Math.ceil(filteredSchedules.value.length / itemsPerPage.value))
+
+const paginatedSchedules = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return filteredSchedules.value.slice(start, end)
+})
+
 // Options
 const generationOptions = ['All', '8', '9', '10', '11']
 const yearOptions = ['All', '2024', '2025', '2026']
@@ -471,6 +520,10 @@ const groupIdRules = [
 const groupNameRules = [
   v => !!v || 'Group name is required',
   v => v.length >= 3 || 'Group name must be at least 3 characters'
+]
+const classroomRules = [
+  v => !!v || 'Classroom is required',
+  v => /^[A-Z]\d{3}$/.test(v) || 'Classroom must be in format: A101, B205, etc.'
 ]
 
 // Methods
@@ -507,6 +560,7 @@ const resetForm = () => {
     specialize: '',
     semester: null,
     academic_year: '',
+    classroom: '',
     start_date: '',
     end_date: '',
     status: 'active',
@@ -616,6 +670,20 @@ const formatDateRange = (start, end) => {
   const endDate = new Date(end).toLocaleDateString()
   return `${startDate} - ${endDate}`
 }
+
+// Pagination methods
+const goToPrevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
+
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
+// Watch for filter changes and reset pagination
+watch([searchQuery, generationFilter, yearFilter, statusFilter], () => {
+  currentPage.value = 1
+})
 
 // Lifecycle
 onMounted(() => {
@@ -832,6 +900,42 @@ onMounted(() => {
 /* Cards Content */
 .cards-content {
   padding: 16px 24px 24px;
+}
+
+/* Pagination */
+.pagination-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  margin-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.pagination-btn {
+  min-width: 100px;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-text {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 /* Cards Grid */

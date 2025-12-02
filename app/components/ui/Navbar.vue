@@ -274,8 +274,8 @@
           </VListItem>
 
           <!-- Leave Request -->
-          <VListItem :to="'/lecturer/leave'" nav :active="isActivePath('/lecturer/leave')"
-            :class="['uas-item', isActivePath('/lecturer/leave') && 'uas-item--active']" @click="onClickItem">
+          <VListItem :to="'/lecturer/schedule'" nav :active="isActivePath('/lecturer/schedule')"
+            :class="['uas-item', isActivePath('/lecturer/schedule') && 'uas-item--active']" @click="onClickItem">
             <template #prepend>
               <div class="uas-item-icon-wrapper">
                 <VTooltip v-if="isRail" text="Leave Request" location="right" offset="8">
@@ -286,11 +286,27 @@
                 <VIcon v-else icon="mdi-calendar-clock" class="uas-item-icon" />
               </div>
             </template>
+            <VListItemTitle v-if="!isRail" class="uas-item-title">Schedules</VListItemTitle>
+          </VListItem>
+
+          <!-- Leave Request -->
+          <VListItem :to="'/lecturer/leave'" nav :active="isActivePath('/lecturer/leave')"
+            :class="['uas-item', isActivePath('/lecturer/leave') && 'uas-item--active']" @click="onClickItem">
+            <template #prepend>
+              <div class="uas-item-icon-wrapper">
+                <VTooltip v-if="isRail" text="Leave Request" location="right" offset="8">
+                  <template #activator="{ props }">
+                    <VIcon v-bind="props" icon="mdi-calendar-clock" class="uas-item-icon" />
+                  </template>
+                </VTooltip>
+                <VIcon v-else icon="mdi-calendar-remove" class="uas-item-icon" />
+              </div>
+            </template>
             <VListItemTitle v-if="!isRail" class="uas-item-title">Leave Request</VListItemTitle>
           </VListItem>
 
           <!-- Attendance -->
-          <VListItem :to="'/lecturer/attendance'" nav :active="isActivePath('/lecturer/attendance')"
+          <!-- <VListItem :to="'/lecturer/attendance'" nav :active="isActivePath('/lecturer/attendance')"
             :class="['uas-item', isActivePath('/lecturer/attendance') && 'uas-item--active']" @click="onClickItem">
             <template #prepend>
               <div class="uas-item-icon-wrapper">
@@ -303,7 +319,7 @@
               </div>
             </template>
             <VListItemTitle v-if="!isRail" class="uas-item-title">Attendance</VListItemTitle>
-          </VListItem>
+          </VListItem> -->
         </template>
       </VList>
     </div>
