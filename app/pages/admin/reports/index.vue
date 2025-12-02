@@ -1,259 +1,261 @@
 <template>
-    <v-container fluid class="py-10 px-4 px-md-8 admin-report">
-        <!-- ========================= -->
-        <!-- PAGE HEADER -->
-        <!-- ========================= -->
-        <div class="d-flex flex-column flex-md-row justify-space-between align-start align-md-center mb-8 gap-4">
-            <div>
-                <h1 class="text-h4 font-weight-bold text-primary mb-2">
-                    Teaching & Attendance Analytics (Admin)
-                </h1>
-                <p class="text-body-1 text-medium-emphasis max-w-600">
-                    Centralized overview of instructors, course offerings, sessions, and student
-                    attendance across terms, generations, and departments.
-                </p>
-            </div>
-
-            <div class="text-center text-md-end">
-                <v-chip size="large" color="primary" class="font-weight-bold text-h6 px-5" elevation="2">
-                    <v-icon start size="28">mdi-shield-account</v-icon>
-                    Admin Dashboard
-                </v-chip>
-
-                <div class="mt-3 text-caption text-medium-emphasis">
-                    <v-icon small class="mr-1">mdi-calendar</v-icon>
-                    Term Filter:
-                    <strong>{{ currentTermLabel || 'All terms' }}</strong>
+    <div class="reports-page">
+        <!-- Modern Header Section -->
+        <div class="modern-header">
+            <div class="header-container">
+                <div class="title-section">
+                    <div class="title-wrapper">
+                        <div class="title-icon">
+                            <v-icon icon="mdi-chart-box" size="32" color="white" />
+                        </div>
+                        <div class="title-content">
+                            <h1 class="page-title">Reports & Analytics</h1>
+                            <div class="breadcrumb">
+                                <span class="breadcrumb-item">Admin</span>
+                                <v-icon icon="mdi-chevron-right" size="16" color="grey" class="breadcrumb-separator" />
+                                <span class="breadcrumb-item active">Reports</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ summary.totalInstructors }}</div>
+                            <div class="stat-label">Instructors</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ summary.totalStudents }}</div>
+                            <div class="stat-label">Students</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">{{ summary.avgAttendance.toFixed(1) }}%</div>
+                            <div class="stat-label">Avg Attendance</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-caption text-medium-emphasis">
-                    <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-                    Updated {{ lastUpdated }}
+
+                <div class="action-section">
+                    <v-btn class="modern-btn" prepend-icon="mdi-refresh" variant="outlined" :loading="isLoading"
+                        @click="fetchReport">
+                        Refresh
+                    </v-btn>
+
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ props }">
+                            <v-btn class="modern-btn export-btn" prepend-icon="mdi-download" variant="flat"
+                                color="primary" v-bind="props">
+                                Export
+                                <v-icon icon="mdi-chevron-down" size="16" class="ml-1" />
+                            </v-btn>
+                        </template>
+                        <v-list class="modern-menu">
+                            <v-list-item class="menu-item">
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-file-excel" color="success" />
+                                </template>
+                                <v-list-item-title>Export to Excel</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item class="menu-item">
+                                <template v-slot:prepend>
+                                    <v-icon icon="mdi-file-pdf-box" color="error" />
+                                </template>
+                                <v-list-item-title>Export to PDF</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </div>
             </div>
         </div>
 
-        <!-- ========================= -->
-        <!-- FILTERS BAR -->
-        <!-- ========================= -->
-        <v-card elevation="4" rounded="xl" class="mb-8 overflow-hidden border">
-            <v-card-text class="pa-6">
-                <v-row align="center">
-                    <!-- Term -->
-                    <v-col cols="12" sm="6" md="2">
-                        <v-select v-model="filters.termId" :items="termOptions" label="Academic Term" variant="outlined"
-                            density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-calendar-month" hide-details />
-                    </v-col>
-
-                    <!-- Generation -->
-                    <v-col cols="12" sm="6" md="2">
-                        <v-select v-model="filters.generationId" :items="generationOptions" label="Generation"
-                            variant="outlined" density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-school" hide-details />
-                    </v-col>
-
-                    <!-- Department -->
-                    <v-col cols="12" sm="6" md="2">
-                        <v-select v-model="filters.departmentId" :items="departmentOptions" label="Department"
-                            variant="outlined" density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-office-building" hide-details />
-                    </v-col>
-
-                    <!-- Instructor -->
-                    <v-col cols="12" sm="6" md="3">
-                        <v-select v-model="filters.instructorId" :items="instructorOptions" label="Instructor"
-                            variant="outlined" density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-account-tie" hide-details />
-                    </v-col>
-
-                    <!-- Min Attendance -->
-                    <v-col cols="12" sm="6" md="3">
-                        <div class="d-flex flex-column">
-                            <div class="d-flex align-center justify-space-between mb-1">
-                                <span class="text-caption text-medium-emphasis">
-                                    Minimum Attendance %
-                                </span>
-                                <span class="text-caption font-weight-bold">
-                                    {{ filters.minAttendance }}%
-                                </span>
+        <!-- Modern Table Section -->
+        <div class="modern-table-section">
+            <div class="table-container">
+                <!-- Filters Panel -->
+                <div class="filters-panel-wrapper">
+                    <div class="filters-content">
+                        <div class="filters-row">
+                            <div class="filter-item">
+                                <v-select v-model="filters.termId" :items="termOptions" label="Academic Term"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-calendar-month" hide-details class="filter-select" />
                             </div>
-                            <v-slider v-model="filters.minAttendance" :min="0" :max="100" :step="5" hide-details
-                                thumb-label />
+                            <div class="filter-item">
+                                <v-select v-model="filters.generationId" :items="generationOptions" label="Generation"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-school" hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.departmentId" :items="departmentOptions" label="Department"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-office-building" hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.instructorId" :items="instructorOptions" label="Instructor"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-account-tie" hide-details class="filter-select" />
+                            </div>
                         </div>
-                    </v-col>
-                </v-row>
-
-                <v-row class="mt-4" align="center">
-                    <!-- Group -->
-                    <v-col cols="12" sm="6" md="3">
-                        <v-select v-model="filters.groupId" :items="groupOptions" label="Group" variant="outlined"
-                            density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-account-group" hide-details />
-                    </v-col>
-
-                    <!-- Subject -->
-                    <v-col cols="12" sm="6" md="3">
-                        <v-select v-model="filters.subjectId" :items="subjectOptions" label="Subject" variant="outlined"
-                            density="comfortable" item-title="label" item-value="id" clearable
-                            prepend-inner-icon="mdi-book-open-page-variant" hide-details />
-                    </v-col>
-
-                    <!-- Actions -->
-                    <v-col cols="12" md="6" class="d-flex align-center justify-end flex-wrap gap-2">
-                        <v-btn size="large" color="primary" variant="elevated" :loading="isLoading"
-                            prepend-icon="mdi-refresh" @click="fetchReport" class="rounded-lg"
-                            style="margin-right: 30px">
-                            Refresh
-                        </v-btn>
-
-                        <v-btn size="large" color="grey-darken-1" variant="outlined" prepend-icon="mdi-download"
-                            class="rounded-lg">
-                            Export Summary
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-        </v-card>
-
-        <!-- ========================= -->
-        <!-- SUMMARY CARDS -->
-        <!-- ========================= -->
-        <v-row class="mb-10">
-            <v-col v-for="(card, i) in summaryCards" :key="i" cols="12" sm="6" md="3">
-                <v-card rounded="xl" elevation="6" class="h-100 pa-6 summary-card-gradient"
-                    :class="`summary-card-${i}`">
-                    <div class="d-flex align-center justify-space-between mb-4">
-                        <v-avatar size="56" :color="card.color" class="shadow-lg">
-                            <v-icon size="32" color="white">{{ card.icon }}</v-icon>
-                        </v-avatar>
-                        <v-chip :color="card.chipColor" size="small" variant="flat" class="font-weight-bold">
-                            {{ card.trend || '+0%' }}
-                        </v-chip>
-                    </div>
-
-                    <div class="text-h3 font-weight-black text-primary mb-1">
-                        {{ card.value }}
-                    </div>
-                    <div class="text-body-1 font-weight-medium text-high-emphasis">
-                        {{ card.label }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis mt-1">
-                        {{ card.description }}
-                    </div>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- ========================= -->
-        <!-- MAIN TABLE (ADMIN VIEW) -->
-        <!-- ========================= -->
-        <v-card rounded="xl" elevation="6" class="overflow-hidden">
-            <v-card-title class="bg-gradient-primary text-white pa-6">
-                <div>
-                    <div class="text-h5 font-weight-bold">
-                        Instructor & Course Attendance Overview
-                    </div>
-                    <div class="text-body-1 opacity-90">
-                        Aggregated attendance performance by instructor, subject, and group.
+                        <div class="filters-row">
+                            <div class="filter-item">
+                                <v-select v-model="filters.groupId" :items="groupOptions" label="Group"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-account-group" hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.subjectId" :items="subjectOptions" label="Subject"
+                                    variant="outlined" density="compact" item-title="label" item-value="id" clearable
+                                    prepend-inner-icon="mdi-book-open-page-variant" hide-details
+                                    class="filter-select" />
+                            </div>
+                            <div class="filter-item slider-item">
+                                <div class="slider-wrapper">
+                                    <div class="slider-header">
+                                        <span class="slider-label">Min Attendance</span>
+                                        <span class="slider-value">{{ filters.minAttendance }}%</span>
+                                    </div>
+                                    <v-slider v-model="filters.minAttendance" :min="0" :max="100" :step="5" hide-details
+                                        thumb-label color="primary" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify"
-                    placeholder="Search by instructor, subject, code, or group..." variant="solo" density="comfortable"
-                    hide-details class="mt-4 max-w-400 search-field-white" bg-color="white" rounded />
-            </v-card-title>
+                <!-- Summary Cards -->
+                <!-- <div class="summary-cards-wrapper">
+                    <div v-for="(card, i) in summaryCards" :key="i" class="summary-card" :class="`summary-card-${i}`">
+                        <div class="card-header">
+                            <v-avatar size="48" :color="card.color" class="card-icon">
+                                <v-icon size="28" color="white">{{ card.icon }}</v-icon>
+                            </v-avatar>
+                            <v-chip :color="card.chipColor" size="x-small" variant="flat" class="card-trend">
+                                {{ card.trend || '+0%' }}
+                            </v-chip>
+                        </div>
+                        <div class="card-value">{{ card.value }}</div>
+                        <div class="card-label">{{ card.label }}</div>
+                        <div class="card-description">{{ card.description }}</div>
+                    </div>
+                </div> -->
 
-            <v-data-table :headers="headers" :items="filteredRows" :search="search" :loading="isLoading"
-                density="comfortable" class="elevation-1 custom-table" :items-per-page="10" hover>
-                <!-- Instructor -->
-                <template #item.instructor="{ item }">
-                    <div class="py-3">
-                        <div class="font-weight-bold">{{ item.instructorName }}</div>
-                        <div class="text-caption text-medium-emphasis">
-                            {{ item.instructorPosition }} • ID: {{ item.instructorId }}
+                <!-- Table Header with Search -->
+                <div class="table-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="table-title">
+                            <v-icon icon="mdi-table" size="20" class="mr-2" />
+                            Attendance Overview
+                        </h2>
+                        <div class="table-subtitle">Instructor & course performance analysis</div>
+                    </div>
+                    <div class="toolbar-right">
+                        <div class="search-container">
+                            <v-text-field v-model="search" placeholder="Search instructor, subject, or group..."
+                                prepend-inner-icon="mdi-magnify" variant="outlined" density="compact" hide-details
+                                class="search-input" clearable />
                         </div>
                     </div>
-                </template>
+                </div>
 
-                <!-- Subject -->
-                <template #item.subject="{ item }">
-                    <div class="py-3">
-                        <div class="font-weight-bold text-primary">{{ item.subjectName }}</div>
-                        <div class="text-caption text-medium-emphasis">
-                            {{ item.subjectCode }} • {{ item.departmentName }}
-                        </div>
-                    </div>
-                </template>
+                <!-- Modern Table Wrapper -->
+                <div class="modern-table-wrapper">
 
-                <!-- Group / Generation -->
-                <template #item.group="{ item }">
-                    <div>
-                        <v-chip color="primary" size="small" variant="flat" class="font-weight-medium">
-                            {{ item.groupName }}
-                        </v-chip>
-                        <div class="text-caption text-medium-emphasis mt-1">
-                            Gen {{ item.generation }}
-                        </div>
-                    </div>
-                </template>
+                    <v-data-table :headers="headers" :items="filteredRows" :search="search" :loading="isLoading"
+                        density="comfortable" class="modern-table" :items-per-page="10" hover>
+                        <!-- Instructor -->
+                        <template #item.instructor="{ item }">
+                            <div class="py-3">
+                                <div class="font-weight-bold">{{ item.instructorName }}</div>
+                                <div class="text-caption text-medium-emphasis">
+                                    {{ item.instructorPosition }} • ID: {{ item.instructorId }}
+                                </div>
+                            </div>
+                        </template>
 
-                <!-- Term -->
-                <template #item.term="{ item }">
-                    <v-chip color="indigo-lighten-4" text-color="indigo-darken-4" size="small">
-                        {{ item.term }}
-                    </v-chip>
-                </template>
+                        <!-- Subject -->
+                        <template #item.subject="{ item }">
+                            <div class="py-3">
+                                <div class="font-weight-bold text-primary">{{ item.subjectName }}</div>
+                                <div class="text-caption text-medium-emphasis">
+                                    {{ item.subjectCode }} • {{ item.departmentName }}
+                                </div>
+                            </div>
+                        </template>
 
-                <!-- Sessions -->
-                <template #item.sessions="{ item }">
-                    <div class="text-body-2">
-                        <div>
-                            <strong>{{ item.completedSessions }}</strong> completed
-                        </div>
-                        <div class="text-caption text-medium-emphasis">
-                            {{ item.plannedSessions }} planned • {{ item.canceledSessions }} cancelled
-                        </div>
-                    </div>
-                </template>
-
-                <!-- Attendance -->
-                <template #item.attendanceRate="{ item }">
-                    <div class="d-flex align-center gap-3">
-                        <div class="flex-grow-1">
-                            <v-progress-linear :model-value="item.attendanceRate"
-                                :color="getAttendanceColor(item.attendanceRate)" height="10" rounded class="mb-1" />
-                            <div class="text-caption font-weight-bold">
-                                {{ item.attendanceRate.toFixed(1) }}%
-                                <v-chip :color="getAttendanceColor(item.attendanceRate)" size="x-small" class="ml-2"
-                                    variant="flat">
-                                    {{ getAttendanceLabel(item.attendanceRate) }}
+                        <!-- Group / Generation -->
+                        <template #item.group="{ item }">
+                            <div>
+                                <v-chip color="primary" size="small" variant="flat" class="font-weight-medium">
+                                    {{ item.groupName }}
                                 </v-chip>
+                                <div class="text-caption text-medium-emphasis mt-1">
+                                    Gen {{ item.generation }}
+                                </div>
                             </div>
-                            <div class="text-caption text-medium-emphasis">
-                                P: {{ item.presentCount }} • L: {{ item.lateCount }} • A:
-                                {{ item.absentCount }} • E: {{ item.excusedCount }}
+                        </template>
+
+                        <!-- Term -->
+                        <template #item.term="{ item }">
+                            <v-chip color="indigo-lighten-4" text-color="indigo-darken-4" size="small">
+                                {{ item.term }}
+                            </v-chip>
+                        </template>
+
+                        <!-- Sessions -->
+                        <template #item.sessions="{ item }">
+                            <div class="text-body-2">
+                                <div>
+                                    <strong>{{ item.completedSessions }}</strong> completed
+                                </div>
+                                <div class="text-caption text-medium-emphasis">
+                                    {{ item.plannedSessions }} planned • {{ item.canceledSessions }} cancelled
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </template>
+                        </template>
 
-                <!-- Actions -->
-                <template #item.actions="{ item }">
-                    <v-btn icon="mdi-eye" variant="text" color="white" size="small" class="bg-primary"
-                        @click="openOfferingDetails(item)">
-                        <v-tooltip activator="parent" location="top">
-                            View Details
-                        </v-tooltip>
-                    </v-btn>
-                </template>
+                        <!-- Attendance -->
+                        <template #item.attendanceRate="{ item }">
+                            <div class="d-flex align-center gap-3">
+                                <div class="flex-grow-1">
+                                    <v-progress-linear :model-value="item.attendanceRate"
+                                        :color="getAttendanceColor(item.attendanceRate)" height="10" rounded
+                                        class="mb-1" />
+                                    <div class="text-caption font-weight-bold">
+                                        {{ item.attendanceRate.toFixed(1) }}%
+                                        <v-chip :color="getAttendanceColor(item.attendanceRate)" size="x-small"
+                                            class="ml-2" variant="flat">
+                                            {{ getAttendanceLabel(item.attendanceRate) }}
+                                        </v-chip>
+                                    </div>
+                                    <div class="text-caption text-medium-emphasis">
+                                        P: {{ item.presentCount }} • L: {{ item.lateCount }} • A:
+                                        {{ item.absentCount }} • E: {{ item.excusedCount }}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 
-                <template #no-data>
-                    <v-alert type="info" variant="tonal" class="ma-6">
-                        No records match your filters. Try adjusting term, department, or instructor.
-                    </v-alert>
-                </template>
-            </v-data-table>
-        </v-card>
+                        <!-- Actions -->
+                        <template #item.actions="{ item }">
+                            <v-btn icon="mdi-eye" variant="text" color="white" size="small" class="bg-primary"
+                                @click="openOfferingDetails(item)">
+                                <v-tooltip activator="parent" location="top">
+                                    View Details
+                                </v-tooltip>
+                            </v-btn>
+                        </template>
+
+                        <template #no-data>
+                            <div class="empty-state">
+                                <v-icon icon="mdi-chart-box-outline" size="64" color="grey-lighten-1" />
+                                <h3 class="empty-title">No reports found</h3>
+                                <p class="empty-subtitle">
+                                    {{ search ? 'Try adjusting your search terms' : 'No records match your filters' }}
+                                </p>
+                            </div>
+                        </template>
+                    </v-data-table>
+                </div>
+            </div>
+        </div>
 
         <!-- ========================= -->
         <!-- DETAILS DIALOG (ADMIN VIEW) -->
@@ -349,10 +351,10 @@
                         <template #item.attendanceRate="{ item }">
                             <div class="d-flex align-center">
                                 <v-progress-linear :model-value="item.attendanceRate" height="8" rounded :color="item.attendanceRate >= 90
-                                        ? 'success'
-                                        : item.attendanceRate >= 75
-                                            ? 'warning'
-                                            : 'error'
+                                    ? 'success'
+                                    : item.attendanceRate >= 75
+                                        ? 'warning'
+                                        : 'error'
                                     " class="mr-3" />
                                 <span class="text-caption font-weight-bold">
                                     {{ item.attendanceRate.toFixed(1) }}%
@@ -384,11 +386,15 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-container>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+
+definePageMeta({
+    layout: 'admin'
+})
 
 const lastUpdated = new Date().toLocaleString()
 const currentTermLabel = ref<string | null>(null)
@@ -461,7 +467,7 @@ const headers = [
         title: 'Students',
         value: 'totalStudents',
         width: 100,
-        align: 'center',
+        align: 'center' as const,
     },
     { title: 'Sessions', value: 'sessions', width: 200 },
     { title: 'Attendance', value: 'attendanceRate', width: 260 },
@@ -470,11 +476,11 @@ const headers = [
 
 const studentHeaders = [
     { title: 'Student', value: 'student', width: 260 },
-    { title: 'Present', value: 'presentCount', align: 'center' },
-    { title: 'Late', value: 'lateCount', align: 'center' },
-    { title: 'Absent', value: 'absentCount', align: 'center' },
-    { title: 'Excused', value: 'excusedCount', align: 'center' },
-    { title: 'Attendance %', value: 'attendanceRate', align: 'center' },
+    { title: 'Present', value: 'presentCount', align: 'center' as const },
+    { title: 'Late', value: 'lateCount', align: 'center' as const },
+    { title: 'Absent', value: 'absentCount', align: 'center' as const },
+    { title: 'Excused', value: 'excusedCount', align: 'center' as const },
+    { title: 'Attendance %', value: 'attendanceRate', align: 'center' as const },
     { title: 'Flags', value: 'flags', sortable: false },
 ]
 
@@ -805,67 +811,477 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-report {
-    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+.reports-page {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     min-height: 100vh;
+    padding: 0;
 }
 
+/* Modern Header Styles */
+.modern-header {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+}
+
+.title-section {
+    flex: 1;
+}
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.title-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.title-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.025em;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.breadcrumb-item.active {
+    color: #3b82f6;
+}
+
+.breadcrumb-separator {
+    opacity: 0.5;
+}
+
+.stats-cards {
+    display: flex;
+    gap: 16px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.action-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.modern-btn {
+    height: 44px;
+    border-radius: 12px;
+    text-transform: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 20px;
+    transition: all 0.2s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.modern-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.modern-menu {
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+}
+
+.menu-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 4px;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background: #f8fafc;
+}
+
+/* Modern Table Section */
+.modern-table-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+.table-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* Filters Panel */
+.filters-panel-wrapper {
+    padding: 20px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.filters-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    flex: 1;
+    min-width: 200px;
+}
+
+.slider-item {
+    flex: 1.5;
+}
+
+.filter-select :deep(.v-field) {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.slider-wrapper {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.slider-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.slider-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Summary Cards in Table */
+.summary-cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.summary-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+    border: 1px solid rgba(63, 81, 181, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(63, 81, 181, 0.12);
+}
+
+.summary-card-0 {
+    border-left: 4px solid #673ab7;
+}
+
+.summary-card-1 {
+    border-left: 4px solid #3f51b5;
+}
+
+.summary-card-2 {
+    border-left: 4px solid #ff9800;
+}
+
+.summary-card-3 {
+    border-left: 4px solid #9c27b0;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.card-icon {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.card-trend {
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.card-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.card-description {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* Table Toolbar */
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.toolbar-left {
+    flex: 1;
+}
+
+.table-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+}
+
+.table-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+.toolbar-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-container {
+    min-width: 350px;
+}
+
+.search-input :deep(.v-field) {
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Modern Table Wrapper */
+.modern-table-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-table {
+    width: 100%;
+}
+
+.modern-table :deep(.v-table__wrapper > table > thead > tr) {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.modern-table :deep(.v-table__wrapper > table > thead > tr > th) {
+    color: white !important;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 20px 16px;
+    border: none;
+}
+
+.modern-table :deep(.v-table__wrapper > table > tbody > tr) {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modern-table :deep(.v-table__wrapper > table > tbody > tr:hover) {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.modern-table :deep(.v-table__wrapper > table > tbody > tr > td) {
+    padding: 16px;
+    border: none;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 64px 32px;
+    color: #64748b;
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #475569;
+    margin: 16px 0 8px 0;
+}
+
+.empty-subtitle {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Dialog Styles */
 .bg-gradient-primary {
     background: linear-gradient(90deg, #3f51b5 0%, #5c6bc0 50%, #7986cb 100%);
 }
 
-.summary-card-gradient {
-    background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
-    border: 1px solid rgba(63, 81, 181, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .header-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 24px;
+    }
+
+    .action-section {
+        justify-content: center;
+    }
+
+    .stats-cards {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 }
 
-.summary-card-0 {
-    border-left: 5px solid #4caf50;
-}
+@media (max-width: 768px) {
+    .header-container {
+        padding: 16px 20px;
+    }
 
-.summary-card-1 {
-    border-left: 5px solid #2196f3;
-}
+    .modern-table-section {
+        padding: 16px 20px;
+    }
 
-.summary-card-2 {
-    border-left: 5px solid #ff9800;
-}
+    .title-wrapper {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
 
-.summary-card-3 {
-    border-left: 5px solid #9c27b0;
-}
+    .toolbar-right {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
 
-.summary-card-gradient:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(63, 81, 181, 0.15) !important;
-}
+    .search-container {
+        min-width: auto;
+    }
 
-.custom-table .v-table__wrapper>table>tbody>tr:hover {
-    background: #e8f0ff !important;
-}
+    .table-toolbar {
+        flex-direction: column;
+        gap: 16px;
+    }
 
-.custom-table .v-data-table-header {
-    background: #f5f7fb;
-}
+    .filters-row {
+        flex-direction: column;
+    }
 
-.search-field-white .v-field__input {
-    color: #1a1a1a !important;
-}
+    .filter-item {
+        min-width: 100%;
+    }
 
-.gap-3 {
-    gap: 12px;
-}
-
-.max-w-600 {
-    max-width: 600px;
-}
-
-.max-w-400 {
-    max-width: 400px;
-}
-
-.border {
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    .summary-cards-wrapper {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
