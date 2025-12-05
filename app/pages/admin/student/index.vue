@@ -142,7 +142,8 @@
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label" style="opacity: 0;">Actions</label>
-                                <v-btn class="reset-btn" prepend-icon="mdi-refresh" variant="outlined" block @click="resetFilters">
+                                <v-btn class="reset-btn" prepend-icon="mdi-refresh" variant="outlined" block
+                                    @click="resetFilters">
                                     Reset
                                 </v-btn>
                             </div>
@@ -164,6 +165,9 @@
                                 </th>
                                 <th class="modern-header-cell">
                                     <div class="header-content">Student ID</div>
+                                </th>
+                                <th class="modern-header-cell">
+                                    <div class="header-content">Email</div>
                                 </th>
                                 <th class="modern-header-cell">
                                     <div class="header-content">Generation</div>
@@ -195,15 +199,13 @@
                                                 {{ student.name.charAt(0) }}
                                             </span>
                                         </v-avatar> -->
-                                        <div class="group-details">
-                                            <div class="group-name">{{ student.name }}</div>
-                                            <div class="group-meta">{{ student.email }}</div>
-                                        </div>
+                                        <div class="group-name">{{ student.name }}</div>
                                     </div>
                                 </td>
                                 <td class="modern-table-cell">
                                     <span class="">{{ student.studentId }}</span>
                                 </td>
+                                <td class="modern-table-cell">{{ student.email }}</td>
                                 <td class="modern-table-cell">
                                     <v-chip size="small" variant="tonal" color="">
                                         Gen {{ student.generation }}
@@ -240,7 +242,7 @@
 
                             <!-- Empty State -->
                             <tr v-if="filteredStudents.length === 0">
-                                <td colspan="8" class="modern-table-cell">
+                                <td colspan="9" class="modern-table-cell">
                                     <div class="empty-state">
                                         <v-icon size="64" color="grey-lighten-1">mdi-school-outline</v-icon>
                                         <p class="empty-title">No students found</p>
