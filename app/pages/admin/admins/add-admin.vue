@@ -74,24 +74,12 @@
                                 </v-col>
                             </v-row>
 
-                            <v-row>
-                                <v-col cols="6">
-                                    <div class="form-group">
-                                        <label class="form-label">Admin Role *</label>
-                                        <v-select v-model="formData.adminRole" :items="adminRoleOptions"
-                                            :rules="adminRoleRules" variant="outlined" density="comfortable"
-                                            class="form-field" />
-                                    </div>
-                                </v-col>
-                                <v-col cols="6">
-                                    <div class="form-group">
-                                        <label class="form-label">Department *</label>
-                                        <v-select v-model="formData.department" :items="departmentOptions"
-                                            :rules="departmentRules" variant="outlined" density="comfortable"
-                                            class="form-field" />
-                                    </div>
-                                </v-col>
-                            </v-row>
+                            <div class="form-group">
+                                <label class="form-label">Department *</label>
+                                <v-select v-model="formData.department" :items="departmentOptions"
+                                    :rules="departmentRules" variant="outlined" density="comfortable"
+                                    class="form-field" />
+                            </div>
 
                             <div class="form-group">
                                 <div class="switch-container">
@@ -110,8 +98,7 @@
 
                     <v-card-actions class="dialog-actions">
                         <v-spacer />
-                        <v-btn variant="outlined" class="action-btn cancel-btn" @click="goBack"
-                            :disabled="formLoading">
+                        <v-btn variant="outlined" class="action-btn cancel-btn" @click="goBack" :disabled="formLoading">
                             Cancel
                         </v-btn>
                         <v-btn color="primary" class="action-btn submit-btn" @click="submitForm" :loading="formLoading"
@@ -140,7 +127,6 @@ const formData = reactive({
     name: '',
     email: '',
     phone: '',
-    adminRole: '',
     department: '',
     active: true
 })
@@ -161,11 +147,9 @@ const emailRules = [
     v => /.+@.+\..+/.test(v) || 'Email must be valid'
 ]
 
-const adminRoleRules = [v => !!v || 'Admin Role is required']
 const departmentRules = [v => !!v || 'Department is required']
 
 // Options
-const adminRoleOptions = ['Super Admin', 'System Admin', 'Department Admin']
 const departmentOptions = ['Administration', 'IT Department', 'Academic Affairs', 'Student Affairs']
 
 const submitForm = async () => {

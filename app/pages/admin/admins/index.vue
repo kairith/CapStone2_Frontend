@@ -23,8 +23,8 @@
                             <div class="stat-label">Total Admins</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ superAdminCount }}</div>
-                            <div class="stat-label">Super Admins</div>
+                            <div class="stat-number">{{ inactiveAdminCount }}</div>
+                            <div class="stat-label">Inactive</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">{{ activeAdminCount }}</div>
@@ -94,7 +94,7 @@
                             <v-icon icon="mdi-table" size="20" class="mr-2" />
                             Admin Information
                         </h2>
-                        <div class="table-subtitle">Manage and organize admin records</div>
+                        <!-- <div class="table-subtitle">Manage and organize admin records</div> -->
                     </div>
 
                     <div class="toolbar-right">
@@ -116,11 +116,6 @@
                 <v-expand-transition>
                     <div v-show="showFilters" class="filters-section">
                         <div class="filters-grid">
-                            <div class="filter-item">
-                                <label class="filter-label">Admin Role</label>
-                                <v-select v-model="adminRoleFilter" :items="adminRoleOptions" variant="outlined"
-                                    density="compact" hide-details />
-                            </div>
                             <div class="filter-item">
                                 <label class="filter-label">Department</label>
                                 <v-select v-model="departmentFilter" :items="departmentOptions" variant="outlined"
@@ -150,7 +145,7 @@
                                     <div class="header-content">Admin ID</div>
                                 </th>
                                 <th class="modern-header-cell">
-                                    <div class="header-content">Admin Role</div>
+                                    <div class="header-content">Email</div>
                                 </th>
                                 <th class="modern-header-cell">
                                     <div class="header-content">Department</div>
@@ -166,32 +161,19 @@
                         <tbody>
                             <tr v-for="(admin, index) in paginatedAdmins" :key="admin.id" class="modern-table-row">
                                 <td class="modern-table-cell id-column">
-                                    <span class="id-badge">{{ index + 1 }}</span>
+                                    <span class="">{{ index + 1 }}</span>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <div class="group-info">
-                                        <v-avatar size="36" class="group-avatar" color="primary">
-                                            <span class="text-white text-subtitle-2 font-weight-medium">
-                                                {{ admin.name.charAt(0) }}
-                                            </span>
-                                        </v-avatar>
-                                        <div class="group-details">
-                                            <div class="group-name">{{ admin.name }}</div>
-                                            <div class="group-meta">{{ admin.email }}</div>
-                                        </div>
-                                    </div>
+                                    <div class="group-name">{{ admin.name }}</div>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <span class="global-id-badge">{{ admin.adminId }}</span>
+                                    <span class="">{{ admin.adminId }}</span>
                                 </td>
-                                <td class="modern-table-cell">
-                                    <v-chip size="small" variant="tonal" color="primary">
-                                        {{ admin.adminRole }}
-                                    </v-chip>
-                                </td>
+                                <td class="modern-table-cell">{{ admin.email }}</td>
                                 <td class="modern-table-cell">{{ admin.department }}</td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip :color="admin.status === 'Active' ? 'success' : 'warning'" class="status-chip" size="small">
+                                    <v-chip :color="admin.status === 'Active' ? 'success' : 'warning'"
+                                        class="status-chip" size="small">
                                         <v-icon start size="16">mdi-check-circle</v-icon>
                                         {{ admin.status === 'Active' ? 'active' : 'on leave' }}
                                     </v-chip>
@@ -216,18 +198,18 @@
                         <p class="empty-title">No admins found</p>
                         <p class="empty-subtitle">Try adjusting your filters or add a new admin</p>
                     </div>
-                    
+
                     <!-- Pagination Footer -->
                     <div v-if="filteredAdmins.length > 0" class="pagination-section">
                         <v-btn variant="outlined" :disabled="currentPage === 1" @click="goToPrevPage"
                             class="pagination-btn">
                             Previous
                         </v-btn>
-                        
+
                         <div class="pagination-info">
                             <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
                         </div>
-                        
+
                         <v-btn variant="outlined" :disabled="currentPage >= totalPages" @click="goToNextPage"
                             class="pagination-btn">
                             Next
@@ -288,24 +270,11 @@
                             </v-col>
                         </v-row>
 
-                        <v-row>
-                            <v-col cols="6">
-                                <div class="form-group">
-                                    <label class="form-label">Admin Role *</label>
-                                    <v-select v-model="formData.adminRole" :items="adminRoleOptions.slice(1)"
-                                        :rules="adminRoleRules" variant="outlined" density="comfortable"
-                                        class="form-field" />
-                                </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <div class="form-group">
-                                    <label class="form-label">Department *</label>
-                                    <v-select v-model="formData.department" :items="departmentOptions.slice(1)"
-                                        :rules="departmentRules" variant="outlined" density="comfortable"
-                                        class="form-field" />
-                                </div>
-                            </v-col>
-                        </v-row>
+                        <div class="form-group">
+                            <label class="form-label">Department *</label>
+                            <v-select v-model="formData.department" :items="departmentOptions.slice(1)"
+                                :rules="departmentRules" variant="outlined" density="comfortable" class="form-field" />
+                        </div>
 
                         <div class="form-group">
                             <div class="switch-container">
@@ -407,7 +376,6 @@ const deleteLoading = ref(false)
 // Search and filters
 const searchQuery = ref('')
 const statusFilter = ref('All')
-const adminRoleFilter = ref('All')
 const departmentFilter = ref('All')
 const tableSortOrder = ref('A-Z')
 
@@ -417,7 +385,6 @@ const formData = reactive({
     name: '',
     email: '',
     phone: '',
-    adminRole: '',
     department: '',
     active: true
 })
@@ -438,11 +405,9 @@ const emailRules = [
     v => /.+@.+\..+/.test(v) || 'Email must be valid'
 ]
 
-const adminRoleRules = [v => !!v || 'Admin Role is required']
 const departmentRules = [v => !!v || 'Department is required']
 
 // Filter options
-const adminRoleOptions = ['All', 'Super Admin', 'System Admin', 'Department Admin']
 const departmentOptions = ['All', 'Administration', 'IT Department', 'Academic Affairs', 'Student Affairs']
 const statusOptions = ['All', 'Active', 'Inactive']
 const tableSortOptions = ['A-Z', 'Z-A']
@@ -500,11 +465,6 @@ const filteredAdmins = computed(() => {
         filtered = filtered.filter(a => a.status === statusFilter.value)
     }
 
-    // Admin Role filter
-    if (adminRoleFilter.value !== 'All') {
-        filtered = filtered.filter(a => a.adminRole === adminRoleFilter.value)
-    }
-
     // Department filter
     if (departmentFilter.value !== 'All') {
         filtered = filtered.filter(a => a.department === departmentFilter.value)
@@ -526,8 +486,8 @@ const activeAdminCount = computed(() => {
     return admins.value.filter(a => a.status === 'Active').length
 })
 
-const superAdminCount = computed(() => {
-    return admins.value.filter(a => a.adminRole === 'Super Admin').length
+const inactiveAdminCount = computed(() => {
+    return admins.value.filter(a => a.status === 'Inactive').length
 })
 
 // Dialog methods
@@ -538,7 +498,6 @@ const openCreateDialog = () => {
     formData.name = ''
     formData.email = ''
     formData.phone = ''
-    formData.adminRole = ''
     formData.department = ''
     formData.active = true
     dialogOpen.value = true
@@ -551,7 +510,6 @@ const openEditDialog = (admin) => {
     formData.name = admin.name
     formData.email = admin.email
     formData.phone = admin.phone
-    formData.adminRole = admin.adminRole
     formData.department = admin.department
     formData.active = admin.status === 'Active'
     dialogOpen.value = true
@@ -660,11 +618,11 @@ const toggleAdminStatus = (admin) => {
 .header-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px;
+    padding: 16px 24px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 32px;
+    gap: 20px;
 }
 
 .title-section {
@@ -674,18 +632,18 @@ const toggleAdminStatus = (admin) => {
 .title-wrapper {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .title-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
@@ -723,14 +681,14 @@ const toggleAdminStatus = (admin) => {
 
 .stats-cards {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .stat-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 16px 20px;
+    border-radius: 10px;
+    padding: 12px 16px;
     min-width: 100px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -765,12 +723,12 @@ const toggleAdminStatus = (admin) => {
 }
 
 .modern-btn {
-    height: 44px;
-    border-radius: 12px;
+    height: 38px;
+    border-radius: 10px;
     text-transform: none;
     font-weight: 500;
     font-size: 14px;
-    padding: 0 20px;
+    padding: 0 16px;
     transition: all 0.2s ease;
     border: 1px solid #e2e8f0;
 }
@@ -793,8 +751,8 @@ const toggleAdminStatus = (admin) => {
 }
 
 .menu-item {
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 10px 14px;
+    border-radius: 6px;
     margin: 4px;
     transition: all 0.2s ease;
 }
@@ -807,7 +765,7 @@ const toggleAdminStatus = (admin) => {
 .modern-table-section {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px;
+    padding: 16px 24px;
 }
 
 .table-container {
@@ -822,7 +780,7 @@ const toggleAdminStatus = (admin) => {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 24px 24px 16px;
+    padding: 16px 20px 12px;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -875,7 +833,7 @@ const toggleAdminStatus = (admin) => {
 }
 
 .filters-section {
-    padding: 16px 24px;
+    padding: 12px 20px;
     background: #f8fafc;
     border-bottom: 1px solid #f1f5f9;
 }
@@ -883,7 +841,7 @@ const toggleAdminStatus = (admin) => {
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 12px;
 }
 
 .filter-item {
@@ -911,7 +869,7 @@ const toggleAdminStatus = (admin) => {
 }
 
 .modern-header-cell {
-    padding: 20px 16px;
+    padding: 14px 12px;
     border: none;
     position: relative;
     text-align: left !important;
@@ -929,7 +887,7 @@ const toggleAdminStatus = (admin) => {
 .header-content {
     display: flex;
     align-items: center;
-    color: #45474b  !important;
+    color: #45474b !important;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
@@ -946,7 +904,7 @@ const toggleAdminStatus = (admin) => {
 }
 
 .modern-table-cell {
-    padding: 16px;
+    padding: 12px;
     border: none;
     vertical-align: middle;
     text-align: left !important;
@@ -965,13 +923,13 @@ const toggleAdminStatus = (admin) => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
     color: #3730a3;
     font-weight: 600;
     font-size: 12px;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 .group-info {
@@ -1011,14 +969,14 @@ const toggleAdminStatus = (admin) => {
 .global-id-badge {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
+    padding: 4px 10px;
     background: #f1f5f9;
     color: #1e293b;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 .action-group {
@@ -1028,9 +986,9 @@ const toggleAdminStatus = (admin) => {
 }
 
 .action-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     transition: all 0.2s ease;
 }
 
@@ -1042,7 +1000,7 @@ const toggleAdminStatus = (admin) => {
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 64px 32px;
+    padding: 48px 24px;
     color: #64748b;
 }
 
@@ -1069,14 +1027,14 @@ const toggleAdminStatus = (admin) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
+    padding: 16px 20px;
     background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
 }
 
 .header-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex: 1;
 }
 
@@ -1084,10 +1042,10 @@ const toggleAdminStatus = (admin) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    border-radius: 12px;
+    border-radius: 10px;
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
 }
 
@@ -1121,11 +1079,11 @@ const toggleAdminStatus = (admin) => {
 }
 
 .dialog-content {
-    padding: 24px !important;
+    padding: 20px !important;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .form-group:last-child {
@@ -1161,11 +1119,11 @@ const toggleAdminStatus = (admin) => {
 .switch-container {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
+    gap: 12px;
+    padding: 12px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 10px;
 }
 
 .switch-info {
@@ -1180,8 +1138,8 @@ const toggleAdminStatus = (admin) => {
 }
 
 .dialog-actions {
-    padding: 20px 24px 24px !important;
-    gap: 12px;
+    padding: 16px 20px 20px !important;
+    gap: 10px;
 }
 
 .cancel-btn {
