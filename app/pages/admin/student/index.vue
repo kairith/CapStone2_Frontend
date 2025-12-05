@@ -27,12 +27,12 @@
                             <div class="stat-label">Active</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ gen9Count }}</div>
-                            <div class="stat-label">Gen 9</div>
+                            <div class="stat-number">{{ inactiveStudentCount }}</div>
+                            <div class="stat-label">Inactive</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ gen10Count }}</div>
-                            <div class="stat-label">Gen 10</div>
+                            <div class="stat-number">{{ uniqueGenerations }}</div>
+                            <div class="stat-label">Generations</div>
                         </div>
                     </div>
                 </div>
@@ -123,22 +123,28 @@
                             <div class="filter-item">
                                 <label class="filter-label">Generation</label>
                                 <v-select v-model="generationFilter" :items="generationOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label">Group</label>
                                 <v-select v-model="groupFilter" :items="groupOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label">Specialization</label>
                                 <v-select v-model="specializeFilter" :items="specializeOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label">Status</label>
                                 <v-select v-model="statusFilter" :items="statusOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label" style="opacity: 0;">Actions</label>
+                                <v-btn class="reset-btn" prepend-icon="mdi-refresh" variant="outlined" block @click="resetFilters">
+                                    Reset
+                                </v-btn>
                             </div>
                         </div>
                     </div>
@@ -177,17 +183,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(student, index) in paginatedStudents" :key="student.id" class="modern-table-row">
+                            <tr v-for="(student, index) in paginatedStudents" :key="student.id"
+                                class="modern-table-row">
                                 <td class="modern-table-cell id-column">
-                                    <span class="id-badge">{{ index + 1 }}</span>
+                                    <span class="">{{ index + 1 }}</span>
                                 </td>
                                 <td class="modern-table-cell">
                                     <div class="group-info">
-                                        <v-avatar size="36" class="group-avatar" color="green">
+                                        <!-- <v-avatar size="36" class="group-avatar" color="green">
                                             <span class="text-white text-subtitle-2 font-weight-medium">
                                                 {{ student.name.charAt(0) }}
                                             </span>
-                                        </v-avatar>
+                                        </v-avatar> -->
                                         <div class="group-details">
                                             <div class="group-name">{{ student.name }}</div>
                                             <div class="group-meta">{{ student.email }}</div>
@@ -195,7 +202,7 @@
                                     </div>
                                 </td>
                                 <td class="modern-table-cell">
-                                    <span class="global-id-badge">{{ student.studentId }}</span>
+                                    <span class="">{{ student.studentId }}</span>
                                 </td>
                                 <td class="modern-table-cell">
                                     <v-chip size="small" variant="tonal" color="">
@@ -213,7 +220,8 @@
                                     </v-chip>
                                 </td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip :color="student.status === 'Active' ? 'success' : 'warning'" class="status-chip" size="small">
+                                    <v-chip :color="student.status === 'Active' ? 'success' : 'warning'"
+                                        class="status-chip" size="small">
                                         <v-icon start size="16">mdi-check-circle</v-icon>
                                         {{ student.status === 'Active' ? 'active' : 'on leave' }}
                                     </v-chip>
@@ -249,11 +257,11 @@
                             class="pagination-btn">
                             Previous
                         </v-btn>
-                        
+
                         <div class="pagination-info">
                             <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
                         </div>
-                        
+
                         <v-btn variant="outlined" :disabled="currentPage >= totalPages" @click="goToNextPage"
                             class="pagination-btn">
                             Next
@@ -270,7 +278,8 @@
                 <div class="dialog-header">
                     <div class="header-content">
                         <div class="header-icon">
-                            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" :color="isEdit ? 'warning' : 'primary'" size="28" />
+                            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" :color="isEdit ? 'warning' : 'primary'"
+                                size="28" />
                         </div>
                         <div class="header-text">
                             <h2 class="dialog-title">{{ isEdit ? 'Edit Student' : 'Add New Student' }}</h2>
@@ -321,7 +330,7 @@
                                     <label class="form-label">Generation *</label>
                                     <v-select v-model="formData.generation" :items="['9', '10', '11', '12']"
                                         :rules="generationRules" variant="outlined" density="comfortable"
-                                        class="form-field" />   
+                                        class="form-field" />
                                 </div>
                             </v-col>
                             <v-col cols="6">
@@ -371,13 +380,14 @@
 
                 <!-- Dialog Actions -->
                 <v-card-actions class="dialog-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn" :disabled="formLoading">
+                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn"
+                        :disabled="formLoading">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
 
-                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm" :loading="formLoading"
-                        :disabled="!formValid" class="action-btn submit-btn">
+                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm"
+                        :loading="formLoading" :disabled="!formValid" class="action-btn submit-btn">
                         <v-icon start>mdi-content-save</v-icon>
                         {{ isEdit ? 'Save Changes' : 'Create Student' }}
                     </v-btn>
@@ -419,12 +429,14 @@
 
                 <!-- Delete Actions -->
                 <v-card-actions class="delete-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false" :disabled="deleteLoading" class="action-btn cancel-btn">
+                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false"
+                        :disabled="deleteLoading" class="action-btn cancel-btn">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
 
-                    <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading" class="action-btn delete-btn">
+                    <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading"
+                        class="action-btn delete-btn">
                         <v-icon start>mdi-delete</v-icon>
                         Delete Record
                     </v-btn>
@@ -565,6 +577,15 @@ const activeStudentCount = computed(() => {
     return students.value.filter(s => s.status === 'Active').length
 })
 
+const inactiveStudentCount = computed(() => {
+    return students.value.filter(s => s.status === 'Inactive').length
+})
+
+const uniqueGenerations = computed(() => {
+    const uniqueGens = new Set(students.value.map(s => s.generation))
+    return uniqueGens.size
+})
+
 const gen9Count = computed(() => {
     return students.value.filter(s => s.generation === '9').length
 })
@@ -594,6 +615,15 @@ const goToNextPage = () => {
     if (currentPage.value < totalPages.value) {
         currentPage.value++
     }
+}
+
+// Filter methods
+const resetFilters = () => {
+    statusFilter.value = 'All'
+    generationFilter.value = 'All'
+    groupFilter.value = 'All'
+    specializeFilter.value = 'All'
+    currentPage.value = 1
 }
 
 // Dialog methods
@@ -884,7 +914,7 @@ const handleDelete = async () => {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    border: 1px solid #e0e0e0;  
+    border: 1px solid #e0e0e0;
     background: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -956,8 +986,9 @@ const handleDelete = async () => {
 
 .filters-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
+    align-items: end;
 }
 
 .filter-item {
@@ -972,6 +1003,19 @@ const handleDelete = async () => {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.reset-btn {
+    height: 36px;
+    text-transform: none;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
 }
 
 /* Modern Table Styles */
