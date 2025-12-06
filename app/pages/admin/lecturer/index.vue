@@ -96,7 +96,7 @@
               <v-icon icon="mdi-table" size="20" class="mr-2" />
               Lecturer Information
             </h2>
-            <div class="table-subtitle">Manage and organize lecturer accounts</div>
+            <!-- <div class="table-subtitle">Manage and organize lecturer accounts</div> -->
           </div>
 
           <div class="toolbar-right">
@@ -120,17 +120,23 @@
               <div class="filter-item">
                 <label class="filter-label">Department</label>
                 <v-select v-model="departmentFilter" :items="departmentOptions" variant="outlined" density="compact"
-                  hide-details />
+                  hide-details clearable />
               </div>
               <div class="filter-item">
                 <label class="filter-label">Specialization</label>
                 <v-select v-model="specializationFilter" :items="specializationOptions" variant="outlined"
-                  density="compact" hide-details />
+                  density="compact" hide-details clearable />
               </div>
               <div class="filter-item">
                 <label class="filter-label">Status</label>
                 <v-select v-model="statusFilter" :items="statusOptions" variant="outlined" density="compact"
-                  hide-details />
+                  hide-details clearable />
+              </div>
+              <div class="filter-item">
+                <label class="filter-label" style="opacity: 0;">Actions</label>
+                <v-btn class="reset-btn" prepend-icon="mdi-refresh" variant="outlined" block @click="resetFilters">
+                  Reset
+                </v-btn>
               </div>
             </div>
           </div>
@@ -151,6 +157,9 @@
                   <div class="header-content">Employee ID</div>
                 </th>
                 <th class="modern-header-cell">
+                  <div class="header-content">Email</div>
+                </th>
+                <th class="modern-header-cell">
                   <div class="header-content">Department</div>
                 </th>
                 <th class="modern-header-cell">
@@ -167,24 +176,22 @@
             <tbody>
               <tr v-for="(lecturer, index) in paginatedLecturers" :key="lecturer.id" class="modern-table-row">
                 <td class="modern-table-cell id-column">
-                  <span class="id-badge">{{ index + 1 }}</span>
+                  <span class="">{{ index + 1 }}</span>
                 </td>
                 <td class="modern-table-cell">
                   <div class="group-info">
-                    <v-avatar size="36" class="group-avatar" color="green">
+                    <!-- <v-avatar size="36" class="group-avatar" color="green">
                       <span class="text-white text-subtitle-2 font-weight-medium">
                         {{ lecturer.name.charAt(0) }}
                       </span>
-                    </v-avatar>
-                    <div class="group-details">
-                      <div class="group-name">{{ lecturer.name }}</div>
-                      <div class="group-meta">{{ lecturer.email }}</div>
-                    </div>
+                    </v-avatar> -->
+                    <div class="group-name">{{ lecturer.name }}</div>
                   </div>
                 </td>
                 <td class="modern-table-cell">
-                  <span class="global-id-badge">{{ lecturer.employeeId }}</span>
+                  <span class="">{{ lecturer.employeeId }}</span>
                 </td>
+                <td class="modern-table-cell">{{ lecturer.email }}</td>
                 <td class="modern-table-cell">
                   <v-chip size="small" variant="tonal" color="">
                     {{ lecturer.department }}
@@ -196,7 +203,8 @@
                   </v-chip>
                 </td>
                 <td class="modern-table-cell center-align">
-                  <v-chip :color="lecturer.status === 'Active' ? 'success' : 'warning'" class="status-chip" size="small">
+                  <v-chip :color="lecturer.status === 'Active' ? 'success' : 'warning'" class="status-chip"
+                    size="small">
                     <v-icon start size="16">mdi-check-circle</v-icon>
                     {{ lecturer.status === 'Active' ? 'active' : 'on leave' }}
                   </v-chip>
@@ -228,15 +236,14 @@
 
           <!-- Pagination Footer -->
           <div v-if="filteredLecturers.length > 0" class="pagination-section">
-            <v-btn variant="outlined" :disabled="currentPage === 1" @click="goToPrevPage"
-              class="pagination-btn">
+            <v-btn variant="outlined" :disabled="currentPage === 1" @click="goToPrevPage" class="pagination-btn">
               Previous
             </v-btn>
-            
+
             <div class="pagination-info">
               <span class="pagination-text">Page {{ currentPage }} of {{ totalPages }}</span>
             </div>
-            
+
             <v-btn variant="outlined" :disabled="currentPage >= totalPages" @click="goToNextPage"
               class="pagination-btn">
               Next
@@ -336,8 +343,8 @@
           <v-btn variant="outlined" class="action-btn cancel-btn" @click="closeDialog" :disabled="formLoading">
             Cancel
           </v-btn>
-          <v-btn :color="isEdit ? 'warning' : 'primary'" class="action-btn submit-btn" @click="submitForm" :loading="formLoading"
-            :disabled="!formValid">
+          <v-btn :color="isEdit ? 'warning' : 'primary'" class="action-btn submit-btn" @click="submitForm"
+            :loading="formLoading" :disabled="!formValid">
             {{ isEdit ? 'Update' : 'Create' }} Lecturer
           </v-btn>
         </v-card-actions>
@@ -615,6 +622,14 @@ const submitForm = async () => {
   }
 }
 
+// Filter methods
+const resetFilters = () => {
+  statusFilter.value = 'All'
+  departmentFilter.value = 'All'
+  specializationFilter.value = 'All'
+  currentPage.value = 1
+}
+
 // Delete methods
 const confirmDelete = (lecturer) => {
   selectedLecturer.value = lecturer
@@ -661,11 +676,11 @@ const handleDelete = async () => {
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 32px;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 32px;
+  gap: 20px;
 }
 
 .title-section {
@@ -675,18 +690,18 @@ const handleDelete = async () => {
 .title-wrapper {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .title-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
@@ -724,14 +739,14 @@ const handleDelete = async () => {
 
 .stats-cards {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 }
 
 .stat-card {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px 20px;
+  border-radius: 10px;
+  padding: 12px 16px;
   min-width: 100px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -766,12 +781,12 @@ const handleDelete = async () => {
 }
 
 .modern-btn {
-  height: 44px;
-  border-radius: 12px;
+  height: 38px;
+  border-radius: 10px;
   text-transform: none;
   font-weight: 500;
   font-size: 14px;
-  padding: 0 20px;
+  padding: 0 16px;
   transition: all 0.2s ease;
   border: 1px solid #e2e8f0;
 }
@@ -794,8 +809,8 @@ const handleDelete = async () => {
 }
 
 .menu-item {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 6px;
   margin: 4px;
   transition: all 0.2s ease;
 }
@@ -808,7 +823,7 @@ const handleDelete = async () => {
 .modern-table-section {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px 32px;
+  padding: 16px 24px;
 }
 
 .table-container {
@@ -823,7 +838,7 @@ const handleDelete = async () => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 24px 16px;
+  padding: 16px 20px 12px;
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -882,15 +897,16 @@ const handleDelete = async () => {
 }
 
 .filters-section {
-  padding: 16px 24px;
+  padding: 12px 20px;
   background: #f8fafc;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
 }
 
 .filter-item {
@@ -907,6 +923,22 @@ const handleDelete = async () => {
   letter-spacing: 0.05em;
 }
 
+.reset-btn {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  border-radius: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1.5px solid #e2e8f0;
+  color: #64748b;
+}
+
+.reset-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
 /* Modern Table Styles */
 .modern-table-wrapper {
   position: relative;
@@ -918,7 +950,7 @@ const handleDelete = async () => {
 }
 
 .modern-header-cell {
-  padding: 20px 16px;
+  padding: 14px 12px;
   border: none;
   position: relative;
   text-align: left !important;
@@ -953,7 +985,7 @@ const handleDelete = async () => {
 }
 
 .modern-table-cell {
-  padding: 16px;
+  padding: 12px;
   border: none;
   vertical-align: middle;
   text-align: left !important;
@@ -972,13 +1004,13 @@ const handleDelete = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
   color: #3730a3;
   font-weight: 600;
   font-size: 12px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .group-info {
@@ -1018,14 +1050,14 @@ const handleDelete = async () => {
 .global-id-badge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
+  padding: 4px 10px;
   background: #f1f5f9;
   color: #1e293b;
   font-weight: 600;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .action-group {
@@ -1035,9 +1067,9 @@ const handleDelete = async () => {
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
 
@@ -1049,7 +1081,7 @@ const handleDelete = async () => {
 /* Empty State */
 .empty-state {
   text-align: center;
-  padding: 64px 32px;
+  padding: 48px 24px;
   color: #64748b;
 }
 
@@ -1076,14 +1108,14 @@ const handleDelete = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 16px 20px;
   background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -1091,10 +1123,10 @@ const handleDelete = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
 }
 
@@ -1128,11 +1160,11 @@ const handleDelete = async () => {
 }
 
 .dialog-content {
-  padding: 24px !important;
+  padding: 20px !important;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .form-group:last-child {
@@ -1168,11 +1200,11 @@ const handleDelete = async () => {
 .switch-container {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .switch-info {
@@ -1187,8 +1219,8 @@ const handleDelete = async () => {
 }
 
 .dialog-actions {
-  padding: 20px 24px 24px !important;
-  gap: 12px;
+  padding: 16px 20px 20px !important;
+  gap: 10px;
 }
 
 .cancel-btn {
@@ -1243,16 +1275,16 @@ const handleDelete = async () => {
 }
 
 .delete-content {
-  padding: 24px !important;
+  padding: 20px !important;
 }
 
 .warning-box {
   display: flex;
   gap: 12px;
-  padding: 16px;
+  padding: 12px;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border: 1px solid #fde047;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .warning-icon {
@@ -1279,8 +1311,8 @@ const handleDelete = async () => {
 }
 
 .delete-actions {
-  padding: 20px 24px 24px !important;
-  gap: 12px;
+  padding: 16px 20px 20px !important;
+  gap: 10px;
   display: flex;
   justify-content: flex-end;
 }

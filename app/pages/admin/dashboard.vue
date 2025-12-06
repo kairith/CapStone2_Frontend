@@ -17,10 +17,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="welcome-message">
+                    <!-- <div class="welcome-message">
                         <span class="greeting">Hello, Admin 👋</span>
                         <span class="sub-greeting">Welcome back to your dashboard</span>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="action-section">
@@ -34,26 +34,40 @@
         <div class="modern-content-section">
             <div class="content-container">
                 <!-- Filters Panel -->
-                <div class="filters-panel">
-                    <div class="filters-header">
-                        <v-icon icon="mdi-filter-variant" size="18" class="mr-2" />
-                        <span class="filters-title">Filters</span>
-                    </div>
+                <div class="filters-panel-wrapper">
                     <div class="filters-content">
-                        <v-select v-model="filters.generation" :items="generationOptions" label="Generation"
-                            variant="outlined" density="compact" hide-details class="filter-select" />
-
-                        <v-select v-model="filters.year" :items="yearOptions" label="Year" variant="outlined"
-                            density="compact" hide-details class="filter-select" />
-
-                        <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined"
-                            density="compact" hide-details class="filter-select" />
-
-                        <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialize"
-                            variant="outlined" density="compact" hide-details class="filter-select" />
-
-                        <v-select v-model="filters.order" :items="orderOptions" label="Order" variant="outlined"
-                            density="compact" hide-details class="filter-select" />
+                        <div class="filters-row">
+                            <div class="filter-item">
+                                <v-select v-model="filters.generation" :items="generationOptions" label="Generation"
+                                    variant="outlined" density="compact" clearable prepend-inner-icon="mdi-school"
+                                    hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.year" :items="yearOptions" label="Academic Year"
+                                    variant="outlined" density="compact" clearable prepend-inner-icon="mdi-calendar"
+                                    hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.group" :items="groupOptions" label="Group" variant="outlined"
+                                    density="compact" clearable prepend-inner-icon="mdi-account-group" hide-details
+                                    class="filter-select" />
+                            </div>
+                            <div class="filter-item">
+                                <v-select v-model="filters.specialize" :items="specializeOptions" label="Specialization"
+                                    variant="outlined" density="compact" clearable
+                                    prepend-inner-icon="mdi-school-outline" hide-details class="filter-select" />
+                            </div>
+                            <div class="filter-actions">
+                                <v-btn color="primary" variant="flat" prepend-icon="mdi-magnify" @click="applyFilters"
+                                    class="search-btn">
+                                    Search
+                                </v-btn>
+                                <v-btn variant="outlined" prepend-icon="mdi-refresh" @click="resetFilters"
+                                    class="reset-btn">
+                                    Reset
+                                </v-btn>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -103,49 +117,81 @@
                 </div>
 
                 <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-card chart-large">
-                        <div class="chart-header">
-                            <h3 class="chart-title">
-                                <v-icon icon="mdi-chart-bar" size="20" class="mr-2" />
-                                Average in Weeks
-                            </h3>
-                        </div>
-                        <div class="chart-content">
-                            <canvas ref="barChartCanvas" height="300"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-card chart-small">
-                        <div class="chart-header">
-                            <h3 class="chart-title">
-                                <v-icon icon="mdi-chart-donut" size="20" class="mr-2" />
-                                Attendance Overview
-                            </h3>
-                        </div>
-                        <div class="chart-content doughnut-content">
-                            <canvas ref="doughnutChartCanvas" width="250" height="250"></canvas>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background-color: #1e3a8a"></div>
-                                    <span class="legend-text">Present 62.5%</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background-color: #f97316"></div>
-                                    <span class="legend-text">Leave 12.5%</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background-color: #22c55e"></div>
-                                    <span class="legend-text">Absence 25%</span>
-                                </div>
+                <div class="charts-grid">
+                    <!-- Attendance Distribution Chart -->
+                    <v-card class="pa-6" elevation="2" rounded="xl">
+                        <v-card-title class="d-flex align-center justify-space-between">
+                            <div class="chart-title-section">
+                                <v-icon icon="mdi-chart-donut" size="20" class="mr-2" color="primary" />
+                                <span class="font-weight-bold">Attendance Distribution</span>
                             </div>
-                        </div>
-                    </div>
+                            <v-select v-model="attendanceFilter" :items="['This Week', 'This Month', 'This Year']"
+                                density="compact" max-width="150" variant="solo-filled" flat hide-details single-line />
+                        </v-card-title>
+
+                        <v-pie :key="attendanceFilter" :items="attendanceItems"
+                            :legend="{ position: $vuetify.display.mdAndUp ? 'right' : 'bottom' }"
+                            :tooltip="{ subtitleFormat: '[value]%' }" class="pa-3 mt-3 justify-center" gap="2"
+                            inner-cut="70" item-key="id" rounded="2" size="300" animation hide-slice reveal>
+                            <template v-slot:center>
+                                <div class="text-center">
+                                    <div class="text-h3">{{ attendanceTotal }}</div>
+                                    <div class="opacity-70 mt-1 mb-n1">Students</div>
+                                </div>
+                            </template>
+
+                            <template v-slot:legend="{ items, toggle, isActive }">
+                                <v-list class="py-0 mb-n5 mb-md-0 bg-transparent" density="compact" width="300">
+                                    <v-list-item v-for="item in items" :key="item.key"
+                                        :class="['my-1', { 'opacity-40': !isActive(item) }]" :title="item.title"
+                                        rounded="lg" link @click="toggle(item)">
+                                        <template v-slot:prepend>
+                                            <v-avatar :color="item.color" :size="16"></v-avatar>
+                                        </template>
+                                        <template v-slot:append>
+                                            <div class="font-weight-bold">{{ item.value }}%</div>
+                                        </template>
+                                    </v-list-item>
+                                </v-list>
+                            </template>
+                        </v-pie>
+                    </v-card>
+
+                    <!-- Gender Distribution Chart -->
+                    <v-card class="pa-6" elevation="2" rounded="xl">
+                        <v-card-title class="d-flex align-center justify-space-between">
+                            <div class="chart-title-section">
+                                <v-icon icon="mdi-gender-male-female" size="20" class="mr-2" color="secondary" />
+                                <span class="font-weight-bold">Gender Distribution</span>
+                            </div>
+                        </v-card-title>
+
+                        <v-pie :items="genderItems" :legend="{ position: 'bottom' }"
+                            :tooltip="{ subtitleFormat: '[value] students' }" class="pa-3 mt-3 justify-center" gap="3"
+                            item-key="id" rounded="3" size="280" animation>
+                            <template v-slot:center>
+                                <div class="text-center">
+                                    <div class="text-h3">{{ genderTotal }}</div>
+                                    <div class="opacity-70 mt-1 mb-n1">Total</div>
+                                </div>
+                            </template>
+                        </v-pie>
+                    </v-card>
                 </div>
 
-                <!-- Student Lists Table -->
-                <div class="table-card">
-                    <div class="table-header">
+                <!-- Hidden SVG patterns -->
+                <div class="h-0">
+                    <svg height="0" version="1.1" width="0" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="pattern-0" height="20" patternTransform="rotate(145) scale(.2)"
+                                patternUnits="userSpaceOnUse" width="20">
+                                <path d="M0 10h20zm0 20h20zm0 20h20zm0 20h20z" fill="none"
+                                    stroke="rgb(var(--v-theme-surface))" stroke-width="3" />
+                            </pattern>
+                        </defs>
+                    </svg>
+                </div>
+                <!-- <div class="table-header">
                         <div class="table-title-section">
                             <h3 class="table-title">
                                 <v-icon icon="mdi-account-multiple" size="20" class="mr-2" />
@@ -212,8 +258,7 @@
                                 </tr>
                             </tbody>
                         </v-table>
-                    </div>
-                </div>
+                    </div> -->
             </div>
         </div>
     </div>
@@ -222,184 +267,64 @@
 <script setup>
 definePageMeta({
     layout: 'admin',
-    middleware: ['auth']
+    // middleware: ['auth', 'role-admin'] // Commented out for testing
 })
 
 // Search and filters
 const search = ref('')
-const studentSearch = ref('')
-const studentOrder = ref('A-Z')
 
 const filters = ref({
-    generation: '9',
-    year: '2025',
-    group: 'G1',
-    specialize: 'CS',
-    order: 'A-Z'
+    generation: null,
+    year: null,
+    group: null,
+    specialize: null
 })
 
 const generationOptions = ['9', '10', '11', '12']
 const yearOptions = ['2023', '2024', '2025', '2026']
 const groupOptions = ['G1', 'G2', 'G3', 'G4']
 const specializeOptions = ['CS', 'IT', 'IS', 'SE']
-const orderOptions = ['A-Z', 'Z-A']
 
-// Stats data
-const stats = ref({
-    totalStudents: { count: 45, female: 23, male: 22 },
-    present: { count: 45, female: 23, male: 22 },
-    absent: { count: 45, female: 23, male: 22 }
+// Filter actions
+const applyFilters = () => {
+    console.log('Applying filters:', filters.value)
+    // TODO: Add your filter logic here
+}
+
+const resetFilters = () => {
+    filters.value = {
+        generation: null,
+        year: null,
+        group: null,
+        specialize: null
+    }
+    console.log('Filters reset')
+}
+
+// Chart data and filters
+const attendanceFilter = ref('This Week')
+
+// Attendance Distribution Data
+const attendanceTotal = computed(() => {
+    const total = attendanceItems.value.reduce((sum, item) => sum + item.value, 0)
+    return Math.round((total / 100) * 45) // Based on percentage
 })
 
-// Student data
-const students = ref([
-    {
-        id: 1,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    },
-    {
-        id: 2,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'A', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    },
-    {
-        id: 3,
-        name: 'MEAN Piseth',
-        gender: 'M',
-        generation: '9',
-        dob: 'Sep 01, 2004',
-        status: 'Active',
-        attendanceRecord: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P']
-    }
+const attendanceItems = computed(() => [
+    { id: 1, title: 'Present', value: 75, color: '#22c55e' },
+    { id: 2, title: 'Absent', value: 15, color: '#ef4444' },
+    { id: 3, title: 'Leave', value: 10, color: '#f59e0b' }
 ])
 
-const filteredStudents = computed(() => {
-    let result = students.value
-
-    if (studentSearch.value) {
-        result = result.filter(s =>
-            s.name.toLowerCase().includes(studentSearch.value.toLowerCase())
-        )
-    }
-
-    if (studentOrder.value === 'Z-A') {
-        result = [...result].reverse()
-    }
-
-    return result
+// Gender Distribution Data
+const genderTotal = computed(() => {
+    return genderItems.value.reduce((sum, item) => sum + item.value, 0)
 })
 
-// Chart references
-const barChartCanvas = ref(null)
-const doughnutChartCanvas = ref(null)
-
-const getAttendanceClass = (attendance) => {
-    if (attendance === 'P') return 'present'
-    if (attendance === 'A') return 'absent'
-    if (attendance === 'L') return 'leave'
-    return ''
-}
-
-// Initialize charts on mount
-onMounted(() => {
-    // Use nextTick to ensure DOM is fully rendered
-    nextTick(() => {
-        initBarChart()
-        initDoughnutChart()
-    })
-})
-
-const initBarChart = () => {
-    if (!barChartCanvas.value) return
-
-    try {
-        const ctx = barChartCanvas.value.getContext('2d')
-        if (!ctx) return
-
-        // Simple bar chart implementation
-        const data = [10, 6, 7, 7, 12, 10, 5, 4, 3, 2, 1, 6]
-        const labels = ['Week-1', 'Week-2', 'Week-3', 'Week-4', 'Week-5', 'Week-6', 'Week-7', 'Week-8', 'Week-9', 'Week-10', 'Week-11', 'Week->3']
-
-        const maxValue = Math.max(...data)
-        const canvas = barChartCanvas.value
-        const width = canvas.width || 800
-        const height = canvas.height || 300
-        const barWidth = width / (data.length * 1.5)
-        const padding = 40
-
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height)
-
-        // Draw bars
-        data.forEach((value, index) => {
-            const barHeight = (value / maxValue) * (height - padding * 2)
-            const x = padding + index * (barWidth * 1.5)
-            const y = height - padding - barHeight
-
-            ctx.fillStyle = '#0000FF'
-            ctx.fillRect(x, y, barWidth, barHeight)
-
-            // Draw labels
-            ctx.fillStyle = '#666'
-            ctx.font = '10px Arial'
-            ctx.save()
-            ctx.translate(x + barWidth / 2, height - 10)
-            ctx.rotate(-Math.PI / 4)
-            ctx.textAlign = 'right'
-            ctx.fillText(labels[index], 0, 0)
-            ctx.restore()
-        })
-    } catch (error) {
-        console.error('Error initializing bar chart:', error)
-    }
-}
-
-const initDoughnutChart = () => {
-    if (!doughnutChartCanvas.value) return
-
-    try {
-        const ctx = doughnutChartCanvas.value.getContext('2d')
-        if (!ctx) return
-
-        const centerX = 125
-        const centerY = 125
-        const radius = 80
-        const innerRadius = 50
-
-        const data = [
-            { value: 62.5, color: '#1e3a8a', label: 'Present' },
-            { value: 12.5, color: '#f97316', label: 'Leave' },
-            { value: 25, color: '#22c55e', label: 'Absence' }
-        ]
-
-        let currentAngle = -Math.PI / 2
-
-        data.forEach(segment => {
-            const sliceAngle = (segment.value / 100) * 2 * Math.PI
-
-            // Draw outer arc
-            ctx.beginPath()
-            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle)
-            ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true)
-            ctx.closePath()
-            ctx.fillStyle = segment.color
-            ctx.fill()
-
-            currentAngle += sliceAngle
-        })
-    } catch (error) {
-        console.error('Error initializing doughnut chart:', error)
-    }
-}
+const genderItems = ref([
+    { id: 1, title: 'Male', value: 23, color: '#3b82f6' },
+    { id: 2, title: 'Female', value: 22, color: '#ec4899' }
+])
 </script>
 
 <style scoped>
@@ -419,11 +344,11 @@ const initDoughnutChart = () => {
 .header-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px;
+    padding: 16px 24px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 32px;
+    gap: 20px;
 }
 
 .title-section {
@@ -433,8 +358,8 @@ const initDoughnutChart = () => {
 .title-wrapper {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .title-icon {
@@ -516,66 +441,94 @@ const initDoughnutChart = () => {
 .modern-content-section {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px;
+    padding: 16px 24px;
 }
 
 .content-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
 }
 
 /* Filters Panel */
-.filters-panel {
+.filters-panel-wrapper {
     background: white;
-    border-radius: 16px;
-    padding: 20px 24px;
+    border-radius: 12px;
+    padding: 12px 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
-}
-
-.filters-header {
-    display: flex;
-    align-items: center;
     margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.filters-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1e293b;
 }
 
 .filters-content {
+    width: 100%;
+}
+
+.filters-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.filter-item {
+    width: 100%;
+}
+
+.filter-actions {
     display: flex;
     gap: 12px;
-    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-btn,
+.reset-btn {
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-radius: 8px;
+    height: 36px;
+    padding: 0 16px;
+}
+
+.search-btn {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.reset-btn {
+    border-width: 1.5px;
 }
 
 .filter-select {
-    flex: 1;
-    min-width: 120px;
-    max-width: 160px;
+    width: 100%;
 }
 
 .filter-select :deep(.v-field) {
     border-radius: 12px;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.filter-select :deep(.v-field:hover) {
+    background-color: #f1f5f9;
+}
+
+.filter-select :deep(.v-field--focused) {
+    background-color: white;
 }
 
 /* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    gap: 12px;
 }
 
 .stat-card {
     background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
     border: 1px solid rgba(63, 81, 181, 0.1);
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 12px;
+    padding: 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -601,7 +554,7 @@ const initDoughnutChart = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .stat-icon {
@@ -614,18 +567,18 @@ const initDoughnutChart = () => {
 }
 
 .stat-value {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 700;
     color: #1e293b;
     line-height: 1;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .stat-label {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     color: #475569;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .stat-details {
@@ -634,70 +587,17 @@ const initDoughnutChart = () => {
     line-height: 1.4;
 }
 
-/* Charts Section */
-.charts-section {
+/* Charts Grid */
+.charts-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
+    grid-template-columns: 65% 35%;
+    gap: 12px;
 }
 
-.chart-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
-}
-
-.chart-header {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.chart-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
+.chart-title-section {
     display: flex;
     align-items: center;
-}
-
-.chart-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.doughnut-content {
-    flex-direction: column;
-}
-
-.chart-legend {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
-.legend-text {
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
+    font-size: 16px;
 }
 
 /* Table Card */
@@ -834,7 +734,13 @@ const initDoughnutChart = () => {
         gap: 24px;
     }
 
-    .charts-section {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .charts-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -858,33 +764,17 @@ const initDoughnutChart = () => {
         grid-template-columns: 1fr;
     }
 
-    .filters-content {
-        flex-direction: column;
+    .filters-row {
+        grid-template-columns: 1fr;
     }
 
-    .filter-select {
-        max-width: 100%;
+    .filter-actions {
+        width: 100%;
     }
 
-    .table-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-    }
-
-    .table-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .search-field-small,
-    .order-select {
-        max-width: 100%;
-    }
-
-    .attendance-table {
-        display: block;
-        overflow-x: auto;
+    .search-btn,
+    .reset-btn {
+        flex: 1;
     }
 }
 </style>
