@@ -119,12 +119,19 @@
                             <div class="filter-item">
                                 <label class="filter-label">Department</label>
                                 <v-select v-model="departmentFilter" :items="departmentOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label">Status</label>
                                 <v-select v-model="statusFilter" :items="statusOptions" variant="outlined"
-                                    density="compact" hide-details />
+                                    density="compact" hide-details clearable />
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label" style="opacity: 0;">Actions</label>
+                                <v-btn class="reset-btn" prepend-icon="mdi-refresh" variant="outlined" block
+                                    @click="resetFilters">
+                                    Reset
+                                </v-btn>
                             </div>
                         </div>
                     </div>
@@ -490,6 +497,13 @@ const inactiveAdminCount = computed(() => {
     return admins.value.filter(a => a.status === 'Inactive').length
 })
 
+// Filter methods
+const resetFilters = () => {
+    statusFilter.value = 'All'
+    departmentFilter.value = 'All'
+    currentPage.value = 1
+}
+
 // Dialog methods
 const openCreateDialog = () => {
     selectedAdmin.value = null
@@ -842,6 +856,7 @@ const toggleAdminStatus = (admin) => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+    align-items: end;
 }
 
 .filter-item {
@@ -856,6 +871,19 @@ const toggleAdminStatus = (admin) => {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.reset-btn {
+    height: 36px;
+    text-transform: none;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
 }
 
 /* Modern Table Styles */
