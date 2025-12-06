@@ -2,7 +2,7 @@ export interface User {
   id: string | number;
   name: string;
   email: string;
-  role: "admin" | "lecturer" | "student";
+  role: "admin" | "lecturer" | "student" | "superadmin";
   avatar?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -12,6 +12,7 @@ export interface LoginCredentials {
   email: string;
   password: string;
   rememberMe?: boolean;
+  loginType?: "admin" | "user";
 }
 
 export interface RegisterData {
@@ -19,7 +20,7 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
-  role?: "admin" | "lecturer" | "student";
+  role?: "admin" | "lecturer" | "student" | "superadmin";
 }
 
 export interface AuthResponse {
@@ -33,7 +34,7 @@ export interface AuthError {
   statusCode?: number;
 }
 
-export type UserRole = "admin" | "lecturer" | "student";
+export type UserRole = "admin" | "lecturer" | "student" | "superadmin";
 
 export type Permission =
   | "read"

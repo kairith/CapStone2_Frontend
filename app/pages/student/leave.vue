@@ -279,6 +279,11 @@ const onSubmit = async () => {
     isSubmitting.value = false;
   }
 };
+
+definePageMeta({
+    middleware: ['auth'],
+    layout: 'student'
+})
 </script>
 
 <style scoped>

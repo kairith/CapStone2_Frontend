@@ -3,61 +3,86 @@ import type { LoginCredentials, RegisterData, User, UserRole, Permission } from 
 export const useAuth = () => {
   const authStore = useAuthStore()
 
-  // Login function
+  // Login function with logging
   const login = async (credentials: LoginCredentials) => {
+    console.group('🔓 Auth Composable - Login')
+    console.log('Email:', credentials.email)
+    
     try {
-      await authStore.login(credentials)
-
-      // Redirect based on user role
-      const redirectPath = getRedirectPath(authStore.getUserRole)
+      const apiBase = useRuntimeConfig().public.apiBase
+      console.log('🚀 Starting login attempt')
+      
+      // Call store login which tries admin first, then user endpoint
+      const result = await authStore.login(credentials)
+      
+      // Get user role from stored user data (comes from response)
+      const role = authStore.user?.role
+      console.log('✅ Login successful')
+      console.log('👤 User role from response:', role)
+      
+      // Get redirect path based on actual role from response
+      const redirectPath = getRedirectPath(role)
+      
+      console.log('🔀 Redirecting to:', redirectPath)
       await navigateTo(redirectPath)
+      
+      console.log('✅ Login and redirect completed')
     } catch (error) {
+      console.error('❌ Login error in composable:', error)
       throw error
+    } finally {
+      console.groupEnd()
     }
   }
 
-  // Logout function
+  // Logout function with logging
   const logout = async () => {
-    await authStore.logout()
+    console.group('🚪 Auth Composable - Logout')
+    console.log('⏰ Logout initiated at:', new Date().toISOString())
+    
+    try {
+      await authStore.logout()
+      console.log('✅ Logout completed')
+    } catch (error) {
+      console.error('❌ Logout error:', error)
+    }
+    console.groupEnd()
   }
 
-  // Register function
-  const register = async (userData) => {
-    try {
-      await authStore.register(userData)
-      // After successful registration, redirect to login
-      await navigateTo('/auth/login')
-    } catch (error) {
-      throw error
-    }
-  }
 
   // Forgot password function
-  const forgotPassword = async (email) => {
-    try {
-      await authStore.forgotPassword(email)
-    } catch (error) {
-      throw error
-    }
-  }
 
-  // Check if user is authenticated
+
+  // Check authentication
   const checkAuth = async () => {
-    return await authStore.checkAuth()
+    console.log('🔍 Checking authentication...')
+    const isAuth = await authStore.checkAuth()
+    console.log(isAuth ? '✅ User is authenticated' : '❌ User is not authenticated')
+    return isAuth
   }
 
-  // Get redirect path based on user role
-  const getRedirectPath = (role) => {
-    switch (role) {
-      case 'admin':
-        return '/admin/dashboard'
-      case 'lecturer':
-        return '/lecturer/dashboard'
-      case 'student':
-        return '/student/dashboard'
-      default:
-        return '/auth/login'
+  // Get redirect path
+  const getRedirectPath = (role: string | undefined) => {
+    console.group('🔀 Redirect Path Selection')
+    console.log('User role received:', role)
+    
+    const redirectMap: Record<string, string> = {
+      'admin': '/admin/dashboard',
+      'superadmin': '/admin/dashboard',
+      'lecturer': '/lecturer/dashboard',
+      'student': '/student/dashboard',
     }
+    
+    const path = role && redirectMap[role] ? redirectMap[role] : '/auth/login'
+    console.log('Redirect path:', path)
+    console.log('Route mapping:', {
+      'admin/superadmin': redirectMap['admin'],
+      'lecturer': redirectMap['lecturer'],
+      'student': redirectMap['student']
+    })
+    console.groupEnd()
+    
+    return path
   }
 
   // Require authentication (for middleware)
@@ -73,7 +98,7 @@ export const useAuth = () => {
   }
 
   // Require specific role
-  const requireRole = (requiredRole) => {
+  const requireRole = (requiredRole: string) => {
     if (!authStore.isAuthenticated) {
       throw createError({
         statusCode: 401,
@@ -86,27 +111,6 @@ export const useAuth = () => {
         statusCode: 403,
         statusMessage: 'Access denied'
       })
-    }
-  }
-
-  // Check if user has permission
-  const hasPermission = (permission) => {
-    const role = authStore.getUserRole
-    const permissions = getRolePermissions(role)
-    return permissions.includes(permission)
-  }
-
-  // Get permissions based on role
-  const getRolePermissions = (role) => {
-    switch (role) {
-      case 'admin':
-        return ['read', 'write', 'delete', 'manage_users', 'manage_system']
-      case 'lecturer':
-        return ['read', 'write', 'manage_attendance', 'manage_classes']
-      case 'student':
-        return ['read', 'view_attendance', 'submit_leave']
-      default:
-        return []
     }
   }
 
@@ -129,12 +133,9 @@ export const useAuth = () => {
     // Actions
     login,
     logout,
-    register,
-    forgotPassword,
     checkAuth,
     requireAuth,
     requireRole,
-    hasPermission,
     clearError: authStore.clearError
   }
 }

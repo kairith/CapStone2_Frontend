@@ -58,7 +58,8 @@ export default defineNuxtConfig({
     apiSecret: "123",
     // Public keys (exposed to client-side)
     public: {
-      apiBase: "/api",
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8000/api/v1",
+      apiTimeout: Number(process.env.NUXT_PUBLIC_API_TIMEOUT || 30000),
     },
   },
 });

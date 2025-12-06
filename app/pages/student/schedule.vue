@@ -63,7 +63,7 @@
 
 <script setup>
 definePageMeta({
-    middleware: ['auth', 'role-student'],
+    middleware: ['auth'],
     layout: 'student'
 })
 

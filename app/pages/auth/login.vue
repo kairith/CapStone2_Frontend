@@ -6,7 +6,7 @@
         <v-col cols="12" md="6" class="login-brand-section">
           <div class="brand-content">
             <img
-              src="../../assets/images/login/graduation-logo.jpg"
+              src="~/assets/images/login/graduation-logo.jpg"
               alt="University Logo"
               class="full-screen-image"
             />
@@ -15,15 +15,8 @@
 
         <!-- Right side - Login Form -->
         <v-col cols="12" md="6" class="login-form-section">
-          <div
-            class="form-container d-flex flex-column justify-center align-center pa-8"
-          >
-            <v-card
-              class="login-card pa-8"
-              elevation="0"
-              width="100%"
-              max-width="400"
-            >
+          <div class="form-container d-flex flex-column justify-center align-center pa-8">
+            <v-card class="login-card pa-8" elevation="0" width="100%" max-width="400">
               <div class="text-center mb-8">
                 <h2 class="text-h4 font-weight-bold mb-2">
                   University Attendance System
@@ -44,14 +37,13 @@
                   density="comfortable"
                   class="mb-4"
                   :rules="emailRules"
-                  :error-messages="errors.email"
                   required
                 />
 
                 <!-- Password Field -->
                 <v-text-field
                   v-model="loginData.password"
-                  :label="'Password'"
+                  label="Password"
                   :type="showPassword ? 'text' : 'password'"
                   prepend-inner-icon="mdi-lock"
                   :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -59,7 +51,6 @@
                   density="comfortable"
                   class="mb-4"
                   :rules="passwordRules"
-                  :error-messages="errors.password"
                   @click:append-inner="showPassword = !showPassword"
                   required
                 />
@@ -72,10 +63,7 @@
                     density="compact"
                     hide-details
                   />
-                  <NuxtLink
-                    to="/auth/forgot"
-                    class="text-primary text-decoration-none"
-                  >
+                  <NuxtLink to="/auth/forgot" class="text-primary text-decoration-none">
                     Forgot password?
                   </NuxtLink>
                 </div>
@@ -86,11 +74,11 @@
                   color="primary"
                   size="large"
                   block
-                  class="mb-6"
+                  class="mb-6 text-capitalize"
                   :loading="isLoading"
-                  :disabled="!isFormValid"
+                  :disabled="isLoading"
                 >
-                  Sign In
+                  {{ isLoading ? 'Signing in...' : 'Sign In' }}
                 </v-btn>
 
                 <!-- Error Alert -->
@@ -99,18 +87,16 @@
                   type="error"
                   variant="tonal"
                   class="mb-4"
-                  :text="loginError"
-                />
+                  closable
+                  @click:close="loginError = ''"
+                >
+                  {{ loginError }}
+                </v-alert>
 
                 <!-- Register Link -->
                 <div class="text-center">
-                  <span class="text-medium-emphasis"
-                    >Don't have an account?</span
-                  >
-                  <NuxtLink
-                    to="/auth/register"
-                    class="text-primary text-decoration-none ml-1"
-                  >
+                  <span class="text-medium-emphasis">Don't have an account?</span>
+                  <NuxtLink to="/auth/register" class="text-primary text-decoration-none ml-1">
                     Sign up here
                   </NuxtLink>
                 </div>
@@ -130,156 +116,132 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, reactive } from "vue";
+<script setup lang="ts">
+import { ref, reactive, computed, watch, onMounted } from "vue"
 
-// Meta tags for SEO
+// Page meta
 useHead({
-  title: "Login - UAS System",
-  meta: [
-    { name: "description", content: "Login to access your UAS System account" },
-  ],
-});
+  title: "Login - University Attendance System",
+  meta: [{ name: "description", content: "Admin login for UAS System" }],
+})
 
-// Define layout
 definePageMeta({
-  layout: false, // No layout for auth pages
-  middleware: ["auth"], // Add auth middleware if needed
-});
+  layout: false,
+})
 
-// Reactive data
+// Get runtime config
+const config = useRuntimeConfig()
+const apiEndpoint = computed(() => `${config.public.apiBase}/admin/login`)
+const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
+
+// Use auth composable
+const { login: authLogin } = useAuth()
+
+// Form data
 const loginData = reactive({
   email: "",
   password: "",
-  rememberMe: false,
-});
+  rememberMe: true,
+  // loginType will be auto-detected from response role
+})
 
-const showPassword = ref(false);
-const isLoading = ref(false);
-const loginError = ref("");
-const errors = reactive({
-  email: [],
-  password: [],
-});
-
-// Refs
-const loginForm = ref(null);
-
-// Computed
-const currentYear = computed(() => new Date().getFullYear());
-
-const isFormValid = computed(() => {
-  return (
-    loginData.email &&
-    loginData.password &&
-    emailRules.every((rule) => rule(loginData.email) === true) &&
-    passwordRules.every((rule) => rule(loginData.password) === true)
-  );
-});
+const showPassword = ref(false)
+const isLoading = ref(false)
+const loginError = ref("")
+const loginForm = ref<any>(null)
 
 // Validation rules
 const emailRules = [
-  (v) => !!v || "Email is required",
-  (v) => /.+@.+\..+/.test(v) || "Email must be valid",
-];
+  (v: string) => !!v || "Email is required",
+  (v: string) => /.+@.+\..+/.test(v) || "Please enter a valid email",
+]
 
 const passwordRules = [
-  (v) => !!v || "Password is required",
-  (v) => (v && v.length >= 6) || "Password must be at least 6 characters",
-];
+  (v: string) => !!v || "Password is required",
+  (v: string) => v.length >= 6 || "Password must be at least 6 characters",
+]
 
-// Methods
+const currentYear = computed(() => new Date().getFullYear())
+
+// Main Login Function
 const handleLogin = async () => {
-  // Validate form
-  const { valid } = await loginForm.value.validate();
-
+  console.clear()
+  
+  const { valid } = await loginForm.value?.validate()
   if (!valid) {
-    return;
+    console.warn('⚠️ Form validation failed')
+    return
   }
 
-  isLoading.value = true;
-  loginError.value = "";
+  isLoading.value = true
+  loginError.value = ""
 
   try {
-    // TODO: Replace with your actual authentication logic
-    // const authStore = useAuthStore()
-    // await authStore.login(loginData)
+    console.log('🔐 Initiating login process...')
+    console.log('📧 Email:', loginData.email)
+    console.log('💾 Remember me:', loginData.rememberMe)
+    
+    await authLogin(loginData)
+    console.log('✅ Login and redirect successful!')
+  } catch (error: any) {
+    console.error('❌ Login error:', error)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (error.data?.message) {
+      loginError.value = error.data.message
+    } else if (error.message) {
+      loginError.value = error.message
+    } else {
+      loginError.value = "Invalid email or password. Please try again."
+    }
 
-    // Redirect based on user role
-    // For now, redirect to dashboard
-    await navigateTo("/admin/dashboard");
-  } catch (error) {
-    console.error("Login error:", error);
-    loginError.value = error.message || "Login failed. Please try again.";
+    console.error('Error displayed to user:', loginError.value)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
-// Clear errors when user types
-watch(
-  () => loginData.email,
-  () => {
-    errors.email = [];
-    loginError.value = "";
-  }
-);
+// Clear error when typing
+watch([() => loginData.email, () => loginData.password], () => {
+  loginError.value = ""
+})
 
-watch(
-  () => loginData.password,
-  () => {
-    errors.password = [];
-    loginError.value = "";
-  }
-);
+// Log on mount
+onMounted(() => {
+  console.group('📱 Login Page Mounted')
+  console.log('API Base URL:', config.public.apiBase)
+  console.log('API Timeout:', config.public.apiTimeout, 'ms')
+  console.log('Environment:', isDevelopment.value ? 'Development' : 'Production')
+  console.log('⏰ Ready for login at:', new Date().toLocaleTimeString())
+  console.groupEnd()
+})
 </script>
 
 <style scoped>
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  background: #f8fafc;
 }
 
 .login-brand-section {
-  background: #ffffff;
-  padding: 0 !important;
+  background: #0f172a;
   height: 100vh;
   overflow: hidden;
-}
-
-.login-form-section {
-  background: #ffffff;
 }
 
 .brand-content {
   width: 100%;
   height: 100%;
-  position: relative;
-  padding: 0;
-  margin: 0;
 }
 
 .full-screen-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  display: block;
+  opacity: 0.9;
 }
 
-.brand-title {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.brand-subtitle {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.max-width-400 {
-  max-width: 400px;
+.login-form-section {
+  background: #ffffff;
 }
 
 .form-container {
@@ -287,58 +249,27 @@ watch(
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
-  border-radius: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
 }
 
 .login-footer {
-  margin-top: auto;
+  padding-bottom: 2rem;
 }
 
-/* Responsive adjustments */
+.debug-info {
+  font-family: 'Courier New', monospace;
+  border-left: 3px solid #1976d2;
+}
+
+/* Responsive */
 @media (max-width: 960px) {
   .login-brand-section {
-    height: 40vh;
-    min-height: 300px;
+    height: 300px;
   }
-
   .form-container {
-    min-height: 60vh;
+    min-height: calc(100vh - 300px);
   }
-
-  .brand-content {
-    padding: 0 !important;
-  }
-
-  .full-screen-image {
-    height: 100%;
-    width: 100%;
-  }
-}
-
-/* Custom input styling */
-:deep(.v-field--variant-outlined .v-field__outline) {
-  --v-field-border-width: 2px;
-}
-
-:deep(.v-field--variant-outlined.v-field--focused .v-field__outline) {
-  --v-field-border-width: 2px;
-}
-
-/* Button hover effects */
-.v-btn {
-  text-transform: none !important;
-  font-weight: 600;
-}
-
-/* Link styling */
-a {
-  transition: all 0.2s ease-in-out;
-}
-
-a:hover {
-  text-decoration: underline !important;
 }
 </style>

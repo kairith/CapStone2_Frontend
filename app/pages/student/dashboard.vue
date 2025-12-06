@@ -119,7 +119,7 @@
 <script setup>
 definePageMeta({
     layout: 'student',
-    middleware: ['auth', 'role-student']
+    middleware: ['auth']
 })
 
 const studentName = ref('John Doe')
