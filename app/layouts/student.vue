@@ -48,10 +48,22 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
+
+defineEmits(['toggle-drawer'])
+
+const auth = useAuthStore()
+const router = useRouter()
 const drawer = ref(true)
 
+// Use a wrapper function to ensure reactivity
 const logout = async () => {
-    const { logout } = useAuth()
-    await logout()
+  try {
+    await auth.logout()
+    router.push('/auth/login') 
+  } catch (err) {
+    console.error('Logout failed:', err)
+  }
 }
 </script>
