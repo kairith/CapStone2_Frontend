@@ -1,20 +1,22 @@
-import { api } from './api';
-import type { 
-  CourseOffering, 
-  CourseOfferingFormData, 
+import { api } from "./api";
+import type {
+  CourseOffering,
+  CourseOfferingFormData,
   CourseOfferingDisplay,
-  CourseOfferingFilters 
-} from '~/types/courseOffering';
+  CourseOfferingFilters,
+} from "~/types/courseOffering";
 
 export class CourseOfferingService {
-  private baseURL = '/api/course-offerings';
+  private baseURL = "/api/course-offerings";
 
   /**
    * Get all course offerings with optional filters
    */
-  async getAll(filters?: CourseOfferingFilters): Promise<CourseOfferingDisplay[]> {
+  async getAll(
+    filters?: CourseOfferingFilters
+  ): Promise<CourseOfferingDisplay[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -32,7 +34,9 @@ export class CourseOfferingService {
    * Get a single course offering by ID
    */
   async getById(id: number): Promise<CourseOfferingDisplay> {
-    const response = await api.get<CourseOfferingDisplay>(`${this.baseURL}/${id}`);
+    const response = await api.get<CourseOfferingDisplay>(
+      `${this.baseURL}/${id}`
+    );
     return response.data;
   }
 
@@ -40,23 +44,33 @@ export class CourseOfferingService {
    * Get course offerings by term
    */
   async getByTerm(termId: number): Promise<CourseOfferingDisplay[]> {
-    const response = await api.get<CourseOfferingDisplay[]>(`${this.baseURL}/term/${termId}`);
+    const response = await api.get<CourseOfferingDisplay[]>(
+      `${this.baseURL}/term/${termId}`
+    );
     return response.data;
   }
 
   /**
    * Get course offerings by instructor
    */
-  async getByInstructor(instructorId: number): Promise<CourseOfferingDisplay[]> {
-    const response = await api.get<CourseOfferingDisplay[]>(`${this.baseURL}/instructor/${instructorId}`);
+  async getByInstructor(
+    instructorId: number
+  ): Promise<CourseOfferingDisplay[]> {
+    const response = await api.get<CourseOfferingDisplay[]>(
+      `${this.baseURL}/instructor/${instructorId}`
+    );
     return response.data;
   }
 
   /**
    * Get course offerings by generation
    */
-  async getByGeneration(generationId: number): Promise<CourseOfferingDisplay[]> {
-    const response = await api.get<CourseOfferingDisplay[]>(`${this.baseURL}/generation/${generationId}`);
+  async getByGeneration(
+    generationId: number
+  ): Promise<CourseOfferingDisplay[]> {
+    const response = await api.get<CourseOfferingDisplay[]>(
+      `${this.baseURL}/generation/${generationId}`
+    );
     return response.data;
   }
 
@@ -64,7 +78,9 @@ export class CourseOfferingService {
    * Get course offerings by group
    */
   async getByGroup(groupId: number): Promise<CourseOfferingDisplay[]> {
-    const response = await api.get<CourseOfferingDisplay[]>(`${this.baseURL}/group/${groupId}`);
+    const response = await api.get<CourseOfferingDisplay[]>(
+      `${this.baseURL}/group/${groupId}`
+    );
     return response.data;
   }
 
@@ -79,8 +95,14 @@ export class CourseOfferingService {
   /**
    * Update an existing course offering
    */
-  async update(id: number, data: Partial<CourseOfferingFormData>): Promise<CourseOffering> {
-    const response = await api.put<CourseOffering>(`${this.baseURL}/${id}`, data);
+  async update(
+    id: number,
+    data: Partial<CourseOfferingFormData>
+  ): Promise<CourseOffering> {
+    const response = await api.put<CourseOffering>(
+      `${this.baseURL}/${id}`,
+      data
+    );
     return response.data;
   }
 
@@ -94,8 +116,14 @@ export class CourseOfferingService {
   /**
    * Update course offering status
    */
-  async updateStatus(id: number, status: 1 | 2 | 3 | 4): Promise<CourseOffering> {
-    const response = await api.patch<CourseOffering>(`${this.baseURL}/${id}/status`, { status });
+  async updateStatus(
+    id: number,
+    status: 1 | 2 | 3 | 4
+  ): Promise<CourseOffering> {
+    const response = await api.patch<CourseOffering>(
+      `${this.baseURL}/${id}/status`,
+      { status }
+    );
     return response.data;
   }
 
@@ -103,7 +131,9 @@ export class CourseOfferingService {
    * Get enrolled students count for a course offering
    */
   async getEnrollmentCount(id: number): Promise<number> {
-    const response = await api.get<{ count: number }>(`${this.baseURL}/${id}/enrollment-count`);
+    const response = await api.get<{ count: number }>(
+      `${this.baseURL}/${id}/enrollment-count`
+    );
     return response.data.count;
   }
 
@@ -111,14 +141,18 @@ export class CourseOfferingService {
    * Get course offerings for current term (active term)
    */
   async getCurrentTermOfferings(): Promise<CourseOfferingDisplay[]> {
-    const response = await api.get<CourseOfferingDisplay[]>(`${this.baseURL}/current-term`);
+    const response = await api.get<CourseOfferingDisplay[]>(
+      `${this.baseURL}/current-term`
+    );
     return response.data;
   }
 
   /**
    * Check for scheduling conflicts
    */
-  async checkConflicts(data: CourseOfferingFormData): Promise<{ hasConflict: boolean; conflicts: any[] }> {
+  async checkConflicts(
+    data: CourseOfferingFormData
+  ): Promise<{ hasConflict: boolean; conflicts: any[] }> {
     const response = await api.post<{ hasConflict: boolean; conflicts: any[] }>(
       `${this.baseURL}/check-conflicts`,
       data
@@ -130,7 +164,10 @@ export class CourseOfferingService {
    * Clone a course offering to a new term
    */
   async clone(id: number, newTermId: number): Promise<CourseOffering> {
-    const response = await api.post<CourseOffering>(`${this.baseURL}/${id}/clone`, { term_id: newTermId });
+    const response = await api.post<CourseOffering>(
+      `${this.baseURL}/${id}/clone`,
+      { term_id: newTermId }
+    );
     return response.data;
   }
 
@@ -144,7 +181,7 @@ export class CourseOfferingService {
     by_generation: Record<string, number>;
   }> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -153,10 +190,10 @@ export class CourseOfferingService {
       });
     }
 
-    const url = params.toString() 
-      ? `${this.baseURL}/statistics?${params}` 
+    const url = params.toString()
+      ? `${this.baseURL}/statistics?${params}`
       : `${this.baseURL}/statistics`;
-    
+
     const response = await api.get(url);
     return response.data;
   }

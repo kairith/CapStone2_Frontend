@@ -1,17 +1,17 @@
-import { api } from './api';
-import type { 
-  Subject, 
-  SubjectFormData, 
+import { api } from "./api";
+import type {
+  Subject,
+  SubjectFormData,
   SubjectDisplay,
   Department,
   DepartmentFormData,
   Specialization,
   SpecializationFormData,
-  SpecializationDisplay
-} from '~/types/catalog';
+  SpecializationDisplay,
+} from "~/types/catalog";
 
 export class SubjectService {
-  private baseURL = '/api/subjects';
+  private baseURL = "/api/subjects";
 
   async getAll(): Promise<SubjectDisplay[]> {
     const response = await api.get<SubjectDisplay[]>(this.baseURL);
@@ -23,13 +23,19 @@ export class SubjectService {
     return response.data;
   }
 
-  async getBySpecialization(specializationId: number): Promise<SubjectDisplay[]> {
-    const response = await api.get<SubjectDisplay[]>(`${this.baseURL}/specialization/${specializationId}`);
+  async getBySpecialization(
+    specializationId: number
+  ): Promise<SubjectDisplay[]> {
+    const response = await api.get<SubjectDisplay[]>(
+      `${this.baseURL}/specialization/${specializationId}`
+    );
     return response.data;
   }
 
   async getByCode(code: string): Promise<SubjectDisplay> {
-    const response = await api.get<SubjectDisplay>(`${this.baseURL}/code/${code}`);
+    const response = await api.get<SubjectDisplay>(
+      `${this.baseURL}/code/${code}`
+    );
     return response.data;
   }
 
@@ -54,7 +60,7 @@ export class SubjectService {
 }
 
 export class DepartmentService {
-  private baseURL = '/api/departments';
+  private baseURL = "/api/departments";
 
   async getAll(): Promise<Department[]> {
     const response = await api.get<Department[]>(this.baseURL);
@@ -71,7 +77,10 @@ export class DepartmentService {
     return response.data;
   }
 
-  async update(id: number, data: Partial<DepartmentFormData>): Promise<Department> {
+  async update(
+    id: number,
+    data: Partial<DepartmentFormData>
+  ): Promise<Department> {
     const response = await api.put<Department>(`${this.baseURL}/${id}`, data);
     return response.data;
   }
@@ -87,7 +96,7 @@ export class DepartmentService {
 }
 
 export class SpecializationService {
-  private baseURL = '/api/specializations';
+  private baseURL = "/api/specializations";
 
   async getAll(): Promise<SpecializationDisplay[]> {
     const response = await api.get<SpecializationDisplay[]>(this.baseURL);
@@ -95,12 +104,18 @@ export class SpecializationService {
   }
 
   async getById(id: number): Promise<SpecializationDisplay> {
-    const response = await api.get<SpecializationDisplay>(`${this.baseURL}/${id}`);
+    const response = await api.get<SpecializationDisplay>(
+      `${this.baseURL}/${id}`
+    );
     return response.data;
   }
 
-  async getByDepartment(departmentId: number): Promise<SpecializationDisplay[]> {
-    const response = await api.get<SpecializationDisplay[]>(`${this.baseURL}/department/${departmentId}`);
+  async getByDepartment(
+    departmentId: number
+  ): Promise<SpecializationDisplay[]> {
+    const response = await api.get<SpecializationDisplay[]>(
+      `${this.baseURL}/department/${departmentId}`
+    );
     return response.data;
   }
 
@@ -109,8 +124,14 @@ export class SpecializationService {
     return response.data;
   }
 
-  async update(id: number, data: Partial<SpecializationFormData>): Promise<Specialization> {
-    const response = await api.put<Specialization>(`${this.baseURL}/${id}`, data);
+  async update(
+    id: number,
+    data: Partial<SpecializationFormData>
+  ): Promise<Specialization> {
+    const response = await api.put<Specialization>(
+      `${this.baseURL}/${id}`,
+      data
+    );
     return response.data;
   }
 
@@ -119,7 +140,9 @@ export class SpecializationService {
   }
 
   async getActive(): Promise<SpecializationDisplay[]> {
-    const response = await api.get<SpecializationDisplay[]>(`${this.baseURL}/active`);
+    const response = await api.get<SpecializationDisplay[]>(
+      `${this.baseURL}/active`
+    );
     return response.data;
   }
 }

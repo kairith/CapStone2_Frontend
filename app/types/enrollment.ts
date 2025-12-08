@@ -1,4 +1,4 @@
-import type { EnrollmentStatus } from './enums';
+import type { EnrollmentStatus } from "./enums";
 
 // Enrollments - links students to course offerings
 export interface Enrollment {
@@ -27,7 +27,7 @@ export interface EnrollmentDisplay extends Enrollment {
   student_name?: string;
   student_code?: string;
   student_email?: string;
-  
+
   // Course offering info
   subject_name?: string;
   subject_code?: string;
@@ -35,7 +35,7 @@ export interface EnrollmentDisplay extends Enrollment {
   term_name?: string;
   instructor_name?: string;
   generation_name?: string;
-  
+
   // Attendance statistics
   total_sessions?: number;
   attended_sessions?: number;

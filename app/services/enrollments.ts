@@ -1,21 +1,21 @@
-import { api } from './api';
-import type { 
-  Enrollment, 
-  EnrollmentFormData, 
+import { api } from "./api";
+import type {
+  Enrollment,
+  EnrollmentFormData,
   EnrollmentDisplay,
   EnrollmentFilters,
-  BulkEnrollmentData
-} from '~/types/enrollment';
+  BulkEnrollmentData,
+} from "~/types/enrollment";
 
 export class EnrollmentService {
-  private baseURL = '/api/enrollments';
+  private baseURL = "/api/enrollments";
 
   /**
    * Get all enrollments with optional filters
    */
   async getAll(filters?: EnrollmentFilters): Promise<EnrollmentDisplay[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -41,7 +41,9 @@ export class EnrollmentService {
    * Get enrollments by student
    */
   async getByStudent(studentId: number): Promise<EnrollmentDisplay[]> {
-    const response = await api.get<EnrollmentDisplay[]>(`${this.baseURL}/student/${studentId}`);
+    const response = await api.get<EnrollmentDisplay[]>(
+      `${this.baseURL}/student/${studentId}`
+    );
     return response.data;
   }
 
@@ -49,7 +51,9 @@ export class EnrollmentService {
    * Get enrollments by course offering
    */
   async getByOffering(offeringId: number): Promise<EnrollmentDisplay[]> {
-    const response = await api.get<EnrollmentDisplay[]>(`${this.baseURL}/offering/${offeringId}`);
+    const response = await api.get<EnrollmentDisplay[]>(
+      `${this.baseURL}/offering/${offeringId}`
+    );
     return response.data;
   }
 
@@ -57,7 +61,9 @@ export class EnrollmentService {
    * Get student's current enrollments (active term)
    */
   async getCurrentEnrollments(studentId: number): Promise<EnrollmentDisplay[]> {
-    const response = await api.get<EnrollmentDisplay[]>(`${this.baseURL}/student/${studentId}/current`);
+    const response = await api.get<EnrollmentDisplay[]>(
+      `${this.baseURL}/student/${studentId}/current`
+    );
     return response.data;
   }
 
@@ -80,7 +86,10 @@ export class EnrollmentService {
   /**
    * Update an enrollment
    */
-  async update(id: number, data: Partial<EnrollmentFormData>): Promise<Enrollment> {
+  async update(
+    id: number,
+    data: Partial<EnrollmentFormData>
+  ): Promise<Enrollment> {
     const response = await api.put<Enrollment>(`${this.baseURL}/${id}`, data);
     return response.data;
   }
@@ -104,15 +113,23 @@ export class EnrollmentService {
    * Mark enrollment as completed (set status to 3)
    */
   async complete(id: number): Promise<Enrollment> {
-    const response = await api.patch<Enrollment>(`${this.baseURL}/${id}/complete`);
+    const response = await api.patch<Enrollment>(
+      `${this.baseURL}/${id}/complete`
+    );
     return response.data;
   }
 
   /**
    * Check if student is enrolled in a course offering
    */
-  async checkEnrollment(studentId: number, offeringId: number): Promise<{ enrolled: boolean; enrollment?: Enrollment }> {
-    const response = await api.get<{ enrolled: boolean; enrollment?: Enrollment }>(
+  async checkEnrollment(
+    studentId: number,
+    offeringId: number
+  ): Promise<{ enrolled: boolean; enrollment?: Enrollment }> {
+    const response = await api.get<{
+      enrolled: boolean;
+      enrollment?: Enrollment;
+    }>(
       `${this.baseURL}/check?student_id=${studentId}&offering_id=${offeringId}`
     );
     return response.data;
@@ -122,7 +139,9 @@ export class EnrollmentService {
    * Get enrollment with attendance statistics
    */
   async getWithStats(id: number): Promise<EnrollmentDisplay> {
-    const response = await api.get<EnrollmentDisplay>(`${this.baseURL}/${id}/stats`);
+    const response = await api.get<EnrollmentDisplay>(
+      `${this.baseURL}/${id}/stats`
+    );
     return response.data;
   }
 
@@ -135,7 +154,9 @@ export class EnrollmentService {
     dropped: number;
     completed: number;
   }> {
-    const response = await api.get(`${this.baseURL}/offering/${offeringId}/statistics`);
+    const response = await api.get(
+      `${this.baseURL}/offering/${offeringId}/statistics`
+    );
     return response.data;
   }
 
@@ -149,14 +170,19 @@ export class EnrollmentService {
     dropped: number;
     total_credits: number;
   }> {
-    const response = await api.get(`${this.baseURL}/student/${studentId}/statistics`);
+    const response = await api.get(
+      `${this.baseURL}/student/${studentId}/statistics`
+    );
     return response.data;
   }
 
   /**
    * Enroll entire group to a course offering
    */
-  async enrollGroup(offeringId: number, groupId: number): Promise<Enrollment[]> {
+  async enrollGroup(
+    offeringId: number,
+    groupId: number
+  ): Promise<Enrollment[]> {
     const response = await api.post<Enrollment[]>(
       `${this.baseURL}/enroll-group`,
       { offering_id: offeringId, group_id: groupId }
@@ -167,7 +193,10 @@ export class EnrollmentService {
   /**
    * Validate enrollment eligibility
    */
-  async validateEnrollment(studentId: number, offeringId: number): Promise<{
+  async validateEnrollment(
+    studentId: number,
+    offeringId: number
+  ): Promise<{
     eligible: boolean;
     reasons?: string[];
   }> {

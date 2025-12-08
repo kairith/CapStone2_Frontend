@@ -1,15 +1,15 @@
-import { defineStore } from 'pinia';
-import type { 
-  Session, 
-  SessionDisplay, 
+import { defineStore } from "pinia";
+import type {
+  Session,
+  SessionDisplay,
   SessionFormData,
   SessionFilters,
   SessionBulkCreateData,
-  SessionWithAttendance
-} from '~/types/session';
-import { sessionService } from '~/services/sessions';
+  SessionWithAttendance,
+} from "~/types/session";
+import { sessionService } from "~/services/sessions";
 
-export const useSessionStore = defineStore('session', {
+export const useSessionStore = defineStore("session", {
   state: () => ({
     sessions: [] as SessionDisplay[],
     currentSession: null as SessionDisplay | null,
@@ -21,21 +21,25 @@ export const useSessionStore = defineStore('session', {
 
   getters: {
     // Get active sessions
-    activeSessions: (state) =>
-      state.sessions.filter((s) => s.active === 1),
+    activeSessions: (state) => state.sessions.filter((s) => s.active === 1),
 
     // Get sessions by status
-    sessionsByStatus: (state) => (status: 'planned' | 'completed' | 'canceled' | 'makeup') =>
-      state.sessions.filter((s) => s.status === status),
+    sessionsByStatus:
+      (state) => (status: "planned" | "completed" | "canceled" | "makeup") =>
+        state.sessions.filter((s) => s.status === status),
 
     // Get upcoming sessions (planned and not past)
     upcomingSessions: (state) =>
-      state.sessions.filter((s) => 
-        s.status === 'planned' && 
-        new Date(s.start_datetime) > new Date()
-      ).sort((a, b) => 
-        new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime()
-      ),
+      state.sessions
+        .filter(
+          (s) =>
+            s.status === "planned" && new Date(s.start_datetime) > new Date()
+        )
+        .sort(
+          (a, b) =>
+            new Date(a.start_datetime).getTime() -
+            new Date(b.start_datetime).getTime()
+        ),
 
     // Get today's sessions
     todaySessions: (state) => {
@@ -43,13 +47,17 @@ export const useSessionStore = defineStore('session', {
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      return state.sessions.filter((s) => {
-        const sessionDate = new Date(s.start_datetime);
-        return sessionDate >= today && sessionDate < tomorrow;
-      }).sort((a, b) => 
-        new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime()
-      );
+
+      return state.sessions
+        .filter((s) => {
+          const sessionDate = new Date(s.start_datetime);
+          return sessionDate >= today && sessionDate < tomorrow;
+        })
+        .sort(
+          (a, b) =>
+            new Date(a.start_datetime).getTime() -
+            new Date(b.start_datetime).getTime()
+        );
     },
 
     // Get ongoing sessions
@@ -58,7 +66,7 @@ export const useSessionStore = defineStore('session', {
       return state.sessions.filter((s) => {
         const start = new Date(s.start_datetime);
         const end = new Date(s.end_datetime);
-        return start <= now && end >= now && s.status !== 'canceled';
+        return start <= now && end >= now && s.status !== "canceled";
       });
     },
 
@@ -76,15 +84,15 @@ export const useSessionStore = defineStore('session', {
 
     // Get completed sessions
     completedSessions: (state) =>
-      state.sessions.filter((s) => s.status === 'completed'),
+      state.sessions.filter((s) => s.status === "completed"),
 
     // Get canceled sessions
     canceledSessions: (state) =>
-      state.sessions.filter((s) => s.status === 'canceled'),
+      state.sessions.filter((s) => s.status === "canceled"),
 
     // Get makeup sessions
     makeupSessions: (state) =>
-      state.sessions.filter((s) => s.status === 'makeup'),
+      state.sessions.filter((s) => s.status === "makeup"),
   },
 
   actions: {
@@ -98,8 +106,8 @@ export const useSessionStore = defineStore('session', {
         }
         this.sessions = await sessionService.getAll(this.filters);
       } catch (error) {
-        this.error = 'Failed to fetch sessions';
-        console.error('Error fetching sessions:', error);
+        this.error = "Failed to fetch sessions";
+        console.error("Error fetching sessions:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -114,8 +122,8 @@ export const useSessionStore = defineStore('session', {
         this.currentSession = await sessionService.getById(id);
         return this.currentSession;
       } catch (error) {
-        this.error = 'Failed to fetch session';
-        console.error('Error fetching session:', error);
+        this.error = "Failed to fetch session";
+        console.error("Error fetching session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -127,11 +135,12 @@ export const useSessionStore = defineStore('session', {
       this.loading = true;
       this.error = null;
       try {
-        this.currentSessionWithAttendance = await sessionService.getWithAttendance(id);
+        this.currentSessionWithAttendance =
+          await sessionService.getWithAttendance(id);
         return this.currentSessionWithAttendance;
       } catch (error) {
-        this.error = 'Failed to fetch session with attendance';
-        console.error('Error fetching session with attendance:', error);
+        this.error = "Failed to fetch session with attendance";
+        console.error("Error fetching session with attendance:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -145,8 +154,8 @@ export const useSessionStore = defineStore('session', {
       try {
         this.sessions = await sessionService.getByOffering(offeringId);
       } catch (error) {
-        this.error = 'Failed to fetch sessions by offering';
-        console.error('Error fetching sessions by offering:', error);
+        this.error = "Failed to fetch sessions by offering";
+        console.error("Error fetching sessions by offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -158,10 +167,13 @@ export const useSessionStore = defineStore('session', {
       this.loading = true;
       this.error = null;
       try {
-        this.sessions = await sessionService.getByInstructor(instructorId, filters);
+        this.sessions = await sessionService.getByInstructor(
+          instructorId,
+          filters
+        );
       } catch (error) {
-        this.error = 'Failed to fetch sessions by instructor';
-        console.error('Error fetching sessions by instructor:', error);
+        this.error = "Failed to fetch sessions by instructor";
+        console.error("Error fetching sessions by instructor:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -175,8 +187,8 @@ export const useSessionStore = defineStore('session', {
       try {
         this.sessions = await sessionService.getByStudent(studentId, filters);
       } catch (error) {
-        this.error = 'Failed to fetch sessions by student';
-        console.error('Error fetching sessions by student:', error);
+        this.error = "Failed to fetch sessions by student";
+        console.error("Error fetching sessions by student:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -190,8 +202,8 @@ export const useSessionStore = defineStore('session', {
       try {
         this.sessions = await sessionService.getUpcoming(limit);
       } catch (error) {
-        this.error = 'Failed to fetch upcoming sessions';
-        console.error('Error fetching upcoming sessions:', error);
+        this.error = "Failed to fetch upcoming sessions";
+        console.error("Error fetching upcoming sessions:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -224,20 +236,22 @@ export const useSessionStore = defineStore('session', {
           data.start_datetime,
           data.end_datetime
         );
-        
+
         if (conflictCheck.hasConflict) {
-          throw new Error(`Room conflict detected: ${JSON.stringify(conflictCheck.conflicts)}`);
+          throw new Error(
+            `Room conflict detected: ${JSON.stringify(conflictCheck.conflicts)}`
+          );
         }
 
         const newSession = await sessionService.create(data);
-        
+
         // Refresh the list
         await this.fetchSessions(this.filters);
-        
+
         return newSession;
       } catch (error) {
-        this.error = 'Failed to create session';
-        console.error('Error creating session:', error);
+        this.error = "Failed to create session";
+        console.error("Error creating session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -250,14 +264,14 @@ export const useSessionStore = defineStore('session', {
       this.error = null;
       try {
         const newSessions = await sessionService.bulkCreate(data);
-        
+
         // Refresh the list
         await this.fetchSessions(this.filters);
-        
+
         return newSessions;
       } catch (error) {
-        this.error = 'Failed to bulk create sessions';
-        console.error('Error bulk creating sessions:', error);
+        this.error = "Failed to bulk create sessions";
+        console.error("Error bulk creating sessions:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -270,7 +284,7 @@ export const useSessionStore = defineStore('session', {
       this.error = null;
       try {
         const updated = await sessionService.update(id, data);
-        
+
         // Update in local state
         const index = this.sessions.findIndex((s) => s.id === id);
         if (index !== -1) {
@@ -278,11 +292,11 @@ export const useSessionStore = defineStore('session', {
           await this.fetchSessionById(id);
           this.sessions[index] = this.currentSession!;
         }
-        
+
         return updated;
       } catch (error) {
-        this.error = 'Failed to update session';
-        console.error('Error updating session:', error);
+        this.error = "Failed to update session";
+        console.error("Error updating session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -295,12 +309,12 @@ export const useSessionStore = defineStore('session', {
       this.error = null;
       try {
         await sessionService.delete(id);
-        
+
         // Remove from local state
         this.sessions = this.sessions.filter((s) => s.id !== id);
       } catch (error) {
-        this.error = 'Failed to delete session';
-        console.error('Error deleting session:', error);
+        this.error = "Failed to delete session";
+        console.error("Error deleting session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -308,22 +322,25 @@ export const useSessionStore = defineStore('session', {
     },
 
     // Update session status
-    async updateStatus(id: number, status: 'planned' | 'completed' | 'canceled' | 'makeup') {
+    async updateStatus(
+      id: number,
+      status: "planned" | "completed" | "canceled" | "makeup"
+    ) {
       this.loading = true;
       this.error = null;
       try {
         const updated = await sessionService.updateStatus(id, status);
-        
+
         // Update in local state
         const index = this.sessions.findIndex((s) => s.id === id);
         if (index !== -1 && this.sessions[index]) {
           this.sessions[index]!.status = status;
         }
-        
+
         return updated;
       } catch (error) {
-        this.error = 'Failed to update session status';
-        console.error('Error updating session status:', error);
+        this.error = "Failed to update session status";
+        console.error("Error updating session status:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -332,7 +349,7 @@ export const useSessionStore = defineStore('session', {
 
     // Mark session as completed
     async markCompleted(id: number) {
-      return this.updateStatus(id, 'completed');
+      return this.updateStatus(id, "completed");
     },
 
     // Cancel session
@@ -341,17 +358,17 @@ export const useSessionStore = defineStore('session', {
       this.error = null;
       try {
         const updated = await sessionService.cancel(id, reason);
-        
+
         // Update in local state
         const index = this.sessions.findIndex((s) => s.id === id);
         if (index !== -1 && this.sessions[index]) {
-          this.sessions[index]!.status = 'canceled';
+          this.sessions[index]!.status = "canceled";
         }
-        
+
         return updated;
       } catch (error) {
-        this.error = 'Failed to cancel session';
-        console.error('Error canceling session:', error);
+        this.error = "Failed to cancel session";
+        console.error("Error canceling session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -359,19 +376,25 @@ export const useSessionStore = defineStore('session', {
     },
 
     // Create makeup session
-    async createMakeupSession(originalSessionId: number, data: SessionFormData) {
+    async createMakeupSession(
+      originalSessionId: number,
+      data: SessionFormData
+    ) {
       this.loading = true;
       this.error = null;
       try {
-        const makeup = await sessionService.createMakeup(originalSessionId, data);
-        
+        const makeup = await sessionService.createMakeup(
+          originalSessionId,
+          data
+        );
+
         // Refresh the list
         await this.fetchSessions(this.filters);
-        
+
         return makeup;
       } catch (error) {
-        this.error = 'Failed to create makeup session';
-        console.error('Error creating makeup session:', error);
+        this.error = "Failed to create makeup session";
+        console.error("Error creating makeup session:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -379,27 +402,33 @@ export const useSessionStore = defineStore('session', {
     },
 
     // Generate schedule
-    async generateSchedule(offeringId: number, scheduleData: {
-      start_date: string;
-      end_date: string;
-      days_of_week: number[];
-      start_time: string;
-      end_time: string;
-      room_id: number;
-      exclude_dates?: string[];
-    }) {
+    async generateSchedule(
+      offeringId: number,
+      scheduleData: {
+        start_date: string;
+        end_date: string;
+        days_of_week: number[];
+        start_time: string;
+        end_time: string;
+        room_id: number;
+        exclude_dates?: string[];
+      }
+    ) {
       this.loading = true;
       this.error = null;
       try {
-        const generatedSessions = await sessionService.generateSchedule(offeringId, scheduleData);
-        
+        const generatedSessions = await sessionService.generateSchedule(
+          offeringId,
+          scheduleData
+        );
+
         // Refresh the list
         await this.fetchSessions(this.filters);
-        
+
         return generatedSessions;
       } catch (error) {
-        this.error = 'Failed to generate schedule';
-        console.error('Error generating schedule:', error);
+        this.error = "Failed to generate schedule";
+        console.error("Error generating schedule:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -413,8 +442,8 @@ export const useSessionStore = defineStore('session', {
       try {
         return await sessionService.getAttendanceStats(id);
       } catch (error) {
-        this.error = 'Failed to fetch attendance statistics';
-        console.error('Error fetching attendance statistics:', error);
+        this.error = "Failed to fetch attendance statistics";
+        console.error("Error fetching attendance statistics:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -428,8 +457,8 @@ export const useSessionStore = defineStore('session', {
       try {
         return await sessionService.getStatistics(filters);
       } catch (error) {
-        this.error = 'Failed to fetch statistics';
-        console.error('Error fetching statistics:', error);
+        this.error = "Failed to fetch statistics";
+        console.error("Error fetching statistics:", error);
         throw error;
       } finally {
         this.loading = false;

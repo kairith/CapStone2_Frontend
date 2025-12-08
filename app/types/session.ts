@@ -1,4 +1,4 @@
-import type { SessionStatus } from './enums';
+import type { SessionStatus } from "./enums";
 
 // Sessions - real class meetings that depend on course offerings and rooms
 export interface Session {
@@ -33,11 +33,11 @@ export interface SessionDisplay extends Session {
   instructor_name?: string;
   assistant_name?: string;
   generation_name?: string;
-  
+
   // Room info
   room_name?: string;
   room_capacity?: number;
-  
+
   // Attendance stats
   total_students?: number;
   present_count?: number;
@@ -45,7 +45,7 @@ export interface SessionDisplay extends Session {
   late_count?: number;
   excused_count?: number;
   attendance_rate?: number;
-  
+
   // Calculated fields
   duration_minutes?: number;
   is_upcoming?: boolean;

@@ -1,4 +1,4 @@
-import type { OfferingStatus } from './enums';
+import type { OfferingStatus } from "./enums";
 
 // Course Offerings - connects subjects, terms, groups, instructors, rooms, and generations
 export interface CourseOffering {

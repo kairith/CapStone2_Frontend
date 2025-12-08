@@ -1,22 +1,22 @@
-import { api } from './api';
-import type { 
-  Session, 
-  SessionFormData, 
+import { api } from "./api";
+import type {
+  Session,
+  SessionFormData,
   SessionDisplay,
   SessionFilters,
   SessionBulkCreateData,
-  SessionWithAttendance
-} from '~/types/session';
+  SessionWithAttendance,
+} from "~/types/session";
 
 export class SessionService {
-  private baseURL = '/api/sessions';
+  private baseURL = "/api/sessions";
 
   /**
    * Get all sessions with optional filters
    */
   async getAll(filters?: SessionFilters): Promise<SessionDisplay[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -42,7 +42,9 @@ export class SessionService {
    * Get session with attendance records
    */
   async getWithAttendance(id: number): Promise<SessionWithAttendance> {
-    const response = await api.get<SessionWithAttendance>(`${this.baseURL}/${id}/attendance`);
+    const response = await api.get<SessionWithAttendance>(
+      `${this.baseURL}/${id}/attendance`
+    );
     return response.data;
   }
 
@@ -50,7 +52,9 @@ export class SessionService {
    * Get sessions by course offering
    */
   async getByOffering(offeringId: number): Promise<SessionDisplay[]> {
-    const response = await api.get<SessionDisplay[]>(`${this.baseURL}/offering/${offeringId}`);
+    const response = await api.get<SessionDisplay[]>(
+      `${this.baseURL}/offering/${offeringId}`
+    );
     return response.data;
   }
 
@@ -58,14 +62,19 @@ export class SessionService {
    * Get sessions by room
    */
   async getByRoom(roomId: number): Promise<SessionDisplay[]> {
-    const response = await api.get<SessionDisplay[]>(`${this.baseURL}/room/${roomId}`);
+    const response = await api.get<SessionDisplay[]>(
+      `${this.baseURL}/room/${roomId}`
+    );
     return response.data;
   }
 
   /**
    * Get sessions by date range
    */
-  async getByDateRange(startDate: string, endDate: string): Promise<SessionDisplay[]> {
+  async getByDateRange(
+    startDate: string,
+    endDate: string
+  ): Promise<SessionDisplay[]> {
     const response = await api.get<SessionDisplay[]>(
       `${this.baseURL}/date-range?start=${startDate}&end=${endDate}`
     );
@@ -76,7 +85,9 @@ export class SessionService {
    * Get upcoming sessions
    */
   async getUpcoming(limit?: number): Promise<SessionDisplay[]> {
-    const url = limit ? `${this.baseURL}/upcoming?limit=${limit}` : `${this.baseURL}/upcoming`;
+    const url = limit
+      ? `${this.baseURL}/upcoming?limit=${limit}`
+      : `${this.baseURL}/upcoming`;
     const response = await api.get<SessionDisplay[]>(url);
     return response.data;
   }
@@ -92,9 +103,12 @@ export class SessionService {
   /**
    * Get sessions for a specific instructor
    */
-  async getByInstructor(instructorId: number, filters?: SessionFilters): Promise<SessionDisplay[]> {
+  async getByInstructor(
+    instructorId: number,
+    filters?: SessionFilters
+  ): Promise<SessionDisplay[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -103,10 +117,10 @@ export class SessionService {
       });
     }
 
-    const url = params.toString() 
+    const url = params.toString()
       ? `${this.baseURL}/instructor/${instructorId}?${params}`
       : `${this.baseURL}/instructor/${instructorId}`;
-    
+
     const response = await api.get<SessionDisplay[]>(url);
     return response.data;
   }
@@ -114,9 +128,12 @@ export class SessionService {
   /**
    * Get sessions for a specific student (through enrollments)
    */
-  async getByStudent(studentId: number, filters?: SessionFilters): Promise<SessionDisplay[]> {
+  async getByStudent(
+    studentId: number,
+    filters?: SessionFilters
+  ): Promise<SessionDisplay[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -125,10 +142,10 @@ export class SessionService {
       });
     }
 
-    const url = params.toString() 
+    const url = params.toString()
       ? `${this.baseURL}/student/${studentId}?${params}`
       : `${this.baseURL}/student/${studentId}`;
-    
+
     const response = await api.get<SessionDisplay[]>(url);
     return response.data;
   }
@@ -167,8 +184,13 @@ export class SessionService {
   /**
    * Update session status
    */
-  async updateStatus(id: number, status: 'planned' | 'completed' | 'canceled' | 'makeup'): Promise<Session> {
-    const response = await api.patch<Session>(`${this.baseURL}/${id}/status`, { status });
+  async updateStatus(
+    id: number,
+    status: "planned" | "completed" | "canceled" | "makeup"
+  ): Promise<Session> {
+    const response = await api.patch<Session>(`${this.baseURL}/${id}/status`, {
+      status,
+    });
     return response.data;
   }
 
@@ -176,21 +198,26 @@ export class SessionService {
    * Mark session as completed
    */
   async markCompleted(id: number): Promise<Session> {
-    return this.updateStatus(id, 'completed');
+    return this.updateStatus(id, "completed");
   }
 
   /**
    * Cancel a session
    */
   async cancel(id: number, reason?: string): Promise<Session> {
-    const response = await api.patch<Session>(`${this.baseURL}/${id}/cancel`, { reason });
+    const response = await api.patch<Session>(`${this.baseURL}/${id}/cancel`, {
+      reason,
+    });
     return response.data;
   }
 
   /**
    * Create a makeup session
    */
-  async createMakeup(originalSessionId: number, data: SessionFormData): Promise<Session> {
+  async createMakeup(
+    originalSessionId: number,
+    data: SessionFormData
+  ): Promise<Session> {
     const response = await api.post<Session>(
       `${this.baseURL}/${originalSessionId}/makeup`,
       data
@@ -201,14 +228,24 @@ export class SessionService {
   /**
    * Check for room conflicts
    */
-  async checkRoomConflict(roomId: number, startDatetime: string, endDatetime: string, excludeSessionId?: number): Promise<{
+  async checkRoomConflict(
+    roomId: number,
+    startDatetime: string,
+    endDatetime: string,
+    excludeSessionId?: number
+  ): Promise<{
     hasConflict: boolean;
     conflicts: SessionDisplay[];
   }> {
-    const response = await api.post<{ hasConflict: boolean; conflicts: SessionDisplay[] }>(
-      `${this.baseURL}/check-room-conflict`,
-      { room_id: roomId, start_datetime: startDatetime, end_datetime: endDatetime, exclude_session_id: excludeSessionId }
-    );
+    const response = await api.post<{
+      hasConflict: boolean;
+      conflicts: SessionDisplay[];
+    }>(`${this.baseURL}/check-room-conflict`, {
+      room_id: roomId,
+      start_datetime: startDatetime,
+      end_datetime: endDatetime,
+      exclude_session_id: excludeSessionId,
+    });
     return response.data;
   }
 
@@ -239,7 +276,7 @@ export class SessionService {
     canceled: number;
   }> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -248,10 +285,10 @@ export class SessionService {
       });
     }
 
-    const url = params.toString() 
-      ? `${this.baseURL}/statistics?${params}` 
+    const url = params.toString()
+      ? `${this.baseURL}/statistics?${params}`
       : `${this.baseURL}/statistics`;
-    
+
     const response = await api.get(url);
     return response.data;
   }
@@ -259,15 +296,18 @@ export class SessionService {
   /**
    * Generate sessions for a course offering based on schedule pattern
    */
-  async generateSchedule(offeringId: number, scheduleData: {
-    start_date: string;
-    end_date: string;
-    days_of_week: number[]; // 0=Sunday, 1=Monday, etc.
-    start_time: string;
-    end_time: string;
-    room_id: number;
-    exclude_dates?: string[]; // Holidays, etc.
-  }): Promise<Session[]> {
+  async generateSchedule(
+    offeringId: number,
+    scheduleData: {
+      start_date: string;
+      end_date: string;
+      days_of_week: number[]; // 0=Sunday, 1=Monday, etc.
+      start_time: string;
+      end_time: string;
+      room_id: number;
+      exclude_dates?: string[]; // Holidays, etc.
+    }
+  ): Promise<Session[]> {
     const response = await api.post<Session[]>(
       `${this.baseURL}/generate-schedule`,
       { offering_id: offeringId, ...scheduleData }

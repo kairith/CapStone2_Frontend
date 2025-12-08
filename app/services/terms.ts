@@ -1,8 +1,8 @@
-import { api } from './api';
-import type { Term, TermFormData } from '~/types/catalog';
+import { api } from "./api";
+import type { Term, TermFormData } from "~/types/catalog";
 
 export class TermService {
-  private baseURL = '/api/terms';
+  private baseURL = "/api/terms";
 
   async getAll(): Promise<Term[]> {
     const response = await api.get<Term[]>(this.baseURL);

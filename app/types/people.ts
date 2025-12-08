@@ -1,4 +1,4 @@
-import type { Role, Position, Gender } from './enums';
+import type { Role, Position, Gender } from "./enums";
 
 // Admins
 export interface Admin {

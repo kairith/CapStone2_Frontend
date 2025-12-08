@@ -1,13 +1,13 @@
-import { defineStore } from 'pinia';
-import type { 
-  CourseOffering, 
-  CourseOfferingDisplay, 
+import { defineStore } from "pinia";
+import type {
+  CourseOffering,
+  CourseOfferingDisplay,
   CourseOfferingFormData,
-  CourseOfferingFilters 
-} from '~/types/courseOffering';
-import { courseOfferingService } from '~/services/courseOfferings';
+  CourseOfferingFilters,
+} from "~/types/courseOffering";
+import { courseOfferingService } from "~/services/courseOfferings";
 
-export const useCourseOfferingStore = defineStore('courseOffering', {
+export const useCourseOfferingStore = defineStore("courseOffering", {
   state: () => ({
     offerings: [] as CourseOfferingDisplay[],
     currentOffering: null as CourseOfferingDisplay | null,
@@ -18,8 +18,7 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
 
   getters: {
     // Get active offerings
-    activeOfferings: (state) =>
-      state.offerings.filter((o) => o.active === 1),
+    activeOfferings: (state) => state.offerings.filter((o) => o.active === 1),
 
     // Get offerings by status
     offeringsByStatus: (state) => (status: 1 | 2 | 3 | 4) =>
@@ -46,12 +45,10 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       state.offerings.find((o) => o.id === id),
 
     // Get planned offerings (status = 1)
-    plannedOfferings: (state) =>
-      state.offerings.filter((o) => o.status === 1),
+    plannedOfferings: (state) => state.offerings.filter((o) => o.status === 1),
 
     // Get active offerings (status = 2)
-    currentOfferings: (state) =>
-      state.offerings.filter((o) => o.status === 2),
+    currentOfferings: (state) => state.offerings.filter((o) => o.status === 2),
 
     // Get completed offerings (status = 3)
     completedOfferings: (state) =>
@@ -69,8 +66,8 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
         }
         this.offerings = await courseOfferingService.getAll(this.filters);
       } catch (error) {
-        this.error = 'Failed to fetch course offerings';
-        console.error('Error fetching course offerings:', error);
+        this.error = "Failed to fetch course offerings";
+        console.error("Error fetching course offerings:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -85,8 +82,8 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
         this.currentOffering = await courseOfferingService.getById(id);
         return this.currentOffering;
       } catch (error) {
-        this.error = 'Failed to fetch course offering';
-        console.error('Error fetching course offering:', error);
+        this.error = "Failed to fetch course offering";
+        console.error("Error fetching course offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -100,8 +97,8 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       try {
         this.offerings = await courseOfferingService.getByTerm(termId);
       } catch (error) {
-        this.error = 'Failed to fetch course offerings by term';
-        console.error('Error fetching course offerings by term:', error);
+        this.error = "Failed to fetch course offerings by term";
+        console.error("Error fetching course offerings by term:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -113,10 +110,12 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       this.loading = true;
       this.error = null;
       try {
-        this.offerings = await courseOfferingService.getByInstructor(instructorId);
+        this.offerings = await courseOfferingService.getByInstructor(
+          instructorId
+        );
       } catch (error) {
-        this.error = 'Failed to fetch course offerings by instructor';
-        console.error('Error fetching course offerings by instructor:', error);
+        this.error = "Failed to fetch course offerings by instructor";
+        console.error("Error fetching course offerings by instructor:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -130,8 +129,8 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       try {
         this.offerings = await courseOfferingService.getCurrentTermOfferings();
       } catch (error) {
-        this.error = 'Failed to fetch current term offerings';
-        console.error('Error fetching current term offerings:', error);
+        this.error = "Failed to fetch current term offerings";
+        console.error("Error fetching current term offerings:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -146,18 +145,22 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
         // Check for conflicts first
         const conflictCheck = await courseOfferingService.checkConflicts(data);
         if (conflictCheck.hasConflict) {
-          throw new Error(`Scheduling conflicts detected: ${JSON.stringify(conflictCheck.conflicts)}`);
+          throw new Error(
+            `Scheduling conflicts detected: ${JSON.stringify(
+              conflictCheck.conflicts
+            )}`
+          );
         }
 
         const newOffering = await courseOfferingService.create(data);
-        
+
         // Refresh the list
         await this.fetchOfferings(this.filters);
-        
+
         return newOffering;
       } catch (error) {
-        this.error = 'Failed to create course offering';
-        console.error('Error creating course offering:', error);
+        this.error = "Failed to create course offering";
+        console.error("Error creating course offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -170,7 +173,7 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       this.error = null;
       try {
         const updated = await courseOfferingService.update(id, data);
-        
+
         // Update in local state
         const index = this.offerings.findIndex((o) => o.id === id);
         if (index !== -1) {
@@ -178,11 +181,11 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
           await this.fetchOfferingById(id);
           this.offerings[index] = this.currentOffering!;
         }
-        
+
         return updated;
       } catch (error) {
-        this.error = 'Failed to update course offering';
-        console.error('Error updating course offering:', error);
+        this.error = "Failed to update course offering";
+        console.error("Error updating course offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -195,12 +198,12 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       this.error = null;
       try {
         await courseOfferingService.delete(id);
-        
+
         // Remove from local state
         this.offerings = this.offerings.filter((o) => o.id !== id);
       } catch (error) {
-        this.error = 'Failed to delete course offering';
-        console.error('Error deleting course offering:', error);
+        this.error = "Failed to delete course offering";
+        console.error("Error deleting course offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -213,17 +216,17 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       this.error = null;
       try {
         const updated = await courseOfferingService.updateStatus(id, status);
-        
+
         // Update in local state
         const index = this.offerings.findIndex((o) => o.id === id);
         if (index !== -1 && this.offerings[index]) {
           this.offerings[index]!.status = status;
         }
-        
+
         return updated;
       } catch (error) {
-        this.error = 'Failed to update offering status';
-        console.error('Error updating offering status:', error);
+        this.error = "Failed to update offering status";
+        console.error("Error updating offering status:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -236,14 +239,14 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       this.error = null;
       try {
         const cloned = await courseOfferingService.clone(id, newTermId);
-        
+
         // Refresh the list
         await this.fetchOfferings(this.filters);
-        
+
         return cloned;
       } catch (error) {
-        this.error = 'Failed to clone course offering';
-        console.error('Error cloning course offering:', error);
+        this.error = "Failed to clone course offering";
+        console.error("Error cloning course offering:", error);
         throw error;
       } finally {
         this.loading = false;
@@ -257,8 +260,8 @@ export const useCourseOfferingStore = defineStore('courseOffering', {
       try {
         return await courseOfferingService.getStatistics(filters);
       } catch (error) {
-        this.error = 'Failed to fetch statistics';
-        console.error('Error fetching statistics:', error);
+        this.error = "Failed to fetch statistics";
+        console.error("Error fetching statistics:", error);
         throw error;
       } finally {
         this.loading = false;

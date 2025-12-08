@@ -1,8 +1,8 @@
-import { api } from './api';
-import type { Room, RoomFormData } from '~/types/catalog';
+import { api } from "./api";
+import type { Room, RoomFormData } from "~/types/catalog";
 
 export class RoomService {
-  private baseURL = '/api/rooms';
+  private baseURL = "/api/rooms";
 
   async getAll(): Promise<Room[]> {
     const response = await api.get<Room[]>(this.baseURL);
@@ -33,14 +33,21 @@ export class RoomService {
     return response.data;
   }
 
-  async getAvailable(startDatetime: string, endDatetime: string): Promise<Room[]> {
+  async getAvailable(
+    startDatetime: string,
+    endDatetime: string
+  ): Promise<Room[]> {
     const response = await api.get<Room[]>(
       `${this.baseURL}/available?start=${startDatetime}&end=${endDatetime}`
     );
     return response.data;
   }
 
-  async checkAvailability(roomId: number, startDatetime: string, endDatetime: string): Promise<{
+  async checkAvailability(
+    roomId: number,
+    startDatetime: string,
+    endDatetime: string
+  ): Promise<{
     available: boolean;
     conflicts?: any[];
   }> {
