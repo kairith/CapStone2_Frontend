@@ -1,34 +1,34 @@
-﻿<template>
-    <div class="professors-page">
+<template>
+    <div class="specializations-page">
         <!-- Modern Header Section -->
         <div class="modern-header">
             <div class="header-container">
                 <div class="title-section">
                     <div class="title-wrapper">
                         <div class="title-icon">
-                            <v-icon icon="mdi-account-tie" size="32" color="white" />
+                            <v-icon icon="mdi-school" size="32" color="white" />
                         </div>
                         <div class="title-content">
-                            <h1 class="page-title">Professor Management</h1>
+                            <h1 class="page-title">Specialization Management</h1>
                             <div class="breadcrumb">
                                 <span class="breadcrumb-item">Admin</span>
-                                <v-icon icon="mdi-chevron-right" size="16" color="grey" class="breadcrumb-separator" />
-                                <span class="breadcrumb-item active">Professors</span>
+                                <v-icon icon="mdi-chevron-right" size="16" class="breadcrumb-separator" />
+                                <span class="breadcrumb-item active">Specializations</span>
                             </div>
                         </div>
                     </div>
                     <div class="stats-cards">
                         <div class="stat-card">
-                            <div class="stat-number">{{ professors.length }}</div>
-                            <div class="stat-label">Total Professors</div>
+                            <div class="stat-number">{{ specializations.length }}</div>
+                            <div class="stat-label">Total Specializations</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ activeProfessors.length }}</div>
+                            <div class="stat-number">{{ activeSpecializations.length }}</div>
                             <div class="stat-label">Active</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">{{ onLeaveProfessors.length }}</div>
-                            <div class="stat-label">On Leave</div>
+                            <div class="stat-number">{{ inactiveSpecializations.length }}</div>
+                            <div class="stat-label">Inactive</div>
                         </div>
                     </div>
                 </div>
@@ -74,9 +74,9 @@
                         </v-list>
                     </v-menu>
 
-                    <v-btn class="modern-btn add-btn" prepend-icon="mdi-plus" variant="flat" color="primary"
-                        @click="openCreateDialog" elevation="2">
-                        Add Professor
+                    <v-btn class="modern-btn add-btn" prepend-icon="mdi-plus" variant="flat"
+                        @click="openCreateDialog">
+                        Add Specialization
                     </v-btn>
                 </div>
             </div>
@@ -89,21 +89,18 @@
                 <div class="table-toolbar">
                     <div class="toolbar-left">
                         <h2 class="table-title">
-                            <v-icon icon="mdi-account-tie" size="20" class="mr-2" />
-                            Professor Information
+                            <v-icon icon="mdi-school" size="20" class="mr-2" />
+                            Specialization Information
                         </h2>
-                        <div class="table-subtitle">Manage and organize your professors</div>
+                        <div class="table-subtitle">Manage and organize academic specializations</div>
                     </div>
 
                     <div class="toolbar-right">
                         <div class="search-container">
-                            <v-text-field v-model="searchQuery" placeholder="Search professors..." prepend-inner-icon="mdi-magnify"
+                            <v-text-field v-model="searchQuery" placeholder="Search specializations..." prepend-inner-icon="mdi-magnify"
                                 variant="outlined" density="compact" hide-details class="search-input" clearable />
                         </div>
 
-                        <v-select v-model="departmentFilter" :items="departmentOptions" label="Department" variant="outlined"
-                            density="compact" hide-details class="filter-select" />
-                        
                         <v-select v-model="statusFilter" :items="statusOptions" label="Status" variant="outlined"
                             density="compact" hide-details class="filter-select" />
 
@@ -116,6 +113,11 @@
                 <v-expand-transition>
                     <div v-show="showFilters" class="filters-panel">
                         <div class="filters-content">
+                            <div class="filter-group">
+                                <label class="filter-label">Department</label>
+                                <v-select v-model="departmentFilter" :items="departmentOptions" variant="outlined" density="compact"
+                                    hide-details class="filter-select" />
+                            </div>
                             <div class="filter-group">
                                 <label class="filter-label">Sort By</label>
                                 <v-select v-model="sortOrder" :items="sortOptions" variant="outlined" density="compact"
@@ -131,22 +133,22 @@
                         <thead>
                             <tr class="modern-header-row">
                                 <th class="modern-header-cell id-column">
-                                    <div class="header-content">ID</div>
+                                    <div class="header-content">#</div>
                                 </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">Professor</div>
+                                <th class="modern-header-cell center-align">
+                                    <div class="header-content">Global ID</div>
                                 </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">Code</div>
+                                <th class="modern-header-cell center-align">
+                                    <div class="header-content">Specialization Name</div>
                                 </th>
-                                <th class="modern-header-cell">
+                                <th class="modern-header-cell center-align">
                                     <div class="header-content">Department</div>
-                                </th>
-                                <th class="modern-header-cell">
-                                    <div class="header-content">Contact</div>
                                 </th>
                                 <th class="modern-header-cell center-align">
                                     <div class="header-content">Status</div>
+                                </th>
+                                <th class="modern-header-cell center-align">
+                                    <div class="header-content">Created At</div>
                                 </th>
                                 <th class="modern-header-cell center-align">
                                     <div class="header-content">Actions</div>
@@ -154,48 +156,44 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="professor in paginatedProfessors" :key="professor.id" class="modern-table-row">
+                            <tr v-for="(specialization, index) in paginatedSpecializations" :key="specialization.id" class="modern-table-row">
                                 <td class="modern-table-cell id-column">
-                                    <div class="id-badge">{{ professor.id }}</div>
+                                    <div class="id-badge">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</div>
                                 </td>
-                                <td class="modern-table-cell">
-                                    <div class="professor-info">
-                                        <div class="professor-avatar">
-                                            <v-icon icon="mdi-account-tie" />
+                                <td class="modern-table-cell center-align">
+                                    <div class="code-badge">{{ specialization.global_id }}</div>
+                                </td>
+                                <td class="modern-table-cell center-align">
+                                    <div class="specialization-info">
+                                        <div class="specialization-details">
+                                            <div class="specialization-name">{{ specialization.name }}</div>
                                         </div>
-                                        <div class="professor-details">
-                                            <div class="professor-name">{{ professor.name }}</div>
-                                            <div class="professor-email">{{ professor.email }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="modern-table-cell">
-                                    <div class="code-badge">{{ professor.professor_code }}</div>
-                                </td>
-                                <td class="modern-table-cell">
-                                    <div class="department-info">{{ professor.department }}</div>
-                                </td>
-                                <td class="modern-table-cell">
-                                    <div class="contact-info">
-                                        <div class="phone">{{ professor.phone }}</div>
                                     </div>
                                 </td>
                                 <td class="modern-table-cell center-align">
-                                    <v-chip :color="professor.status === 'Active' ? 'success' : 'warning'" size="small"
-                                        class="status-chip">
-                                        <v-icon start size="16">mdi-check-circle</v-icon>
-                                        {{ professor.status === 'Active' ? 'active' : 'on leave' }}
+                                    <v-chip color="primary" variant="tonal" size="small" class="dept-chip">
+                                        {{ getDepartmentName(specialization.department_id) }}
                                     </v-chip>
                                 </td>
                                 <td class="modern-table-cell center-align">
+                                    <v-chip :color="specialization.active === 1 ? 'success' : 'error'" size="small"
+                                        class="status-chip">
+                                        <v-icon start size="16">{{ specialization.active === 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                                        {{ specialization.active === 1 ? 'Active' : 'Inactive' }}
+                                    </v-chip>
+                                </td>
+                                <td class="modern-table-cell center-align">
+                                    <div class="date-info">{{ formatDate(specialization.created_at) }}</div>
+                                </td>
+                                <td class="modern-table-cell center-align">
                                     <div class="action-group">
-                                        <v-btn icon class="action-btn" @click="handleView(professor)">
+                                        <v-btn icon class="action-btn" @click="handleView(specialization)">
                                             <v-icon color="#3b82f6">mdi-eye</v-icon>
                                         </v-btn>
-                                        <v-btn icon class="action-btn" @click="openEditDialog(professor)">
+                                        <v-btn icon class="action-btn" @click="openEditDialog(specialization)">
                                             <v-icon color="#fde047">mdi-pencil</v-icon>
                                         </v-btn>
-                                        <v-btn icon class="action-btn" @click="confirmDelete(professor)">
+                                        <v-btn icon class="action-btn" @click="confirmDelete(specialization)">
                                             <v-icon color="#dc2626">mdi-delete</v-icon>
                                         </v-btn>
                                     </div>
@@ -205,20 +203,20 @@
                     </v-table>
 
                     <!-- Empty State -->
-                    <div v-if="filteredProfessors.length === 0" class="empty-state">
-                        <v-icon icon="mdi-account-tie-outline" size="64" color="grey-lighten-1" />
-                        <h3 class="empty-title">No professors found</h3>
+                    <div v-if="filteredSpecializations.length === 0" class="empty-state">
+                        <v-icon icon="mdi-school-outline" size="64" color="grey-lighten-1" />
+                        <h3 class="empty-title">No specializations found</h3>
                         <p class="empty-subtitle">
-                            Create your first professor to get started with management.
+                            Create your first specialization to get started with academic program management.
                         </p>
                         <v-btn color="primary" variant="flat" @click="openCreateDialog" class="mt-4">
                             <v-icon start>mdi-plus</v-icon>
-                            Add Professor
+                            Add Specialization
                         </v-btn>
                     </div>
                     
                     <!-- Pagination Footer -->
-                    <div v-if="filteredProfessors.length > 0" class="pagination-section">
+                    <div v-if="filteredSpecializations.length > 0" class="pagination-section">
                         <v-btn 
                             variant="outlined" 
                             :disabled="currentPage === 1"
@@ -247,16 +245,16 @@
 
         <!-- View Details Dialog -->
         <v-dialog v-model="viewDialog" max-width="800" persistent>
-            <v-card class="modern-dialog" elevation="24" v-if="selectedProfessor">
+            <v-card class="modern-dialog" elevation="24" v-if="selectedSpecialization">
                 <!-- Dialog Header -->
                 <div class="dialog-header">
                     <div class="header-content">
                         <div class="header-icon">
-                            <v-icon icon="mdi-account-tie" color="primary" size="24" />
+                            <v-icon icon="mdi-school" color="primary" size="24" />
                         </div>
                         <div class="header-text">
-                            <h2 class="dialog-title">Professor Details</h2>
-                            <p class="dialog-subtitle">{{ selectedProfessor.name }} - {{ selectedProfessor.professor_code }}</p>
+                            <h2 class="dialog-title">Specialization Details</h2>
+                            <p class="dialog-subtitle">{{ selectedSpecialization.name }}</p>
                         </div>
                     </div>
                     <v-btn icon="mdi-close" variant="text" size="small" @click="viewDialog = false" class="close-btn" />
@@ -275,58 +273,62 @@
                             </div>
                             <div class="detail-grid">
                                 <div class="detail-item">
-                                    <div class="detail-label">Full Name</div>
-                                    <div class="detail-value">{{ selectedProfessor.name }}</div>
+                                    <div class="detail-label">Specialization ID</div>
+                                    <div class="detail-value">{{ selectedSpecialization.id }}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">Professor Code</div>
-                                    <div class="detail-value">{{ selectedProfessor.professor_code }}</div>
+                                    <div class="detail-label">Global ID</div>
+                                    <div class="detail-value">{{ selectedSpecialization.global_id }}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">Email Address</div>
-                                    <div class="detail-value">{{ selectedProfessor.email }}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Phone Number</div>
-                                    <div class="detail-value">{{ selectedProfessor.phone }}</div>
+                                    <div class="detail-label">Specialization Name</div>
+                                    <div class="detail-value">{{ selectedSpecialization.name }}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Department</div>
-                                    <div class="detail-value">{{ selectedProfessor.department }}</div>
+                                    <div class="detail-value">{{ getDepartmentName(selectedSpecialization.department_id) }}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Status</div>
                                     <div class="detail-value">
-                                        <v-chip :color="selectedProfessor.status === 'Active' ? 'success' : 'warning'" size="small">
-                                            {{ selectedProfessor.status }}
+                                        <v-chip :color="selectedSpecialization.active === 1 ? 'success' : 'error'" size="small">
+                                            {{ selectedSpecialization.active === 1 ? 'Active' : 'Inactive' }}
                                         </v-chip>
                                     </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Created At</div>
+                                    <div class="detail-value">{{ formatDate(selectedSpecialization.created_at) }}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Updated At</div>
+                                    <div class="detail-value">{{ formatDate(selectedSpecialization.updated_at) }}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Teaching Information -->
+                        <!-- Statistics (placeholder for future) -->
                         <div class="detail-section">
                             <div class="section-title">
-                                <v-icon icon="mdi-school" size="16" />
-                                Teaching Information
+                                <v-icon icon="mdi-chart-box" size="16" />
+                                Statistics
                             </div>
                             <div class="detail-grid">
                                 <div class="detail-item">
-                                    <div class="detail-label">Total Classes</div>
-                                    <div class="detail-value">12 classes</div>
+                                    <div class="detail-label">Total Subjects</div>
+                                    <div class="detail-value">0</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Active Subjects</div>
+                                    <div class="detail-value">0</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Total Students</div>
-                                    <div class="detail-value">245 students</div>
+                                    <div class="detail-value">0</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="detail-label">Subjects</div>
-                                    <div class="detail-value">8 subjects</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Years Teaching</div>
-                                    <div class="detail-value">5 years</div>
+                                    <div class="detail-label">Total Instructors</div>
+                                    <div class="detail-value">0</div>
                                 </div>
                             </div>
                         </div>
@@ -337,13 +339,10 @@
 
                 <!-- Dialog Actions -->
                 <v-card-actions class="dialog-actions">
+                    <v-spacer />
                     <v-btn variant="outlined" color="grey-darken-1" @click="viewDialog = false" class="action-btn">
                         <v-icon start>mdi-close</v-icon>
                         Close
-                    </v-btn>
-                    <v-btn color="primary" variant="flat" @click="openEditDialog(selectedProfessor)" class="action-btn">
-                        <v-icon start>mdi-pencil</v-icon>
-                        Edit Professor
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -356,11 +355,11 @@
                 <div class="dialog-header">
                     <div class="header-content">
                         <div class="header-icon">
-                            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" color="#fde047" size="24" />
+                            <v-icon :icon="isEdit ? 'mdi-pencil' : 'mdi-plus'" :color="isEdit ? 'warning' : 'primary'" size="24" />
                         </div>
                         <div class="header-text">
-                            <h2 class="dialog-title">{{ isEdit ? 'Edit Professor' : 'Add New Professor' }}</h2>
-                            <p class="dialog-subtitle">{{ isEdit ? 'Update professor information' : 'Create a new professor profile' }}</p>
+                            <h2 class="dialog-title">{{ isEdit ? 'Edit Specialization' : 'Add New Specialization' }}</h2>
+                            <p class="dialog-subtitle">{{ isEdit ? 'Update specialization information' : 'Create a new specialization' }}</p>
                         </div>
                     </div>
                     <v-btn icon="mdi-close" variant="text" size="small" @click="closeDialog" class="close-btn" />
@@ -372,39 +371,56 @@
                 <v-card-text class="dialog-content">
                     <v-form ref="formRef" v-model="formValid" @submit.prevent="submitForm">
                         <div class="form-group">
-                            <label class="form-label">Professor Code</label>
-                            <v-text-field v-model="formData.professor_code" :rules="codeRules" variant="outlined"
-                                density="comfortable" hide-details="auto" class="form-field" placeholder="PROF-001" />
+                            <label class="form-label">Global ID <span class="text-red">*</span></label>
+                            <v-text-field 
+                                v-model="formData.global_id" 
+                                :rules="globalIdRules" 
+                                variant="outlined"
+                                density="comfortable" 
+                                hide-details="auto" 
+                                class="form-field" 
+                                placeholder="SPEC-001"
+                                :disabled="isEdit" />
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <v-text-field v-model="formData.name" :rules="nameRules" variant="outlined"
-                                density="comfortable" hide-details="auto" class="form-field" placeholder="Dr. John Doe" />
+                            <label class="form-label">Specialization Name <span class="text-red">*</span></label>
+                            <v-text-field 
+                                v-model="formData.name" 
+                                :rules="nameRules" 
+                                variant="outlined"
+                                density="comfortable" 
+                                hide-details="auto" 
+                                class="form-field" 
+                                placeholder="Software Engineering" />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <v-text-field v-model="formData.email" :rules="emailRules" variant="outlined"
-                                density="comfortable" hide-details="auto" class="form-field" placeholder="john.doe@example.com" />
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Department</label>
-                            <v-select v-model="formData.department" :items="departmentItems" :rules="requiredRules"
-                                variant="outlined" density="comfortable" hide-details="auto" class="form-field" />
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Phone Number</label>
-                            <v-text-field v-model="formData.phone" :rules="phoneRules" variant="outlined"
-                                density="comfortable" hide-details="auto" class="form-field" placeholder="012 345 678" />
+                            <label class="form-label">Department <span class="text-red">*</span></label>
+                            <v-select 
+                                v-model="formData.department_id" 
+                                :items="departments" 
+                                :rules="departmentRules"
+                                item-title="name"
+                                item-value="id"
+                                variant="outlined" 
+                                density="comfortable" 
+                                hide-details="auto" 
+                                class="form-field"
+                                placeholder="Select department" />
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Status</label>
-                            <v-select v-model="formData.status" :items="statusItems" :rules="requiredRules"
-                                variant="outlined" density="comfortable" hide-details="auto" class="form-field" />
+                            <v-select 
+                                v-model="formData.active" 
+                                :items="statusItems" 
+                                item-title="text"
+                                item-value="value"
+                                variant="outlined" 
+                                density="comfortable" 
+                                hide-details="auto" 
+                                class="form-field" />
                         </div>
                     </v-form>
                 </v-card-text>
@@ -413,15 +429,15 @@
 
                 <!-- Dialog Actions -->
                 <v-card-actions class="dialog-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" class="action-btn cancel-btn">
+                    <v-spacer />
+                    <v-btn variant="outlined" color="grey-darken-1" @click="closeDialog" :disabled="formLoading" class="action-btn cancel-btn">
                         <v-icon start>mdi-close</v-icon>
                         Cancel
                     </v-btn>
-
-                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm"
-                        :disabled="!formValid" :loading="formLoading" class="action-btn submit-btn">
+                    <v-btn :color="isEdit ? 'warning' : 'primary'" variant="flat" @click="submitForm" 
+                        :loading="formLoading" :disabled="!formValid" class="action-btn submit-btn">
                         <v-icon start>{{ isEdit ? 'mdi-content-save' : 'mdi-plus' }}</v-icon>
-                        {{ isEdit ? 'Update Professor' : 'Add Professor' }}
+                        {{ isEdit ? 'Update Specialization' : 'Add Specialization' }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -435,7 +451,7 @@
                     <div class="delete-icon-container">
                         <v-icon icon="mdi-delete-alert" color="error" size="48" />
                     </div>
-                    <h2 class="delete-title">Delete Professor</h2>
+                    <h2 class="delete-title">Delete Specialization</h2>
                     <p class="delete-subtitle">This action cannot be undone</p>
                 </div>
 
@@ -447,8 +463,8 @@
                         <v-icon icon="mdi-alert-circle" color="warning" class="warning-icon" />
                         <div class="warning-text">
                             <p class="warning-message">
-                                You are about to permanently delete the professor
-                                <strong class="professor-name">{{ selectedProfessor?.name }}</strong>
+                                You are about to permanently delete the specialization
+                                <strong class="specialization-name">{{ selectedSpecialization?.name }}</strong>
                             </p>
                         </div>
                     </div>
@@ -458,7 +474,8 @@
 
                 <!-- Delete Actions -->
                 <v-card-actions class="delete-actions">
-                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false"
+                    <v-spacer />
+                    <v-btn variant="outlined" color="grey-darken-1" @click="deleteDialog = false" :disabled="deleteLoading"
                         class="action-btn cancel-btn">
                         <v-icon start>mdi-cancel</v-icon>
                         Cancel
@@ -467,217 +484,92 @@
                     <v-btn color="error" variant="flat" @click="handleDelete" :loading="deleteLoading"
                         class="action-btn delete-btn">
                         <v-icon start>mdi-delete</v-icon>
-                        Delete Professor
+                        Delete Specialization
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!-- Snackbar for notifications -->
+        <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="3000" location="top right">
+            {{ snackbarMessage }}
+        </v-snackbar>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
 definePageMeta({
-    layout: "admin",
-});
+    middleware: ['auth'],
+    layout: 'admin'
+})
 
-const router = useRouter();
+// Mock departments data
+const departments = ref([
+    { id: 1, name: "Computer Science" },
+    { id: 2, name: "Information Technology" },
+    { id: 3, name: "Business Administration" },
+    { id: 4, name: "Engineering" },
+    { id: 5, name: "Arts and Sciences" }
+])
 
-const professors = ref([
+// Mock data - this will be replaced with API calls
+const specializations = ref([
     {
         id: 1,
-        professor_code: "PROF-001",
-        name: "Dr. John Doe",
-        email: "john.doe@example.com",
-        department: "Computer Science",
-        phone: "012 345 678",
-        status: "Active",
+        global_id: "SPEC-001",
+        name: "Software Engineering",
+        department_id: 1,
+        active: 1,
+        created_at: "2024-01-15T10:00:00",
+        updated_at: "2024-01-15T10:00:00"
     },
     {
         id: 2,
-        professor_code: "PROF-002",
-        name: "Dr. Jane Smith",
-        email: "jane.smith@example.com",
-        department: "Information Technology",
-        phone: "098 765 432",
-        status: "On Leave",
+        global_id: "SPEC-002",
+        name: "Data Science",
+        department_id: 1,
+        active: 1,
+        created_at: "2024-01-15T10:30:00",
+        updated_at: "2024-01-15T10:30:00"
     },
     {
         id: 3,
-        professor_code: "PROF-003",
-        name: "Dr. Michael Chan",
-        email: "michael.chan@example.com",
-        department: "Mathematics",
-        phone: "010 234 567",
-        status: "Active",
+        global_id: "SPEC-003",
+        name: "Cybersecurity",
+        department_id: 1,
+        active: 1,
+        created_at: "2024-01-15T11:00:00",
+        updated_at: "2024-01-15T11:00:00"
     },
     {
         id: 4,
-        professor_code: "PROF-004",
-        name: "Dr. Laura Kim",
-        email: "laura.kim@example.com",
-        department: "Physics",
-        phone: "099 556 761",
-        status: "Active",
+        global_id: "SPEC-004",
+        name: "Network Administration",
+        department_id: 2,
+        active: 1,
+        created_at: "2024-01-15T11:30:00",
+        updated_at: "2024-01-15T11:30:00"
     },
     {
         id: 5,
-        professor_code: "PROF-005",
-        name: "Dr. Robert Lee",
-        email: "robert.lee@example.com",
-        department: "Chemistry",
-        phone: "093 827 364",
-        status: "On Leave",
-    },
-    {
-        id: 6,
-        professor_code: "PROF-006",
-        name: "Dr. Angela Rivera",
-        email: "angela.rivera@example.com",
-        department: "Business Administration",
-        phone: "087 444 222",
-        status: "Active",
-    },
-    {
-        id: 7,
-        professor_code: "PROF-007",
-        name: "Dr. Samuel Park",
-        email: "samuel.park@example.com",
-        department: "Information Technology",
-        phone: "088 221 113",
-        status: "Active",
-    },
-    {
-        id: 8,
-        professor_code: "PROF-008",
-        name: "Dr. Emily Watson",
-        email: "emily.watson@example.com",
-        department: "Nursing",
-        phone: "016 558 209",
-        status: "On Leave",
-    },
-    {
-        id: 9,
-        professor_code: "PROF-009",
-        name: "Dr. Kevin Brown",
-        email: "kevin.brown@example.com",
-        department: "Engineering",
-        phone: "067 322 111",
-        status: "Active",
-    },
-    {
-        id: 10,
-        professor_code: "PROF-010",
-        name: "Dr. Susan Hart",
-        email: "susan.hart@example.com",
-        department: "Architecture",
-        phone: "077 990 443",
-        status: "Active",
-    },
-    {
-        id: 11,
-        professor_code: "PROF-011",
-        name: "Dr. Patrick Wilson",
-        email: "patrick.wilson@example.com",
-        department: "Computer Science",
-        phone: "015 789 345",
-        status: "On Leave",
-    },
-    {
-        id: 12,
-        professor_code: "PROF-012",
-        name: "Dr. Harriet Moore",
-        email: "harriet.moore@example.com",
-        department: "Pharmacy",
-        phone: "061 233 890",
-        status: "Active",
-    },
-    {
-        id: 13,
-        professor_code: "PROF-013",
-        name: "Dr. Anthony Scott",
-        email: "anthony.scott@example.com",
-        department: "Literature",
-        phone: "099 887 001",
-        status: "Active",
-    },
-    {
-        id: 14,
-        professor_code: "PROF-014",
-        name: "Dr. Kimberly Adams",
-        email: "kimberly.adams@example.com",
-        department: "Human Resources",
-        phone: "097 224 669",
-        status: "On Leave",
-    },
-    {
-        id: 15,
-        professor_code: "PROF-015",
-        name: "Dr. Victor Nguyen",
-        email: "victor.nguyen@example.com",
-        department: "Management",
-        phone: "092 556 710",
-        status: "Active",
-    },
-    {
-        id: 16,
-        professor_code: "PROF-016",
-        name: "Dr. Sophia Turner",
-        email: "sophia.turner@example.com",
-        department: "Marketing",
-        phone: "089 773 442",
-        status: "Active",
-    },
-    {
-        id: 17,
-        professor_code: "PROF-017",
-        name: "Dr. Daniel Cooper",
-        email: "daniel.cooper@example.com",
-        department: "Education",
-        phone: "090 123 776",
-        status: "On Leave",
-    },
-    {
-        id: 18,
-        professor_code: "PROF-018",
-        name: "Dr. Maria Lopez",
-        email: "maria.lopez@example.com",
-        department: "Psychology",
-        phone: "096 889 441",
-        status: "Active",
-    },
-    {
-        id: 19,
-        professor_code: "PROF-019",
-        name: "Dr. Felix Grant",
-        email: "felix.grant@example.com",
-        department: "Sociology",
-        phone: "086 112 908",
-        status: "Active",
-    },
-    {
-        id: 20,
-        professor_code: "PROF-020",
-        name: "Dr. Jasmine Patel",
-        email: "jasmine.patel@example.com",
-        department: "Biology",
-        phone: "085 443 229",
-        status: "On Leave",
+        global_id: "SPEC-005",
+        name: "Web Development",
+        department_id: 2,
+        active: 0,
+        created_at: "2024-01-15T12:00:00",
+        updated_at: "2024-01-15T12:00:00"
     },
 ]);
 
 // Reactive data
 const searchQuery = ref('')
-const departmentFilter = ref('All')
 const statusFilter = ref('All')
+const departmentFilter = ref('All')
 const sortOrder = ref('A-Z')
 const dialogOpen = ref(false)
 const viewDialog = ref(false)
 const deleteDialog = ref(false)
-// explicitly type selectedProfessor as a nullable object to satisfy TypeScript
-const selectedProfessor = ref<Record<string, any> | null>(null)
+const selectedSpecialization = ref<Record<string, any> | null>(null)
 const isEdit = ref(false)
 const formValid = ref(false)
 const formRef = ref(null)
@@ -687,263 +579,284 @@ const showFilters = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
+// Snackbar
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+const snackbarColor = ref('success')
+
 // Form data
 const formData = reactive({
-    professor_code: '',
+    global_id: '',
     name: '',
-    email: '',
-    department: '',
-    phone: '',
-    status: 'Active'
+    department_id: null as number | null,
+    active: 1
 })
 
 // Computed properties
-const activeProfessors = computed(() => professors.value.filter(p => p.status === 'Active'))
-const onLeaveProfessors = computed(() => professors.value.filter(p => p.status === 'On Leave'))
+const activeSpecializations = computed(() => specializations.value.filter(s => s.active === 1))
+const inactiveSpecializations = computed(() => specializations.value.filter(s => s.active === 0))
 
-const filteredProfessors = computed(() => {
-    let filtered = [...professors.value]
-
+const filteredSpecializations = computed(() => {
+    let result = [...specializations.value]
+    
     // Search filter
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(professor =>
-            professor.name.toLowerCase().includes(query) ||
-            professor.email.toLowerCase().includes(query) ||
-            professor.professor_code.toLowerCase().includes(query) ||
-            professor.department.toLowerCase().includes(query)
+        result = result.filter(s => 
+            s.name.toLowerCase().includes(query) ||
+            s.global_id.toLowerCase().includes(query) ||
+            getDepartmentName(s.department_id).toLowerCase().includes(query)
         )
+    }
+    
+    // Status filter
+    if (statusFilter.value !== 'All') {
+        const isActive = statusFilter.value === 'Active' ? 1 : 0
+        result = result.filter(s => s.active === isActive)
     }
 
     // Department filter
     if (departmentFilter.value !== 'All') {
-        filtered = filtered.filter(professor => professor.department === departmentFilter.value)
+        const deptName = departmentFilter.value
+        result = result.filter(s => getDepartmentName(s.department_id) === deptName)
     }
-
-    // Status filter
-    if (statusFilter.value !== 'All') {
-        filtered = filtered.filter(professor => professor.status === statusFilter.value)
-    }
-
+    
     // Sort
-    filtered.sort((a, b) => {
-        switch (sortOrder.value) {
-            case 'A-Z':
-                return a.name.localeCompare(b.name)
-            case 'Z-A':
-                return b.name.localeCompare(a.name)
-            case 'Department':
-                return a.department.localeCompare(b.department)
-            default:
-                return 0
-        }
-    })
-
-    return filtered
+    if (sortOrder.value === 'A-Z') {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortOrder.value === 'Z-A') {
+        result.sort((a, b) => b.name.localeCompare(a.name))
+    } else if (sortOrder.value === 'Newest') {
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    } else if (sortOrder.value === 'Oldest') {
+        result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    }
+    
+    return result
 })
 
-// Pagination computed properties
-const totalPages = computed(() => Math.ceil(filteredProfessors.value.length / itemsPerPage.value))
+const totalPages = computed(() => Math.ceil(filteredSpecializations.value.length / itemsPerPage.value))
 
-const paginatedProfessors = computed(() => {
+const paginatedSpecializations = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value
     const end = start + itemsPerPage.value
-    return filteredProfessors.value.slice(start, end)
+    return filteredSpecializations.value.slice(start, end)
 })
 
 // Options
-const departmentOptions = ['All', 'Computer Science', 'Information Technology', 'Mathematics', 'Physics', 'Chemistry', 'Business Administration', 'Nursing', 'Engineering', 'Architecture', 'Pharmacy', 'Literature', 'Human Resources', 'Management', 'Marketing', 'Education', 'Psychology', 'Sociology', 'Biology']
-const statusOptions = ['All', 'Active', 'On Leave']
-const sortOptions = ['A-Z', 'Z-A', 'Department']
-
-const departmentItems = ['Computer Science', 'Information Technology', 'Mathematics', 'Physics', 'Chemistry', 'Business Administration', 'Nursing', 'Engineering', 'Architecture', 'Pharmacy', 'Literature', 'Human Resources', 'Management', 'Marketing', 'Education', 'Psychology', 'Sociology', 'Biology']
-const statusItems = ['Active', 'On Leave']
+const statusOptions = ['All', 'Active', 'Inactive']
+const departmentOptions = computed(() => ['All', ...departments.value.map(d => d.name)])
+const sortOptions = ['A-Z', 'Z-A', 'Newest', 'Oldest']
+const statusItems = [
+    { text: 'Active', value: 1 },
+    { text: 'Inactive', value: 0 }
+]
 
 // Validation rules
-const requiredRules = [(v: any) => !!v || 'Field is required']
-const codeRules = [
-    (v: any) => !!v || 'Professor code is required',
-    (v: any) => /^PROF-\d{3}$/.test(v) || 'Professor code must be in format: PROF-001'
+const globalIdRules = [
+    (v: string) => !!v || 'Global ID is required',
+    (v: string) => /^SPEC-\d{3}$/.test(v) || 'Global ID must be in format: SPEC-001'
 ]
+
 const nameRules = [
-    (v: any) => !!v || 'Name is required',
-    (v: any) => v.length >= 3 || 'Name must be at least 3 characters'
-]
-const emailRules = [
-    (v: any) => !!v || 'Email is required',
-    (v: any) => /.+@.+\..+/.test(v) || 'Email must be valid'
-]
-const phoneRules = [
-    (v: any) => !!v || 'Phone is required',
-    (v: any) => /^\d{3} \d{3} \d{3}$/.test(v) || 'Phone must be in format: 012 345 678'
+    (v: string) => !!v || 'Specialization name is required',
+    (v: string) => v.length >= 3 || 'Specialization name must be at least 3 characters',
+    (v: string) => v.length <= 100 || 'Specialization name must not exceed 100 characters'
 ]
 
-const permissions = reactive({
-    add: true,
-    edit: true,
-    delete: true,
-    list: true,
-});
+const departmentRules = [
+    (v: any) => !!v || 'Department is required'
+]
 
-// Dialog methods
+// Methods
+const getDepartmentName = (departmentId: number) => {
+    const dept = departments.value.find(d => d.id === departmentId)
+    return dept ? dept.name : 'Unknown'
+}
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    })
+}
+
 const openCreateDialog = () => {
-    selectedProfessor.value = null
     isEdit.value = false
-    resetForm()
+    formData.global_id = generateNextGlobalId()
+    formData.name = ''
+    formData.department_id = null
+    formData.active = 1
     dialogOpen.value = true
 }
 
-const openEditDialog = (professor: any) => {
-    viewDialog.value = false // Close view dialog if open
-    selectedProfessor.value = professor
+const openEditDialog = (specialization: any) => {
     isEdit.value = true
-    // Populate form data
-    formData.professor_code = professor.professor_code
-    formData.name = professor.name
-    formData.email = professor.email
-    formData.department = professor.department
-    formData.phone = professor.phone
-    formData.status = professor.status
+    selectedSpecialization.value = specialization
+    Object.assign(formData, {
+        global_id: specialization.global_id,
+        name: specialization.name,
+        department_id: specialization.department_id,
+        active: specialization.active
+    })
     dialogOpen.value = true
+    viewDialog.value = false
 }
 
 const closeDialog = () => {
     dialogOpen.value = false
-    selectedProfessor.value = null
     isEdit.value = false
-    resetForm()
-}
-
-const resetForm = () => {
-    formData.professor_code = ''
+    formData.global_id = ''
     formData.name = ''
-    formData.email = ''
-    formData.department = ''
-    formData.phone = ''
-    formData.status = 'Active'
+    formData.department_id = null
+    formData.active = 1
+    selectedSpecialization.value = null
     if (formRef.value) {
-        (formRef.value as any).resetValidation()
+        (formRef.value as any).reset()
     }
 }
 
-// Form submission
 const submitForm = async () => {
     if (!formValid.value) return
-
+    
     formLoading.value = true
-
+    
     try {
-        // Simulate API call delay
+        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000))
-
-        if (isEdit.value && selectedProfessor.value) {
-            // Update existing professor
-            const index = professors.value.findIndex(p => p.id === selectedProfessor.value!.id)
-            // ensure the item exists at that index before accessing it
-            const existingProfessor = professors.value[index]
-            if (index !== -1 && existingProfessor) {
-                professors.value[index] = {
-                    id: existingProfessor.id,
-                    professor_code: formData.professor_code,
+        
+        if (isEdit.value && selectedSpecialization.value) {
+            // Update existing specialization
+            const index = specializations.value.findIndex(s => s.id === selectedSpecialization.value!.id)
+            if (index !== -1) {
+                const existingSpec = specializations.value[index]!
+                specializations.value[index] = {
+                    id: existingSpec.id,
+                    global_id: existingSpec.global_id,
                     name: formData.name,
-                    email: formData.email,
-                    department: formData.department,
-                    phone: formData.phone,
-                    status: formData.status
+                    department_id: formData.department_id!,
+                    active: formData.active,
+                    created_at: existingSpec.created_at,
+                    updated_at: new Date().toISOString()
                 }
             }
+            showSnackbar('Specialization updated successfully!', 'success')
         } else {
-            // Create new professor
-            const newProfessor = {
-                id: Math.max(...professors.value.map(p => p.id)) + 1,
-                professor_code: formData.professor_code,
+            // Create new specialization
+            const newSpecialization = {
+                id: specializations.value.length + 1,
+                global_id: formData.global_id,
                 name: formData.name,
-                email: formData.email,
-                department: formData.department,
-                phone: formData.phone,
-                status: formData.status
+                department_id: formData.department_id!,
+                active: formData.active,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             }
-            professors.value.push(newProfessor)
+            specializations.value.push(newSpecialization)
+            showSnackbar('Specialization created successfully!', 'success')
         }
-
+        
         closeDialog()
     } catch (error) {
-        console.error('Error submitting form:', error)
+        showSnackbar('An error occurred. Please try again.', 'error')
     } finally {
         formLoading.value = false
     }
 }
 
-// CRUD operations
-const confirmDelete = (professor: any) => {
-    selectedProfessor.value = professor
+const handleView = (specialization: any) => {
+    selectedSpecialization.value = specialization
+    viewDialog.value = true
+}
+
+const confirmDelete = (specialization: any) => {
+    selectedSpecialization.value = specialization
     deleteDialog.value = true
 }
 
-const handleEdit = (id: number | string) => {
-    const professor = professors.value.find(p => p.id === id)
-    if (professor) {
-        openEditDialog(professor)
-    }
-}
-
 const handleDelete = async () => {
-    if (!selectedProfessor.value) return
-
+    if (!selectedSpecialization.value) return
+    
     deleteLoading.value = true
-
+    
     try {
-        // Simulate API call delay
+        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000))
-
-        professors.value = professors.value.filter((p) => p.id !== selectedProfessor.value!.id)
+        
+        const index = specializations.value.findIndex(s => s.id === selectedSpecialization.value!.id)
+        if (index !== -1) {
+            specializations.value.splice(index, 1)
+        }
+        
+        showSnackbar('Specialization deleted successfully!', 'success')
         deleteDialog.value = false
-        selectedProfessor.value = null
+        selectedSpecialization.value = null
     } catch (error) {
-        console.error('Error deleting professor:', error)
+        showSnackbar('An error occurred. Please try again.', 'error')
     } finally {
         deleteLoading.value = false
     }
 }
 
-const handleView = (prof: any) => {
-    selectedProfessor.value = prof
-    viewDialog.value = true
-}
-
-// Export/Import functions
 const handleExportExcel = () => {
+    showSnackbar('Exporting to Excel...', 'info')
     // Implementation for Excel export
-    console.log('Exporting professors to Excel...')
 }
 
 const handleExportPDF = () => {
+    showSnackbar('Exporting to PDF...', 'info')
     // Implementation for PDF export
-    console.log('Exporting professors to PDF...')
 }
 
 const handleImportCSV = () => {
+    showSnackbar('Import CSV functionality coming soon...', 'info')
     // Implementation for CSV import
-    console.log('Importing professors from CSV...')
 }
 
-// Pagination methods
+const generateNextGlobalId = () => {
+    if (specializations.value.length === 0) return 'SPEC-001'
+    
+    const ids = specializations.value
+        .map(s => {
+            const parts = s.global_id.split('-')
+            return parseInt(parts[1] || '0')
+        })
+        .filter(id => !isNaN(id))
+        .sort((a, b) => b - a)
+    
+    const lastId = ids.length > 0 ? ids[0] : 0
+    const nextNum = ((lastId ?? 0) + 1).toString().padStart(3, '0')
+    return `SPEC-${nextNum}`
+}
+
 const goToPrevPage = () => {
-    if (currentPage.value > 1) currentPage.value--
+    if (currentPage.value > 1) {
+        currentPage.value--
+    }
 }
 
 const goToNextPage = () => {
-    if (currentPage.value < totalPages.value) currentPage.value++
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++
+    }
 }
 
-// Watch for filter changes and reset pagination
-watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
+const showSnackbar = (message: string, color: string) => {
+    snackbarMessage.value = message
+    snackbarColor.value = color
+    snackbar.value = true
+}
+
+// Watch for search/filter changes to reset pagination
+watch([searchQuery, statusFilter, departmentFilter, sortOrder], () => {
     currentPage.value = 1
 })
 </script>
 
 <style scoped>
-.professors-page {
+.specializations-page {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     min-height: 100vh;
     padding: 0;
@@ -1210,30 +1123,26 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
     width: 100%;
 }
 
+.modern-header-row {
+    background: #f9fafb;
+}
+
 .modern-header-cell {
-    padding: 20px 16px;
-    border: none;
-    position: relative;
-    text-align: left !important;
-}
-
-.modern-header-cell.center-align {
-    text-align: center !important;
-}
-
-.modern-header-cell.id-column {
-    width: 80px;
-    text-align: left !important;
+    padding: 20px 16px !important;
+    font-weight: 600 !important;
+    color: #45474b !important;
+    text-transform: uppercase !important;
+    font-size: 13px !important;
+    letter-spacing: 0.05em !important;
+    border: none !important;
+    border-bottom: 1px solid #f1f5f9 !important;
 }
 
 .header-content {
     display: flex;
     align-items: center;
-    color: #45474b !important;
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    justify-content: center;
+    gap: 8px;
     margin-left: 4px;
 }
 
@@ -1248,19 +1157,19 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
 }
 
 .modern-table-cell {
-    padding: 16px;
-    border: none;
+    padding: 16px !important;
+    color: #1e293b;
+    font-size: 14px;
+    border: none !important;
     vertical-align: middle;
-    text-align: left !important;
 }
 
-.modern-table-cell.center-align {
-    text-align: center !important;
-}
-
-.modern-table-cell.id-column {
+.id-column {
     width: 80px;
-    text-align: left !important;
+}
+
+.center-align {
+    text-align: center !important;
 }
 
 .id-badge {
@@ -1271,79 +1180,60 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
     height: 32px;
     background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
     color: #3730a3;
+    border-radius: 8px;
     font-weight: 600;
     font-size: 12px;
-    border-radius: 8px;
 }
 
-.professor-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.professor-avatar {
+.specialization-info {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    color: #1d4ed8;
-    border-radius: 10px;
+    gap: 12px;
 }
 
-.professor-details {
+.specialization-details {
     flex: 1;
 }
 
-.professor-name {
-    font-weight: 500;
-    color: #1e293b;
-    font-size: 14px;
-    line-height: 1.2;
-}
-
-.professor-email {
-    font-size: 12px;
-    color: #64748b;
-    margin-top: 2px;
+.specialization-name {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 15px;
 }
 
 .code-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     padding: 6px 12px;
     background: #f1f5f9;
     color: #1e293b;
+    border-radius: 8px;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-radius: 8px;
+    font-family: 'Courier New', monospace;
 }
 
-.department-info {
-    font-weight: 500;
+.dept-chip {
+    font-weight: 500 !important;
+    text-transform: capitalize !important;
+    border-radius: 16px !important;
+    padding: 0 12px !important;
+    height: 28px !important;
+}
+
+.date-info {
     color: #1e293b;
     font-size: 14px;
-}
-
-.contact-info {
-    text-align: left;
-}
-
-.phone {
     font-weight: 500;
-    color: #1e293b;
-    font-size: 14px;
-    line-height: 1.2;
 }
 
-/* Status Chip Styles */
 .status-chip {
     font-weight: 500 !important;
-    text-transform: lowercase !important;
+    text-transform: capitalize !important;
     border-radius: 16px !important;
     padding: 0 12px !important;
     height: 28px !important;
@@ -1488,58 +1378,6 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
     padding: 24px !important;
 }
 
-.class-details {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.detail-section {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.section-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0 0 16px 0;
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.detail-item.full-width {
-    grid-column: 1 / -1;
-}
-
-.detail-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.detail-value {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1e293b;
-}
-
 .form-group {
     margin-bottom: 20px;
 }
@@ -1557,6 +1395,7 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
 }
 
 .form-field {
+    width: 100%;
     margin-bottom: 0 !important;
 }
 
@@ -1602,6 +1441,55 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
 .submit-btn:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transform: translateY(-1px);
+}
+
+/* Detail View Styles */
+.class-details {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.detail-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 16px 0;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
 }
 
 /* Delete Dialog Styles */
@@ -1670,7 +1558,7 @@ watch([searchQuery, departmentFilter, statusFilter, sortOrder], () => {
     line-height: 1.4;
 }
 
-.professor-name {
+.specialization-name {
     color: black;
     font-weight: 600;
 }
