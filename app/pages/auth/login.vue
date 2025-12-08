@@ -2,7 +2,7 @@
   <div class="login-container">
     <v-container fluid class="fill-height pa-0">
       <v-row no-gutters class="fill-height">
-        <!-- Left side - Branding/Image -->
+        <!-- Left Side Image -->
         <v-col cols="12" md="6" class="login-brand-section">
           <div class="brand-content">
             <img
@@ -13,7 +13,7 @@
           </div>
         </v-col>
 
-        <!-- Right side - Login Form -->
+        <!-- Right Side Form -->
         <v-col cols="12" md="6" class="login-form-section">
           <div class="form-container d-flex flex-column justify-center align-center pa-8">
             <v-card class="login-card pa-8" elevation="0" width="100%" max-width="400">
@@ -27,7 +27,7 @@
               </div>
 
               <v-form ref="loginForm" @submit.prevent="handleLogin">
-                <!-- Email Field -->
+                <!-- Email -->
                 <v-text-field
                   v-model="loginData.email"
                   label="Email Address"
@@ -40,7 +40,7 @@
                   required
                 />
 
-                <!-- Password Field -->
+                <!-- Password -->
                 <v-text-field
                   v-model="loginData.password"
                   label="Password"
@@ -55,7 +55,7 @@
                   required
                 />
 
-                <!-- Remember Me & Forgot Password -->
+                <!-- Remember + Forgot -->
                 <div class="d-flex justify-space-between align-center mb-6">
                   <v-checkbox
                     v-model="loginData.rememberMe"
@@ -117,103 +117,71 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from "vue"
+import { ref, reactive, computed } from "vue"
+import { useAuthStore } from "~/stores/auth"
 
-// Page meta
-useHead({
-  title: "Login - University Attendance System",
-  meta: [{ name: "description", content: "Admin login for UAS System" }],
-})
+// Disable layout
+definePageMeta({ layout: false })
 
-definePageMeta({
-  layout: false,
-})
+const auth = useAuthStore()
 
-// Get runtime config
-const config = useRuntimeConfig()
-const apiEndpoint = computed(() => `${config.public.apiBase}/admin/login`)
-const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
-
-// Use auth composable
-const { login: authLogin } = useAuth()
-
-// Form data
+// Form state
 const loginData = reactive({
   email: "",
   password: "",
   rememberMe: true,
-  // loginType will be auto-detected from response role
 })
-
 const showPassword = ref(false)
 const isLoading = ref(false)
 const loginError = ref("")
 const loginForm = ref<any>(null)
 
-// Validation rules
+const currentYear = computed(() => new Date().getFullYear())
+
+// Validation
 const emailRules = [
   (v: string) => !!v || "Email is required",
   (v: string) => /.+@.+\..+/.test(v) || "Please enter a valid email",
 ]
-
 const passwordRules = [
   (v: string) => !!v || "Password is required",
   (v: string) => v.length >= 6 || "Password must be at least 6 characters",
 ]
 
-const currentYear = computed(() => new Date().getFullYear())
-
-// Main Login Function
+// Login function
 const handleLogin = async () => {
-  console.clear()
-  
   const { valid } = await loginForm.value?.validate()
-  if (!valid) {
-    console.warn('⚠️ Form validation failed')
-    return
-  }
+  if (!valid) return
 
-  isLoading.value = true
   loginError.value = ""
+  isLoading.value = true
 
   try {
-    console.log('🔐 Initiating login process...')
-    console.log('📧 Email:', loginData.email)
-    console.log('💾 Remember me:', loginData.rememberMe)
-    
-    await authLogin(loginData)
-    console.log('✅ Login and redirect successful!')
-  } catch (error: any) {
-    console.error('❌ Login error:', error)
+    const res = await auth.login({
+      email: loginData.email,
+      password: loginData.password,
+    })
 
-    if (error.data?.message) {
-      loginError.value = error.data.message
-    } else if (error.message) {
-      loginError.value = error.message
-    } else {
-      loginError.value = "Invalid email or password. Please try again."
+    if (!res.success) {
+      loginError.value = auth.error || "Invalid email or password"
+      return
     }
 
-    console.error('Error displayed to user:', loginError.value)
+    // Redirect based on role
+    const redirectMap: Record<string, string> = {
+      admin: "/admin/dashboard",
+      superadmin: "/admin/dashboard",
+      lecturer: "/lecturer/dashboard",
+      student: "/student/dashboard",
+    }
+
+    return navigateTo(redirectMap[res.role || "student"])
+  } catch (err: any) {
+    loginError.value = err?.message || "Login failed. Please try again."
   } finally {
     isLoading.value = false
   }
 }
-
-// Clear error when typing
-watch([() => loginData.email, () => loginData.password], () => {
-  loginError.value = ""
-})
-
-// Log on mount
-onMounted(() => {
-  console.group('📱 Login Page Mounted')
-  console.log('API Base URL:', config.public.apiBase)
-  console.log('API Timeout:', config.public.apiTimeout, 'ms')
-  console.log('Environment:', isDevelopment.value ? 'Development' : 'Production')
-  console.log('⏰ Ready for login at:', new Date().toLocaleTimeString())
-  console.groupEnd()
-})
 </script>
 
 <style scoped>

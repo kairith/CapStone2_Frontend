@@ -267,7 +267,7 @@
 <script setup>
 definePageMeta({
     layout: 'admin',
-    // middleware: ['auth', 'role-admin'] // Commented out for testing
+    middleware: ['auth']
 })
 
 // Search and filters

@@ -1,13 +1,13 @@
-<!-- components/ui/AppHeader.vue -->
 <template>
   <VAppBar app flat height="64" class="header-custom">
     <div class="header-left">
       <VBtn icon variant="text" class="menu-btn" @click="$emit('toggle-drawer')">
         <VIcon icon="mdi-menu" />
       </VBtn>
-      <!-- <span class="brand-title">Admin Panel</span> -->
     </div>
+
     <div class="header-spacer" style="flex:1"></div>
+
     <div class="header-right">
       <VBtn icon variant="text" class="notif-btn header-icon">
         <VIcon icon="mdi-bell-outline" />
@@ -16,6 +16,7 @@
         <VIcon icon="mdi-earth" class="earth-btn"/>
         <VIcon icon="mdi-chevron-down" size="16" />
       </VBtn>
+
       <VMenu offset-y min-width="280">
         <template #activator="{ props }">
           <VBtn v-bind="props" class="user-btn header-icon">
@@ -26,8 +27,8 @@
             <VIcon icon="mdi-chevron-down" size="16" />
           </VBtn>
         </template>
+
         <VCard class="user-dropdown" elevation="8">
-          <!-- User Info Header -->
           <div class="user-info-header">
             <VAvatar color="primary" size="48" class="user-avatar">
               <span class="text-white avatar-text">A</span>
@@ -38,7 +39,7 @@
             </div>
           </div>
           <VDivider />
-          <!-- Menu Items -->
+
           <VList class="user-menu" nav density="compact">
             <VListItem @click="$router.push('/profile')" class="menu-item">
               <template #prepend>
@@ -47,7 +48,9 @@
               <VListItemTitle>View profile</VListItemTitle>
             </VListItem>
             <VDivider class="my-1" />
-            <VListItem class="menu-item sign-out">
+
+            <!-- Sign Out -->
+            <VListItem @click="onSignOut" class="menu-item sign-out">
               <template #prepend>
                 <VIcon color="error" size="20">mdi-logout</VIcon>
               </template>
@@ -60,9 +63,24 @@
   </VAppBar>
 </template>
 
-
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
+
 defineEmits(['toggle-drawer'])
+
+const auth = useAuthStore()
+const router = useRouter()
+
+// Use a wrapper function to ensure reactivity
+const onSignOut = async () => {
+  try {
+    await auth.logout()
+    router.push('/auth/login') 
+  } catch (err) {
+    console.error('Logout failed:', err)
+  }
+}
 </script>
 
 
